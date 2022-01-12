@@ -1,0 +1,6 @@
+.header-main {
+  font-size: var(--l2-fs);
+  color: var(--black);
+  margin: auto;
+  text-align: center;
+}

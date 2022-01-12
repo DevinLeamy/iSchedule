@@ -1,0 +1,25 @@
+.input-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: auto;
+}
+
+.input-container input {
+  font-size: var(--l3-fs);
+}
+
+.next-page-btn-container {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  position: absolute;
+  bottom: 10px;
+}
+
+.calendar-container {
+  background-color: orange;
+  width: 100%;
+  height: 400px;
+}

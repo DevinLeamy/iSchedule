@@ -1,0 +1,13 @@
+.content-pane {
+  margin: 20px auto;
+  /* width: 100%; */
+  /* max-width: 1000px; */
+  width: 1000px;
+  /* height: 100%; */
+  height: fit-content;
+  border-radius: 10px;
+  box-shadow: 0 0 20px 8px #d0d0d0;
+  background-color: var(--white);
+  box-sizing: border-box;
+  padding: 30px;
+}
