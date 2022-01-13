@@ -39,7 +39,9 @@ const PageOne: React.FC = () => {
           />  */}
         </Box>
         <div className='calendar-container'>
-          <Calendar />
+          <Calendar 
+            days={7}
+          />
         </div>
         <div>
           Selected date

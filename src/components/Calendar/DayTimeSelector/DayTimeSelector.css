@@ -11,6 +11,10 @@
   width: 100%;
   height: var(--top-bar-sz);
   text-align: center;
+  display: flex;
+  font-size: var(--l3-fs);
+  flex-direction: column;
+  justify-content: center;
 
   box-sizing: border-box;
   border: var(--calendar-border);

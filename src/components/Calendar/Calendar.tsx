@@ -1,38 +1,76 @@
-import React from "react";
+import React, { useState } from "react";
 import DayTimeSelector from "./DayTimeSelector/DayTimeSelector";
+import { Date, DateTimeRange } from "../../types/types";
+import { getDate, getNextDate, formatDate } from "../../utilities/dates";
 import "./Calendar.css"
 
 type CalendarProps = {
-  weekView?: boolean
+  weekView?: boolean,
+  days: number
 };
 
+
+
 const Calendar: React.FC<CalendarProps> = (props) => {
+  const [weekStart, setWeekStart] = useState<Date>(getDate());
+  const [dateTimeRanges, setDateTimeRanges] = useState<DateTimeRange[][]>(
+    [...Array(props.days)].map(_ => [])
+  );
+
+  const onUpdateDateTimeRanges = (dayIndex: number, newDateTimeRanges: DateTimeRange[]) => {
+    let updatedDateTimeRanges: DateTimeRange[][] = [...dateTimeRanges];
+
+    updatedDateTimeRanges[dayIndex] = newDateTimeRanges;
+    setDateTimeRanges(updatedDateTimeRanges);
+  };
+  
 
   return (
     <div className="calendar-main">
       <div className="calendar-topbar">
-        <div className="change-week-btn change-week-left">
+        <div 
+          className="change-week-btn change-week-left"
+          onClick={() => {
+            let newWeekStart: Date = getNextDate(weekStart, -props.days);
+            setWeekStart(newWeekStart);
+          }}
+        >
           {"<"}
         </div>
         <div className="week-header">
-          July 8th - 14th
+          {`${formatDate(weekStart, true)} 
+          - 
+          ${formatDate(getNextDate(weekStart, props.days - 1), true)}`
+          }
         </div>
-        <div className="change-week-btn change-week-right">
+        <div 
+          className="change-week-btn change-week-right"
+          onClick={() => {
+            let newWeekStart: Date = getNextDate(weekStart, props.days);
+            setWeekStart(newWeekStart);
+          }}
+        >
           {">"}
         </div>
       </div>
       <div className="dts-container">
-        <DayTimeSelector month={4} day={4} />
-        <DayTimeSelector month={4} day={4} />
-        <DayTimeSelector month={4} day={4} />
-        <DayTimeSelector month={4} day={4} />
-        <DayTimeSelector month={4} day={4} />
-        <DayTimeSelector month={4} day={4} />
-        <DayTimeSelector month={4} day={4} />
-      </div>
+        {[...Array(props.days)].map((_, i) => 
+          <DayTimeSelector 
+            key={i} 
+            onChange={(newDateTimeRanges) => {
+              onUpdateDateTimeRanges(i, newDateTimeRanges)
+            }}
+            date={getNextDate(weekStart, i)} 
+          />
+        )}
+     </div>
     </div>
   );
 }
+
+Calendar.defaultProps = {
+  days: 7
+};
 
 export default Calendar;
 

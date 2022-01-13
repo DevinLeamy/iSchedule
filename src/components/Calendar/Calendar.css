@@ -12,11 +12,14 @@
 
 .calendar-topbar {
   width: 100%;
+  height: var(--cal-top-bar-sz);
   display: flex;
   position: relative;
 
-  --button-sz: var(--cal-top-bar-sz);
+  --button-sz: calc(var(--cal-top-bar-sz) - 10px); 
+  padding: 4px;
 
+  box-sizing: border-box;
   border: var(--calendar-border);
 }
 
@@ -25,27 +28,28 @@
   box-shadow: 0 0 10px 4px #e4e4e4;
   color: var(--blue);
   font-weight: 700;
-  border-radius: 50%;
+  border-radius: 10%;
   width: var(--button-sz);
   height: var(--button-sz);
   text-align: center;
   line-height: var(--button-sz);
-  font-size: var(--l3-fs);
+  font-size: var(--l4-fs);
   user-select: none;
 }
 
 .change-week-btn:hover {
   cursor: pointer;
+  background-color: var(--off-white);
 }
 
 .change-week-left {
   position: absolute;
-  left: -25px;
+  left: 5px;
 }
 
 .change-week-right {
   position: absolute;
-  right: -25px;
+  right: 5px;
 }
 
 .week-header {
@@ -56,7 +60,10 @@
 }
 
 .dts-container {
+  overflow-y: scroll;
+  overflow-x: hidden;
+
   display: flex;
-  height: calc(100% - var(--cal-top-bar-sz));
+  /* height: calc(100% - var(--cal-top-bar-sz)); */
   max-height: calc(100% - var(--cal-top-bar-sz));
 }

@@ -1,0 +1,19 @@
+.time-slot-main {
+  width: 100%;
+  height: 15px;
+  box-sizing: border-box;
+  border: 2px solid white;
+  background-color: var(--blue);
+  opacity: 0.4;
+}
+
+.time-slot-main:hover {
+  cursor: pointer;
+  background-color: var(--blue);
+  opacity: 0.8;
+}
+
+.time-slot-selected {
+  background-color: var(--blue);
+  opacity: 1;
+}
