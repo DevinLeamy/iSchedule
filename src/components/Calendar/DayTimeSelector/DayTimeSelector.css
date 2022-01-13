@@ -12,7 +12,7 @@
   height: var(--top-bar-sz);
   text-align: center;
   display: flex;
-  font-size: var(--l3-fs);
+  font-size: var(--l4-fs);
   flex-direction: column;
   justify-content: center;
 
@@ -22,8 +22,8 @@
 
 .dts-topbar:hover {
   cursor: pointer;
-  background-color: var(--blue);
-  opacity: 0.7;
+  background-color: rgb(167, 209, 255); 
+  /* opacity: 0.7; */
 }
 
 .dts-selector {

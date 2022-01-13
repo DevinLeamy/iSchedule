@@ -1,5 +1,6 @@
 .header-main {
   font-size: var(--l2-fs);
+  font-family: var(--header-font);
   color: var(--black);
   margin: auto;
   text-align: center;

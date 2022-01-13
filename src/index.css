@@ -16,14 +16,16 @@
   --l6-fs: 13px;
 
   /* Fonts */
-
+  --default-font: 'poppins-regular';
+  --header-font: 'poppins-semibold';
 }
 
 body {
   background-color: var(--off-white);
   margin: 0px;
   padding: 0px;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--default-font);
+  /* font-family: "landasans-medium"; */
 }
 
 div {
@@ -33,6 +35,12 @@ div {
 .spacer {
   height: 20px;
   width: 100%;
+}
+
+.h-center-contents {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .full-page {
@@ -49,3 +57,71 @@ a:link, a:visited {
 }
 
 
+/* Fonts */
+@font-face {
+  font-family: 'life-is-okay';
+  src: url(assets/fonts/life-is-okay-font/LifeIsOkay-PzAE.ttf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'momcake';
+  src: url(assets/fonts/momcake-font/MomcakeBold-WyonA.otf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'poppins-regular';
+  src: url(assets/fonts/poppins/Poppins-Regular.ttf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'poppins-medium';
+  src: url(assets/fonts/poppins/Poppins-Medium.ttf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'poppins-semibold';
+  src: url(assets/fonts/poppins/Poppins-SemiBold.ttf);
+  font-style: normal;
+}
+@font-face {
+  font-family: 'quacker';
+  src: url(assets/fonts/quacker-font/Quacker-vmAvD.otf);
+  font-style: normal;
+}
+@font-face {
+  font-family: 'beautiful-regular';
+  src: url(assets/fonts/beautiful-people-font/regular.ttf);
+  font-style: normal;
+}
+@font-face {
+  font-family: 'beautiful-slanted';
+  src: url(assets/fonts/beautiful-people-font/slanted.ttf);
+  font-style: normal;
+}
+@font-face {
+  font-family: 'dreamwood';
+  src: url(assets/fonts/dreamwood-font/DreamwoodDemoRegular-Zj3q.ttf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'typographica';
+  src: url(assets/fonts/typographica-font/Typographica-Blp5.ttf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'landasans-medium';
+  src: url(assets/fonts/landasans-font/medium.otf);
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'landasans-light';
+  src: url(assets/fonts/landasans-font/light.otf);
+  font-style: normal;
+}
