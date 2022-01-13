@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-timezone-select/dist/index.js b/node_modules/react-timezone-select/dist/index.js
+index e3c7437..80e93ad 100644
+--- a/node_modules/react-timezone-select/dist/index.js
++++ b/node_modules/react-timezone-select/dist/index.js
+@@ -13,7 +13,7 @@ import React from 'react';
+ import Select from 'react-select';
+ import spacetime from 'spacetime';
+ import soft from 'timezone-soft';
+-import allTimezones from './timezone-list';
++import allTimezones from './timezone-list.js';
+ export var LabelType;
+ (function (LabelType) {
+     LabelType["ORIGINAL"] = "original";
+diff --git a/node_modules/react-timezone-select/dist/index.jsx b/node_modules/react-timezone-select/dist/index.jsx
+index 1446065..24e7f13 100644
+--- a/node_modules/react-timezone-select/dist/index.jsx
++++ b/node_modules/react-timezone-select/dist/index.jsx
+@@ -19,7 +19,7 @@ var react_1 = require("react");
+ var react_select_1 = __importDefault(require("react-select"));
+ var spacetime_1 = __importDefault(require("spacetime"));
+ var timezone_soft_1 = __importDefault(require("timezone-soft"));
+-var timezone_list_1 = __importDefault(require("./timezone-list"));
++var timezone_list_1 = __importDefault(require("./timezone-list.js"));
+ exports.allTimezones = timezone_list_1["default"];
+ var LabelType;
+ (function (LabelType) {
