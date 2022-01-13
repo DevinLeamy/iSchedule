@@ -67,11 +67,11 @@ const PageOne: React.FC = () => {
         <Box>
           Select your time zone 
           {/* npm run build && serve -s build */}
-          <TimezoneSelect 
+          {/* <TimezoneSelect 
             value={selectedTimezone}
             onChange={setSelectedTimezone}
             timezones={{...allTimezones}}
-          /> 
+          />  */}
         </Box>
         <div className="spacer"/>
         <div className='calendar-container'>

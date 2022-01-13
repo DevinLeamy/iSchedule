@@ -4,12 +4,12 @@
   display: flex;
   flex-direction: column;
 
-  --top-bar-sz: 60px;
+  --dts-top-bar-sz: 60px;
 }
 
 .dts-topbar {
   width: 100%;
-  height: var(--top-bar-sz);
+  height: var(--dts-top-bar-sz);
   text-align: center;
   display: flex;
   font-size: var(--l4-fs);
@@ -27,7 +27,7 @@
 }
 
 .dts-selector {
-  height: calc(100% - var(--top-bar-sz)); 
+  height: calc(100% - var(--dts-top-bar-sz)); 
   box-sizing: border-box;
   border: var(--calendar-border);
   flex: 1 1 auto;

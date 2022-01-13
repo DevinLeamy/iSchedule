@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DayTimeSelector from "./DayTimeSelector/DayTimeSelector";
-import { Date, DateTimeRange } from "../../types/types";
+import { Date, DateTimeRange, Time } from "../../types/types";
 import { getDate, getNextDate, formatDate } from "../../utilities/dates";
 import "./Calendar.css"
 
@@ -54,16 +54,33 @@ const Calendar: React.FC<CalendarProps> = (props) => {
         </div>
       </div>
       <div className="dts-container">
-        {[...Array(props.days)].map((_, i) => 
-          <DayTimeSelector 
-            key={i} 
-            onChange={(newDateTimeRanges) => {
-              onUpdateDateTimeRanges(i, newDateTimeRanges)
-            }}
-            date={getNextDate(weekStart, i)} 
-          />
-        )}
-     </div>
+        <div className="c-times-display">
+          <div className="c-times-header-spacer">
+
+          </div>
+          {[...Array(48)].map((_, i) => {
+             let timeInMinutes = i * 15;
+             let timeSlot: Time = { hour: Math.floor(timeInMinutes / 60), minute: timeInMinutes % 60 };
+             if (i % 2 === 1) return <div className="c-times-display-time" />
+            return (
+              <div className="c-times-display-time">
+                {`${timeSlot.hour}:${timeSlot.minute}`}
+              </div>
+            );
+          })}
+        </div>
+        <div className='selector-container'>
+          {[...Array(props.days)].map((_, i) => 
+            <DayTimeSelector 
+              key={i} 
+              onChange={(newDateTimeRanges) => {
+                onUpdateDateTimeRanges(i, newDateTimeRanges)
+              }}
+              date={getNextDate(weekStart, i)} 
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

@@ -60,10 +60,40 @@
 }
 
 .dts-container {
-  overflow-y: scroll;
-  overflow-x: hidden;
+  display: flex;
+  width: 100%;
+  height: calc(100% - var(--cal-top-bar-sz));
+  --dts-top-bar-sz: 60px;
+  --dts-cell-height: 15px;
+
+  --dts-dates-width: 50px;
+}
+
+.selector-container {
+  width: calc(100% - var(--dts-dates-width));
 
   display: flex;
-  /* height: calc(100% - var(--cal-top-bar-sz)); */
-  max-height: calc(100% - var(--cal-top-bar-sz));
+
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.c-times-display {
+  display: flex;
+  flex-direction: column;
+  width: var(--dts-dates-width);
+  /* background-color: orange; */
+}
+
+.c-times-header-spacer {
+  height: var(--dts-top-bar-sz);
+}
+
+.c-times-display-time {
+  width: 100%;
+  height: var(--dts-cell-height);
+  text-align: right;
+  color: grey;
+  font-size: 12px;
+  transform: translateY(-7px);
 }
