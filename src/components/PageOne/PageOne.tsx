@@ -11,7 +11,6 @@ import Radio from '@mui/material/Radio';
 
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 
-
 let MONTH_C: string = "MONTH_C";
 let WEEK_C: string = "WEEK_C";
 
@@ -75,9 +74,9 @@ const PageOne: React.FC = () => {
         </Box>
         <div className="spacer"/>
         <div className='calendar-container'>
-          <Calendar 
+          {/* <Calendar 
             days={7}
-          />
+          /> */}
         </div>
         {/* <div className="next-page-btn-container"> */}
         <div className="next-page-btn-container h-center-contents">

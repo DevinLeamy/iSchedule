@@ -1,27 +1,11 @@
-type Month = {
-  name: string,
-  monthIndex: number,
-  days: number
+type DateRange = {
+  start: Date,
+  end: Date 
 };
 
-type Date = {
-  day: number,
-  month: Month  
-};
+type Coords = {
+  x: number,
+  y: number
+}
 
-type Time = {
-  hour: number, // 24 hours
-  minute: number 
-};
-
-type DateTime = {
-  date: Date,
-  time: Time
-};
-
-type DateTimeRange = {
-  startDateTime: DateTime,
-  endDateTime: DateTime
-};
-
-export type { DateTime, Date, Time, Month, DateTimeRange };
+export type { DateRange, Coords } 
