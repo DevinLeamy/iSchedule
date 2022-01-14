@@ -1,8 +1,7 @@
-import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
+import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import classNames from "classnames";
-// import DayTimeSelector from "./DayTimeSelector/DayTimeSelector";
 import { DateRange, Coords } from "../../types/types";
-// import { getDate, getNextDate, formatDate } from "../../utilities/dates";
+import RangeBox from "./RangeBox/RangeBox";
 import "./Calendar.css"
 
 type CalendarProps = {
@@ -13,55 +12,77 @@ type CalendarProps = {
 };
 
 const TOTAL_MINUTES: number = 60 * 24;
+const TOTAL_ROWS: number = 24 * 4;
+const TOTAL_COLS: number = 1;
+
+
+/*
+We collect:
+We make a grid.
+We determine what tiles are selected in the grid.
+We return the interpretation of the selected tiles as time intervals
+*/
 
 
 const Calendar: React.FC<CalendarProps> = (props) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
-  const [rangeSelectorBounds, setRangeSelectorBounds] = useState<DOMRect>(new DOMRect());
+  const [gridState, setGridState] = useState<boolean[][]>(
+    Array.from(Array(TOTAL_ROWS), () => new Array(TOTAL_COLS))
+  );
+
   const [mouseDown, setMouseDown] = useState<boolean>(false);
 
   const getRelativeCoords = (event: any) : Coords => {
     if (rangeSelectorBounds) {
-      let x = event.clientX - rangeSelectorBounds.left;
-      let y = event.clientY - rangeSelectorBounds.top;
+      let x = event.clientX - rangeSelectorBounds().left;
+      let y = event.clientY - rangeSelectorBounds().top;
       return {x: x, y: y};
     }
 
     return {x: -1, y: -1};
   };
 
+  const updateGridState = (row: number, col: number) : void => {
+    let cloned = gridState.map((arr) => arr.slice());
+    cloned[row][col] = !gridState[row][col];
 
-
-  useLayoutEffect(() => {
-    if (rangeSelectorRef && rangeSelectorRef.current) {
-      setRangeSelectorBounds(rangeSelectorRef.current.getBoundingClientRect());
-    }
-  }, [])
-
-  useEffect(() => {
-    if (rangeSelectorRef && rangeSelectorRef.current) {
-      rangeSelectorRef.current.addEventListener("mousedown", handleMouseDown);
-      rangeSelectorRef.current.addEventListener("mouseup", handleMouseUp);
-    }
-  }, []);
-
-
-  const getCellFromCoords = (coords: Coords) : number => {
-    const minute: number = Math.floor(TOTAL_MINUTES * (1 - coords.y / rangeSelectorBounds.height));
-
-    const hours: number = Math.floor(minute / 60);
-    const minutes: number = minute % 60;
-
-    // return { hours, minutes };
-    return 5;
+    setGridState(cloned);
   }
 
-  // const [weekStart, setWeekStart] = useState<Date>(getDate());
+  // useEffect(() => {
+  //   if (rangeSelectorRef && rangeSelectorRef.current) {
+  //     // rangeSelectorRef.current.addEventListener("mousedown", handleMouseDown);
+  //     // rangeSelectorRef.current.addEventListener("mouseup", handleMouseUp);
+  //     // rangeSelectorRef.current.addEventListener("click", handleClick);
+  //   }
+  // }, []);
+
+  const rangeSelectorBounds = () : DOMRect => {
+    if (rangeSelectorRef?.current)
+      return rangeSelectorRef.current.getBoundingClientRect();
+    return new DOMRect();
+  }
+
+
+  const getRowFromCoords = (coords: Coords) : number => {
+    return Math.floor((coords.y / rangeSelectorBounds().height) * TOTAL_ROWS);
+  }
 
   const handleMouseMove = (event: any) => {
-    let coords = getRelativeCoords(event);
+    if (!mouseDown) return;
 
-    // DO SOMETHING HERE
+    let coords = getRelativeCoords(event);
+    let row = getRowFromCoords(coords);
+
+    // updateGridState(row, 0);
+  }
+
+  const handleClick = (event: any) => {
+    let coords = getRelativeCoords(event);
+    let row = getRowFromCoords(coords);
+
+    // also get col by x
+    updateGridState(row, 0);
   }
 
   const handleMouseDown = (event: any) => {
@@ -72,22 +93,25 @@ const Calendar: React.FC<CalendarProps> = (props) => {
     setMouseDown(false);
   }
 
-  const renderGridRow = (date: Date) : React.ReactNode => {
+  const renderGridRow = (col: number) : React.ReactNode => {
     return (
       <div className="rs-grid-row">
-        {[...Array(24)].map((_, i) => { 
-          return renderGridCell(i * 15);
+        {[...Array(TOTAL_ROWS)].map((_, row) => { 
+          return renderGridCell(row, gridState[row][col]);
         })}
+        <RangeBox />
       </div>
    );
   }
 
-  const renderGridCell = (minute: number) : React.ReactNode => {
-    const onHourBound = minute % 60 == 0;
+  const renderGridCell = (row: number, selected: boolean) : React.ReactNode => {
+    const onHourBound = row % 4 == 0;
+
     return (
-      <div className={classNames(
+      <div key={row * 999 } className={classNames(
         "grid-cell",
-        { "grid-cell-hour" : onHourBound } 
+        { "grid-cell-hour" : onHourBound },
+        { "grid-cell-selected": selected } 
       )}/>
     );
   }
@@ -98,19 +122,31 @@ const Calendar: React.FC<CalendarProps> = (props) => {
         <div 
           className="rs-grid-container"
           ref={rangeSelectorRef}
-          onMouseMove={handleMouseMove}
+          // onMouseMove={handleMouseMove}
         >
-          {[...Array(props.days)].map(_ => {
-            return renderGridRow(new Date());
+          {[...Array(TOTAL_COLS)].map((_, col) => {
+            return renderGridRow(col);
           })}
         </div>
       </div>
     );
   }
 
+  const renderRangeSelectorTopBar = () : React.ReactNode => {
+    return (
+      <div className="calendar-header">
+        <div> January 7th </div>
+        <div> January 7th </div>
+        <div> January 7th </div>
+        <div> January 7th </div>
+        <div> January 7th </div>
+      </div>
+    );
+  }
+
   const renderCalenderHeader = () : React.ReactNode => {
     return (
-      <div className="calendar-topbar">
+      <div className="calendar-header">
           <div 
           className="change-week-btn change-week-left"
           // onClick={() => {
@@ -142,6 +178,7 @@ const Calendar: React.FC<CalendarProps> = (props) => {
   return (
     <div className="calendar-main">
       {renderCalenderHeader()}
+      {renderRangeSelectorTopBar()}
       {renderRangeSelector()}
     </div>
   );

@@ -74,9 +74,9 @@ const PageOne: React.FC = () => {
         </Box>
         <div className="spacer"/>
         <div className='calendar-container'>
-          {/* <Calendar 
+          <Calendar 
             days={7}
-          /> */}
+          />
         </div>
         {/* <div className="next-page-btn-container"> */}
         <div className="next-page-btn-container h-center-contents">

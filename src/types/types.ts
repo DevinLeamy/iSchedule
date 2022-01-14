@@ -8,4 +8,11 @@ type Coords = {
   y: number
 }
 
+// type Bounds = {
+//   left: number,
+//   right: number,
+//   bottom: number,
+//   top: number
+// };
+
 export type { DateRange, Coords } 
