@@ -1,6 +1,7 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { DateRange, Coords } from "../../types/types";
+import { useMouseCapture, Position } from "../../hooks/useMouseCapture";
 import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
 import "./Calendar.css"
 
@@ -26,6 +27,11 @@ We return the interpretation of the selected tiles as time intervals
 
 const Calendar: React.FC<CalendarProps> = (props) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
+  const mousePosition: Position | undefined = useMouseCapture(
+    rangeSelectorRef, 
+    TOTAL_ROWS, 
+    TOTAL_COLS
+  );
   const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
   const [gridState, setGridState] = useState<boolean[][]>(
     Array.from(Array(TOTAL_ROWS), () => new Array(TOTAL_COLS))
@@ -66,6 +72,7 @@ const Calendar: React.FC<CalendarProps> = (props) => {
       <RangeBox
         id={id}
         box={rangeBox}
+        mousePosition={mousePosition}
         onRelease={onRangeBoxRelease}
         onExtend={onRangeBoxExtend}
         onDelete={onRangeBoxDelete}
@@ -74,10 +81,34 @@ const Calendar: React.FC<CalendarProps> = (props) => {
     );
   }
 
-  const onRangeBoxRelease = () => {}
-  const onRangeBoxExtend = (boxId: number) => {}
+  const onRangeBoxRelease = () : void => {
+    /* Do nothing */
+  }
+
+  const onRangeBoxExtend = (boxId: number) => {
+    /* 
+    BOX SIDE:
+    - extending   = Detect when the user is holding the mouse on an extender
+    - enter/leave = Detect when the user enters/leaves the extender cell
+    - if (extending and enter/leave) 
+      - tell the calender:
+        - (row, col) was add/removed by box with (boxId)
+
+    CALENDAR SIDE:
+    - Makes the adjustment to the box with (boxId)
+    - Resolves merge conflicts
+    - Updates state
+    
+    */
+  }
   // const onRangeBoxChange = () => {}
-  const onRangeBoxDelete = (boxId: number) => {}
+
+  const onRangeBoxDelete = (boxId: number) => {
+    let updated = [...rangeBoxes];
+    updated.splice(boxId, 1);
+
+    setRangeBoxes(updated);
+  }
 
   const getRelativeCoords = (event: any) : Coords => {
     if (rangeSelectorBounds) {

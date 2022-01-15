@@ -18,6 +18,7 @@
     "intl": "^1.2.5",
     "kalend": "^0.6.5",
     "patch-package": "^6.4.7",
+    "re-resizable": "^6.9.1",
     "react-draggable": "^4.4.4",
     "react-scripts": "^5.0.0",
     "react-timezone-select": "^1.1.15",

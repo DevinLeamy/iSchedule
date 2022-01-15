@@ -1,7 +1,23 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Draggable from "react-draggable";
-import classNames from "classnames";
+import { Position } from "../../../hooks/useMouseCapture";
 import "./RangeBox.css";
+
+/*
+Handle resize:
+- Resize
+- Calls callback 
+- Adjust to fit grid
+- Resolve merges
+- Update state
+
+Handle drag:
+- Drag
+- Calls callback 
+- Adjust to fit grid
+- Resolve merges
+- Update state
+*/
 
 export type RangeBlockBox = {
   bRow: number, // bottom row (smaller value) 
@@ -13,6 +29,7 @@ type RangeBoxProps = {
   id: number,
 
   box: RangeBlockBox,
+  mousePosition: Position | undefined,
 
   onRelease: () => void,
   onExtend: (id: number) => void,
@@ -55,7 +72,44 @@ type Time = {
   minute: number
 };
 
-const RangeBox: React.FC<RangeBoxProps> = (props) => {
+const RangeBox: React.FC<RangeBoxProps> = ({
+  id,
+  box,
+  mousePosition,
+  onRelease,
+  onExtend,
+  onChange,
+  onDelete
+}) => {
+  const rangeBoxRef = useRef<HTMLDivElement | null>(null);
+  const [extending, setExtending] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (rangeBoxRef?.current) {
+      rangeBoxRef.current.addEventListener("mouseup", () => setExtending(false));
+    }
+  }, [])
+
+  const handleMouseMove = () => {
+    checkForExtension()
+  }
+
+  const checkForExtension = () => {
+    if (!mousePosition) return;
+
+    let mouseCol = mousePosition.col
+    let mouseRow = mousePosition.row;
+
+    if (extending && mouseCol === box.col) {
+      if (mouseRow === box.bRow - 1)
+        alert("Extend Down");
+      else if (mouseRow === box.tRow + 1)
+        alert("Extend Up");
+    }
+  }
+
+  checkForExtension()
+
   const getTimeFromRow = (row: number) : Time => {
     const minutes: number = row * 15;
 
@@ -72,8 +126,8 @@ const RangeBox: React.FC<RangeBoxProps> = (props) => {
   }
 
   const getCellDisplayText = () : string => {
-    const startTime = getTimeFromRow(props.box.bRow);
-    const endTime = getTimeFromRow(props.box.tRow);
+    const startTime = getTimeFromRow(box.bRow);
+    const endTime = getTimeFromRow(box.tRow);
 
     return `${getStringFromTime(startTime)} - ${getStringFromTime(endTime)}`;
   } 
@@ -87,9 +141,11 @@ const RangeBox: React.FC<RangeBoxProps> = (props) => {
   }
 
   const renderExtenderCell = (topCell: boolean) : React.ReactNode => {
-    // return <></>
     return (
-      <div className="rb-cell extender" onClick={() => props.onExtend(props.id)}>
+      <div 
+        className="rb-cell extender" 
+        onMouseDown={() => setExtending(true)}
+      >
         {topCell ? renderDateRange() : <></>}
         =
       </div>
@@ -101,14 +157,14 @@ const RangeBox: React.FC<RangeBoxProps> = (props) => {
   }
 
   const renderCell = (row: number) : React.ReactNode => {
-    const extender = row == props.box.bRow || row == props.box.tRow;
+    const extender = row == box.bRow || row == box.tRow;
     
-    return extender ? renderExtenderCell(row == props.box.bRow) : renderHandleCell();
+    return extender ? renderExtenderCell(row == box.bRow) : renderHandleCell();
   }
 
   const renderBox = () : React.ReactNode => {
-    const bottomRow = props.box.bRow;
-    const topRow = props.box.tRow;
+    const bottomRow = box.bRow;
+    const topRow = box.tRow;
 
     return <>{[...Array(topRow - bottomRow + 1)].map((_, i) => renderCell(i + bottomRow))}</>;
   }
@@ -117,13 +173,17 @@ const RangeBox: React.FC<RangeBoxProps> = (props) => {
     <Draggable
       axis="y"
       handle=".handle"
-      defaultPosition={{x: 0, y: 15 * props.box.bRow}}
+      defaultPosition={{x: 0, y: 15 * box.bRow}}
       position={undefined}
       bounds={{top: 0, bottom: 24 * 4 * 20}}
       grid={[15, 15]}
       scale={1}
     >
-      <div className="range-box-main">
+      <div 
+        ref={rangeBoxRef}
+        className="range-box-main"
+        onMouseMove={handleMouseMove}
+      >
         {renderBox()}
       </div>
     </Draggable>
