@@ -1,22 +1,24 @@
 .range-box-main {
   width: 100%;
   border-radius: 10px; 
-  background-color: rgb(8, 8, 19);
+  background-color: rgb(210, 14, 115);
   position: absolute;
 
   color: var(--white);
   /* padding: 10px; */
 
   text-align: center;
+  user-select: none; 
+  z-index: 1;
 }
 
-.rb-cell {
+/* .rb-cell { */
   /* height: var(--dts-cell-height); */
-  height: 15px;
+  /* height: 15px;
   width: 100%;
-}
+} */
 
-.rb-cell:hover {
+/* .rb-cell:hover {
   opacity: 0.8;
   background-color: orange;
   cursor: grab;
@@ -30,4 +32,4 @@
 
 .extender:hover {
   cursor: ns-resize; 
-}
+} */

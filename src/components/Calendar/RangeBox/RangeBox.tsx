@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import Draggable from "react-draggable";
-import { Position } from "../../../hooks/useMouseCapture";
+// import Draggable from "react-draggable";
+import { ResizeDirection } from "re-resizable";
+import { DraggableEvent } from 'react-draggable';
+import { 
+  Rnd, 
+  ResizableDelta, 
+  DraggableData, 
+  Position
+} from "react-rnd"
+// import { Position } from "../../../hooks/useMouseCapture";
 import "./RangeBox.css";
 
 /*
@@ -25,49 +33,26 @@ export type RangeBlockBox = {
   col: number   // column
 }
 
+export type Size = {
+  width: number,
+  height: number
+}
+
 type RangeBoxProps = {
   id: number,
 
   box: RangeBlockBox,
-  mousePosition: Position | undefined,
+
+  cellWidth: number,
+  cellHeight: number,
 
   onRelease: () => void,
-  onExtend: (id: number) => void,
+  onExtend: (id: number, row: number, heightInCells: number) => void,
   onChange: () => void,
   onDelete: (id: number) => void
 };
 
-/*
-
-// EXTENDING AND SHRINKING BLOCKS
-- Mouse down on the extender
-  - Record id of the block being extended
-  - Record column of the block
-- Mouseonenter a grid tile on the grid
-  - Determine block that is being covered
-  - If the block not selected and is a direct extension of the current range
-    - Add the block to the range 
-- Mouseonleave a grid tile on the grid
-  - Determine block that is no longer covered
-  - If the block was previously an ending block
-    - The ending block is removed
-- Updates are relayed down through the state
-
-// CREATING A BLOCK
-- Mouse click on the screen 
-  - Determine the block that is being clicked
-
-// DELETING A BLOCK
-- Mouse click other delete button (which is visible onhover)
-- Calls call back with block Id to remove the block
-
-// MOVING A BLOCK
-- User grabs the block at a holder
-- User drags the block
-// - OnRelease, block data is sent to the calendar
-*/
-
-type Time = {
+export type Time = {
   hour: number,
   minute: number
 };
@@ -75,46 +60,30 @@ type Time = {
 const RangeBox: React.FC<RangeBoxProps> = ({
   id,
   box,
-  mousePosition,
+  cellWidth,
+  cellHeight,
+  
+  // mousePosition,
   onRelease,
   onExtend,
   onChange,
   onDelete
 }) => {
-  const rangeBoxRef = useRef<HTMLDivElement | null>(null);
-  const [extending, setExtending] = useState<boolean>(false);
+  const position: Position = {
+    x: 0, 
+    y: cellHeight * box.bRow
+  };
 
-  useEffect(() => {
-    if (rangeBoxRef?.current) {
-      rangeBoxRef.current.addEventListener("mouseup", () => setExtending(false));
-    }
-  }, [])
-
-  const handleMouseMove = () => {
-    checkForExtension()
-  }
-
-  const checkForExtension = () => {
-    if (!mousePosition) return;
-
-    let mouseCol = mousePosition.col
-    let mouseRow = mousePosition.row;
-
-    if (extending && mouseCol === box.col) {
-      if (mouseRow === box.bRow - 1)
-        alert("Extend Down");
-      else if (mouseRow === box.tRow + 1)
-        alert("Extend Up");
-    }
-  }
-
-  checkForExtension()
+  const size = {
+    width: cellWidth - 20,
+    height: cellHeight * (box.tRow - box.bRow + 1)
+  };
 
   const getTimeFromRow = (row: number) : Time => {
     const minutes: number = row * 15;
 
     return {
-      hour: Math.floor(minutes / 60),
+      hour: Math.round(minutes / 60),
       minute: minutes % 60
     };
   }
@@ -140,53 +109,86 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     );
   }
 
-  const renderExtenderCell = (topCell: boolean) : React.ReactNode => {
-    return (
-      <div 
-        className="rb-cell extender" 
-        onMouseDown={() => setExtending(true)}
-      >
-        {topCell ? renderDateRange() : <></>}
-        =
-      </div>
-    );
-  }
-  const renderHandleCell = () : React.ReactNode => {
-    // TODO: call handler to update the covered cells
-    return <div className="handle rb-cell" onChange={() => {}}/>
-  }
+  // const renderExtenderCell = (topCell: boolean) : React.ReactNode => {
+  //   return (
+  //     <div 
+  //       className="rb-cell extender" 
+  //     >
+  //       {topCell ? renderDateRange() : <></>}
+  //       =
+  //     </div>
+  //   );
+  // }
+  // const renderHandleCell = () : React.ReactNode => {
+  //   // TODO: call handler to update the covered cells
+  //   return <div className="handle rb-cell" onChange={() => {}}/>
+  // }
 
-  const renderCell = (row: number) : React.ReactNode => {
-    const extender = row == box.bRow || row == box.tRow;
+  // const renderCell = (row: number) : React.ReactNode => {
+  //   const extender = row == box.bRow || row == box.tRow;
     
-    return extender ? renderExtenderCell(row == box.bRow) : renderHandleCell();
+  //   return extender ? renderExtenderCell(row == box.bRow) : renderHandleCell();
+  // }
+
+  // const renderBox = () : React.ReactNode => {
+  //   const bottomRow = box.bRow;
+  //   const topRow = box.tRow;
+
+  //   return <>{[...Array(topRow - bottomRow + 1)].map((_, i) => renderCell(i + bottomRow))}</>;
+  // }
+
+  const handleResize = (
+    event: MouseEvent | TouchEvent, 
+    direction: ResizeDirection, 
+    elementRef: HTMLElement,
+    delta: ResizableDelta,
+    position: Position
+  ) => {
+    const row = Math.round(position.y / cellHeight);
+    const heightInCells = Math.round((size.height + delta.height) / cellHeight);
+
+    console.log("resize", row, heightInCells, size.height, delta.height);
+
+    onExtend(id, row, heightInCells);
   }
 
-  const renderBox = () : React.ReactNode => {
-    const bottomRow = box.bRow;
-    const topRow = box.tRow;
+  const handleDrag = (
+    event: DraggableEvent, 
+    data: DraggableData
+  ) => {
+    const row = Math.round(data.y / cellHeight);
+    const heightInCells = Math.round(size.height / cellHeight);
 
-    return <>{[...Array(topRow - bottomRow + 1)].map((_, i) => renderCell(i + bottomRow))}</>;
+    console.log("drag", row, heightInCells, size.height);
+
+    onExtend(id, row, heightInCells);
   }
+
+  console.log("POS", position.x, position.y)
 
   return (
-    <Draggable
-      axis="y"
-      handle=".handle"
-      defaultPosition={{x: 0, y: 15 * box.bRow}}
-      position={undefined}
-      bounds={{top: 0, bottom: 24 * 4 * 20}}
-      grid={[15, 15]}
-      scale={1}
+    <Rnd
+      key={id}
+      dragAxis="y"
+      dragGrid={[15, 15]}
+      resizeGrid={[15, 15]}
+      bounds="parent"
+      position={position}
+      size={size}
+      // onResize={handleResize}
+      onResizeStop={handleResize}
+      onDragStop={handleDrag}
+      // onDrag={handleDrag}
+      className="range-box-main"
+      enableResizing={{
+        left: false,
+        right: false,
+        top: true,
+        bottom: true
+      }}
     >
-      <div 
-        ref={rangeBoxRef}
-        className="range-box-main"
-        onMouseMove={handleMouseMove}
-      >
-        {renderBox()}
-      </div>
-    </Draggable>
+      {renderDateRange()}
+    </Rnd>
   );
 }
 

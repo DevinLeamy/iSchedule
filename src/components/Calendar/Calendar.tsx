@@ -14,7 +14,7 @@ type CalendarProps = {
 
 const TOTAL_MINUTES: number = 60 * 24;
 const TOTAL_ROWS: number = 24 * 4;
-const TOTAL_COLS: number = 3;
+const TOTAL_COLS: number = 7;
 
 
 /*
@@ -27,17 +27,11 @@ We return the interpretation of the selected tiles as time intervals
 
 const Calendar: React.FC<CalendarProps> = (props) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
-  const mousePosition: Position | undefined = useMouseCapture(
-    rangeSelectorRef, 
-    TOTAL_ROWS, 
-    TOTAL_COLS
-  );
+
   const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
   const [gridState, setGridState] = useState<boolean[][]>(
     Array.from(Array(TOTAL_ROWS), () => new Array(TOTAL_COLS))
   );
-
-  const [mouseDown, setMouseDown] = useState<boolean>(false);
 
   const createRangeBox = (row: number, col: number) => {
     const rangeBlockBox: RangeBlockBox = {
@@ -68,40 +62,39 @@ const Calendar: React.FC<CalendarProps> = (props) => {
   const renderRangeBoxesInCol = (col: number) : React.ReactNode => {
     let colRangeBoxes = getRangeBoxesInCol(col);
 
-    return colRangeBoxes.map((rangeBox, id) =>
-      <RangeBox
-        id={id}
-        box={rangeBox}
-        mousePosition={mousePosition}
-        onRelease={onRangeBoxRelease}
-        onExtend={onRangeBoxExtend}
-        onDelete={onRangeBoxDelete}
-        onChange={() => {}}
-      />
-    );
+    return rangeBoxes.map((rangeBox, id) => {
+      if (rangeBox.col === col)
+        return (
+          <RangeBox
+            id={id}
+            box={rangeBox}
+            cellWidth={Math.round(rangeSelectorBounds().width / TOTAL_COLS)}
+            cellHeight={Math.round(rangeSelectorBounds().height / TOTAL_ROWS)}
+            // mousePosition={mousePosition}
+            onRelease={onRangeBoxRelease}
+            onExtend={onRangeBoxExtend}
+            onDelete={onRangeBoxDelete}
+            onChange={() => {}}
+          />
+        );
+      return <></>;
+   });
   }
 
   const onRangeBoxRelease = () : void => {
     /* Do nothing */
   }
 
-  const onRangeBoxExtend = (boxId: number) => {
-    /* 
-    BOX SIDE:
-    - extending   = Detect when the user is holding the mouse on an extender
-    - enter/leave = Detect when the user enters/leaves the extender cell
-    - if (extending and enter/leave) 
-      - tell the calender:
-        - (row, col) was add/removed by box with (boxId)
+  const onRangeBoxExtend = (boxId: number, row: number, heightInCells: number) => {
+    let clone = [...rangeBoxes];
 
-    CALENDAR SIDE:
-    - Makes the adjustment to the box with (boxId)
-    - Resolves merge conflicts
-    - Updates state
-    
-    */
+    let rangeBox = {...rangeBoxes[boxId]};
+    rangeBox.bRow = row;
+    rangeBox.tRow = row + heightInCells - 1;
+
+    clone[boxId] = rangeBox;
+    setRangeBoxes(clone);
   }
-  // const onRangeBoxChange = () => {}
 
   const onRangeBoxDelete = (boxId: number) => {
     let updated = [...rangeBoxes];
@@ -127,14 +120,6 @@ const Calendar: React.FC<CalendarProps> = (props) => {
     setGridState(cloned);
   }
 
-  // useEffect(() => {
-  //   if (rangeSelectorRef && rangeSelectorRef.current) {
-  //     // rangeSelectorRef.current.addEventListener("mousedown", handleMouseDown);
-  //     // rangeSelectorRef.current.addEventListener("mouseup", handleMouseUp);
-  //     // rangeSelectorRef.current.addEventListener("click", handleClick);
-  //   }
-  // }, []);
-
   const rangeSelectorBounds = () : DOMRect => {
     if (rangeSelectorRef?.current)
       return rangeSelectorRef.current.getBoundingClientRect();
@@ -144,31 +129,6 @@ const Calendar: React.FC<CalendarProps> = (props) => {
 
   const getRowFromCoords = (coords: Coords) : number => {
     return Math.floor((coords.y / rangeSelectorBounds().height) * TOTAL_ROWS);
-  }
-
-  const handleMouseMove = (event: any) => {
-    if (!mouseDown) return;
-
-    let coords = getRelativeCoords(event);
-    let row = getRowFromCoords(coords);
-
-    // updateGridState(row, 0);
-  }
-
-  const handleClick = (event: any) => {
-    let coords = getRelativeCoords(event);
-    let row = getRowFromCoords(coords);
-
-    // also get col by x
-    updateGridState(row, 0);
-  }
-
-  const handleMouseDown = (event: any) => {
-    setMouseDown(true);
-  }
-
-  const handleMouseUp = (event: any) => {
-    setMouseDown(false);
   }
 
   const renderGridRow = (col: number) : React.ReactNode => {
@@ -238,17 +198,9 @@ const Calendar: React.FC<CalendarProps> = (props) => {
           {"<"}
         </div>
         <div className="week-header">
-          {/* {`${formatDate(weekStart, true)} 
-          - 
-          ${formatDate(getNextDate(weekStart, props.days - 1), true)}` */}
-          {/* } */}
         </div>
         <div 
           className="change-week-btn change-week-right"
-          // onClick={() => {
-          //   let newWeekStart: Date = getNextDate(weekStart, props.days);
-          //   setWeekStart(newWeekStart);
-          // }}
         >
           {">"}
         </div>
