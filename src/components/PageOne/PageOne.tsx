@@ -28,8 +28,8 @@ const PageOne: React.FC = () => {
 
   return (
     <Page>
-      <Header content="Instantly schedule an event"/>
-      <div className='spacer'/>
+      {/* <Header content="Instantly schedule an event"/>
+      <div className='spacer'/> */}
       <ContentBox>
         <div className='h-center-contents'>
           <TextField 

@@ -13,7 +13,7 @@ type CalendarProps = {
 
 const TOTAL_MINUTES: number = 60 * 24;
 const TOTAL_ROWS: number = 24 * 4;
-const TOTAL_COLS: number = 1;
+const TOTAL_COLS: number = 3;
 
 
 /*
@@ -99,7 +99,14 @@ const Calendar: React.FC<CalendarProps> = (props) => {
         {[...Array(TOTAL_ROWS)].map((_, row) => { 
           return renderGridCell(row, gridState[row][col]);
         })}
-        <RangeBox />
+        <RangeBox 
+          id={0}
+          box={{ bRow: 1, tRow: 10, col: col }}
+          onRelease={() => {}}
+          onExtend={(id: number) => {}}
+          onChange={() => {}}
+          onDelete={(id: number) => {}}
+        />
       </div>
    );
   }

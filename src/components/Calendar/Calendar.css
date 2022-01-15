@@ -110,7 +110,7 @@
   overflow-y: scroll;
 }
 .rs-grid-container {
-  /* display: flex; */
+  display: flex;
   width: 100%;
   height: 100%; 
 }
@@ -129,7 +129,7 @@
 /* GRID CELL STYLES */
 .grid-cell {
   width: 100%;
-  height: 20px;
+  height: 15px;
   /* height: var(--dts-cell-height); */
   box-sizing: border-box;
   border-top: 1px dashed var(--grid-border-color);
