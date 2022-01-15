@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-// import Draggable from "react-draggable";
 import { ResizeDirection } from "re-resizable";
 import { DraggableEvent } from 'react-draggable';
 import { 
@@ -8,7 +7,6 @@ import {
   DraggableData, 
   Position
 } from "react-rnd"
-// import { Position } from "../../../hooks/useMouseCapture";
 import "./RangeBox.css";
 
 /*
@@ -46,9 +44,7 @@ type RangeBoxProps = {
   cellWidth: number,
   cellHeight: number,
 
-  onRelease: () => void,
-  onExtend: (id: number, row: number, heightInCells: number) => void,
-  onChange: () => void,
+  onChange: (id: number, row: number, heightInCells: number) => void,
   onDelete: (id: number) => void
 };
 
@@ -63,9 +59,6 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   cellWidth,
   cellHeight,
   
-  // mousePosition,
-  onRelease,
-  onExtend,
   onChange,
   onDelete
 }) => {
@@ -91,7 +84,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   const getStringFromTime = (time: Time) : string => {
     let AM : boolean = time.hour < 12;
 
-    return `${time.hour % 12}:${time.minute}${AM ? 'AM' : 'PM'}`;
+    return `${time.hour % 12}:${time.minute}${AM ? 'am' : 'pm'}`;
   }
 
   const getCellDisplayText = () : string => {
@@ -109,34 +102,6 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     );
   }
 
-  // const renderExtenderCell = (topCell: boolean) : React.ReactNode => {
-  //   return (
-  //     <div 
-  //       className="rb-cell extender" 
-  //     >
-  //       {topCell ? renderDateRange() : <></>}
-  //       =
-  //     </div>
-  //   );
-  // }
-  // const renderHandleCell = () : React.ReactNode => {
-  //   // TODO: call handler to update the covered cells
-  //   return <div className="handle rb-cell" onChange={() => {}}/>
-  // }
-
-  // const renderCell = (row: number) : React.ReactNode => {
-  //   const extender = row == box.bRow || row == box.tRow;
-    
-  //   return extender ? renderExtenderCell(row == box.bRow) : renderHandleCell();
-  // }
-
-  // const renderBox = () : React.ReactNode => {
-  //   const bottomRow = box.bRow;
-  //   const topRow = box.tRow;
-
-  //   return <>{[...Array(topRow - bottomRow + 1)].map((_, i) => renderCell(i + bottomRow))}</>;
-  // }
-
   const handleResize = (
     event: MouseEvent | TouchEvent, 
     direction: ResizeDirection, 
@@ -145,11 +110,10 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     position: Position
   ) => {
     const row = Math.round(position.y / cellHeight);
-    const heightInCells = Math.round((size.height + delta.height) / cellHeight);
+    const height = elementRef.getBoundingClientRect().height;
+    const heightInCells = Math.round(height / cellHeight);
 
-    console.log("resize", row, heightInCells, size.height, delta.height);
-
-    onExtend(id, row, heightInCells);
+    onChange(id, row, heightInCells);
   }
 
   const handleDrag = (
@@ -159,12 +123,8 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     const row = Math.round(data.y / cellHeight);
     const heightInCells = Math.round(size.height / cellHeight);
 
-    console.log("drag", row, heightInCells, size.height);
-
-    onExtend(id, row, heightInCells);
+    onChange(id, row, heightInCells);
   }
-
-  console.log("POS", position.x, position.y)
 
   return (
     <Rnd
@@ -175,10 +135,10 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       bounds="parent"
       position={position}
       size={size}
-      // onResize={handleResize}
+      onResize={handleResize}
       onResizeStop={handleResize}
       onDragStop={handleDrag}
-      // onDrag={handleDrag}
+      onDrag={handleDrag}
       className="range-box-main"
       enableResizing={{
         left: false,

@@ -29,9 +29,6 @@ const Calendar: React.FC<CalendarProps> = (props) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
 
   const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
-  const [gridState, setGridState] = useState<boolean[][]>(
-    Array.from(Array(TOTAL_ROWS), () => new Array(TOTAL_COLS))
-  );
 
   const createRangeBox = (row: number, col: number) => {
     const rangeBlockBox: RangeBlockBox = {
@@ -40,28 +37,13 @@ const Calendar: React.FC<CalendarProps> = (props) => {
       col: col
     };
 
-    const clone = rangeBoxes.slice();
-    clone.push(rangeBlockBox);
+    const updated = rangeBoxes.slice();
+    updated.push(rangeBlockBox);
 
-    // TODO: reconcile merges
-
-    setRangeBoxes(clone);
-  }
-
-  const getRangeBoxesInCol = (col: number) : RangeBlockBox[] => {
-    let colRangeBoxes: RangeBlockBox[] = [];
-
-    for (let rangeBox of rangeBoxes) {
-      if (rangeBox.col == col)
-        colRangeBoxes.push(rangeBox)
-    }
-
-    return colRangeBoxes;
+    redrawRangeBoxes(updated);
   }
 
   const renderRangeBoxesInCol = (col: number) : React.ReactNode => {
-    let colRangeBoxes = getRangeBoxesInCol(col);
-
     return rangeBoxes.map((rangeBox, id) => {
       if (rangeBox.col === col)
         return (
@@ -70,55 +52,87 @@ const Calendar: React.FC<CalendarProps> = (props) => {
             box={rangeBox}
             cellWidth={Math.round(rangeSelectorBounds().width / TOTAL_COLS)}
             cellHeight={Math.round(rangeSelectorBounds().height / TOTAL_ROWS)}
-            // mousePosition={mousePosition}
-            onRelease={onRangeBoxRelease}
-            onExtend={onRangeBoxExtend}
+            onChange={onRangeBoxChange}
             onDelete={onRangeBoxDelete}
-            onChange={() => {}}
           />
         );
       return <></>;
    });
   }
 
-  const onRangeBoxRelease = () : void => {
-    /* Do nothing */
-  }
-
-  const onRangeBoxExtend = (boxId: number, row: number, heightInCells: number) => {
-    let clone = [...rangeBoxes];
+  const onRangeBoxChange = (boxId: number, row: number, heightInCells: number) => {
+    let updated = [...rangeBoxes];
 
     let rangeBox = {...rangeBoxes[boxId]};
     rangeBox.bRow = row;
     rangeBox.tRow = row + heightInCells - 1;
 
-    clone[boxId] = rangeBox;
-    setRangeBoxes(clone);
+    updated[boxId] = rangeBox;
+
+    redrawRangeBoxes(updated)
+  }
+
+  const redrawRangeBoxes = (updatedBoxes: RangeBlockBox[]) : void => {
+    let cellCovered: boolean[][] = [...Array(TOTAL_ROWS)].map(() => new Array(TOTAL_COLS).fill(false));
+
+    for (let rangeBox of updatedBoxes) {
+      // TODO: boxes get negative row when merges by draw from the bottom 
+      for (let row = rangeBox.bRow; row <= rangeBox.tRow; ++row)
+        cellCovered[row][rangeBox.col] = true;
+    }
+
+    let newRangeBoxes: RangeBlockBox[] = [];
+
+    for (let col = 0; col < TOTAL_COLS; ++col) {
+      let prevCovered = -1;
+
+      for (let row = 0; row <= TOTAL_ROWS; ++row) {
+        let covered = row === TOTAL_ROWS ? false : cellCovered[row][col];
+
+        if (!covered && prevCovered !== -1) {
+          newRangeBoxes.push({
+            bRow: prevCovered,
+            tRow: row - 1,
+            col: col
+          })
+        } 
+        
+        if (covered && prevCovered === -1) {
+          prevCovered = row;
+        } 
+        
+        if (!covered) {
+          prevCovered = -1;
+        }
+      }
+    }
+
+    setRangeBoxes(newRangeBoxes)
   }
 
   const onRangeBoxDelete = (boxId: number) => {
     let updated = [...rangeBoxes];
     updated.splice(boxId, 1);
 
-    setRangeBoxes(updated);
+    redrawRangeBoxes(updated);
   }
 
-  const getRelativeCoords = (event: any) : Coords => {
-    if (rangeSelectorBounds) {
-      let x = event.clientX - rangeSelectorBounds().left;
-      let y = event.clientY - rangeSelectorBounds().top;
-      return {x: x, y: y};
-    }
+  // const getRelativeCoords = (event: any) : Coords => {
+  //   if (rangeSelectorBounds) {
+  //     let x = event.clientX - rangeSelectorBounds().left;
+  //     let y = event.clientY - rangeSelectorBounds().top;
+  //     return {x: x, y: y};
+  //   }
 
-    return {x: -1, y: -1};
-  };
+  //   return {x: -1, y: -1};
+  // };
 
-  const updateGridState = (row: number, col: number) : void => {
-    let cloned = gridState.map((arr) => arr.slice());
-    cloned[row][col] = !gridState[row][col];
+  // const updateGridState = (row: number, col: number) : void => {
+  //   let cloned = gridState.map((arr) => arr.slice());
+  //   cloned[row][col] = !gridState[row][col];
 
-    setGridState(cloned);
-  }
+  //   setGridState(cloned);
+  // }
 
   const rangeSelectorBounds = () : DOMRect => {
     if (rangeSelectorRef?.current)
@@ -142,15 +156,13 @@ const Calendar: React.FC<CalendarProps> = (props) => {
 
   const renderGridCell = (row: number, col: number) : React.ReactNode => {
     const onHourBound = row % 4 == 0;
-    const selected = gridState[row][col];
 
     return (
       <div 
         key={row * 999 } 
         className={classNames(
           "grid-cell",
-          { "grid-cell-hour" : onHourBound },
-          { "grid-cell-selected": selected } 
+          { "grid-cell-hour" : onHourBound }
         )}
         onClick={() => createRangeBox(row, col)}
       />

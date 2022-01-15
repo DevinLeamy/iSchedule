@@ -1,7 +1,7 @@
 .range-box-main {
   width: 100%;
   border-radius: 10px; 
-  background-color: rgb(210, 14, 115);
+  background-color: #001540; 
   position: absolute;
 
   color: var(--white);
@@ -10,6 +10,11 @@
   text-align: center;
   user-select: none; 
   z-index: 1;
+}
+
+.range-box-main:hover {
+  cursor: grab !important; 
+  background-color: #4f669b; 
 }
 
 /* .rb-cell { */
@@ -24,11 +29,14 @@
   cursor: grab;
 }
 
+*/
 .rb-date-range {
   font-size: 12px;
   position: absolute;
   left: 5px;
 }
+
+/*
 
 .extender:hover {
   cursor: ns-resize; 
