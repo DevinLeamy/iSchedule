@@ -14,18 +14,20 @@ type CalendarProps = {
 
 const TOTAL_MINUTES: number = 60 * 24;
 const TOTAL_ROWS: number = 24 * 4;
-const TOTAL_COLS: number = 7;
+const TOTAL_COLS: number = 4;
 
+export type Time = {
+  hour: number,
+  minute: number,
+  am: boolean
+};
 
-/*
-We collect:
-We make a grid.
-We determine what tiles are selected in the grid.
-We return the interpretation of the selected tiles as time intervals
-*/
-
-
-const Calendar: React.FC<CalendarProps> = (props) => {
+const Calendar: React.FC<CalendarProps> = ({
+  weekView,
+  days,
+  dateRanges,
+  onDateRangeChange
+}) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
 
   const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
@@ -76,7 +78,7 @@ const Calendar: React.FC<CalendarProps> = (props) => {
     let cellCovered: boolean[][] = [...Array(TOTAL_ROWS)].map(() => new Array(TOTAL_COLS).fill(false));
 
     for (let rangeBox of updatedBoxes) {
-      // TODO: boxes get negative row when merges by draw from the bottom 
+      // TODO: boxes get negative bRow when merged by draw from the bottom 
       for (let row = rangeBox.bRow; row <= rangeBox.tRow; ++row)
         cellCovered[row][rangeBox.col] = true;
     }
@@ -141,9 +143,9 @@ const Calendar: React.FC<CalendarProps> = (props) => {
   }
 
 
-  const getRowFromCoords = (coords: Coords) : number => {
-    return Math.floor((coords.y / rangeSelectorBounds().height) * TOTAL_ROWS);
-  }
+  // const getRowFromCoords = (coords: Coords) : number => {
+  //   return Math.floor((coords.y / rangeSelectorBounds().height) * TOTAL_ROWS);
+  // }
 
   const renderGridRow = (col: number) : React.ReactNode => {
     return (
@@ -169,17 +171,61 @@ const Calendar: React.FC<CalendarProps> = (props) => {
     );
   }
 
+  const computeHourFrom24Hour = (totalHours: number) : number => {
+    if (totalHours === 0)
+      return 12
+    if (totalHours > 12) 
+      return totalHours - 12
+    return totalHours
+  }
+
+  const getTimeFromRow = (row: number) : Time => {
+    let minutes: number = row * 15;
+    if (minutes === 24 * 60)
+      --minutes;
+
+    let totalHours = Math.floor(minutes / 60)
+    let hour = computeHourFrom24Hour(totalHours);
+    let minute = minutes % 60
+    let am = totalHours < 12
+
+    return { hour, minute, am };
+  }
+
+  const formatMinute = (minute: number) : string => {
+    return (minute < 10) ? `0${minute}` : `${minute}`
+  }
+
+  const getStringFromTime = (time: Time) : string => {
+    let zone = time.am ? 'AM' : 'PM'
+    if (time.minute === 0) 
+      return `${time.hour} ${zone}`
+
+    return `${time.hour}:${formatMinute(time.minute)} ${zone}`;
+  }
+
   const renderRangeSelector = () : React.ReactNode => {
-    return (
+    return ( 
       <div className="rs-main">
+        <div className="calendar-dates">
+          {[...Array(TOTAL_ROWS)].map((_, row) => {
+            if (row === 0) return <div className="calendar-date" />;
+            if (row === TOTAL_ROWS) return <div className="calendar-date" />;
+            if (row % 4 !== 0) return <div className="calendar-date" />;
+            return (
+              <div className="calendar-date">
+                {getStringFromTime(getTimeFromRow(row))}
+              </div> 
+            )
+         })}
+        </div>
         <div 
           className="rs-grid-container"
           ref={rangeSelectorRef}
-          // onMouseMove={handleMouseMove}
         >
-          {[...Array(TOTAL_COLS)].map((_, col) => {
-            return renderGridRow(col);
-          })}
+          {[...Array(TOTAL_COLS)].map((_, col) => 
+            renderGridRow(col)
+          )}
         </div>
       </div>
     );
@@ -225,7 +271,7 @@ const Calendar: React.FC<CalendarProps> = (props) => {
       {renderCalenderHeader()}
       {renderRangeSelectorTopBar()}
       {renderRangeSelector()}
-    </div>
+   </div>
   );
 }
 

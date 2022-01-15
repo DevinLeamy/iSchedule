@@ -8,6 +8,7 @@
   border: var(--calendar-border);
 
   --cal-top-bar-sz: 50px;
+  --dts-cell-height: 15px;
 }
 
 .calendar-header {
@@ -104,14 +105,36 @@
 
 /* GRID STYLES */
 .rs-main {
-  /* width: 100%; */
   max-height: calc(100% - 2 * var(--cal-top-bar-sz));
+  width: 100%;
 
   overflow-y: scroll;
+  display: flex;
+
+  --calendar-dates-width: 50px;
 }
+
+.calendar-dates {
+  width: var(--calendar-dates-width); 
+}
+
+.calendar-date {
+  height: var(--dts-cell-height);
+  width: 100%;
+  line-height: var(--dts-cell-height);
+  transform: translateY(-7.5px);
+  text-align: center;
+
+  font-size: 13px;
+  /* color: var(--grey); */
+  color: grey;
+  font-family: 'poppins-medium' 
+}
+
+
 .rs-grid-container {
   display: flex;
-  width: 100%;
+  width: calc(100% - var(--calendar-dates-width));
   height: 100%; 
 }
 
@@ -122,8 +145,8 @@
   width: 100%;
   position: relative;
 
-  --grid-border-color: rgb(200, 200, 200);
-  border-left: 1px solid var(--grid-border-color);
+  --grid-border-color: rgb(211, 211, 211);
+  border-right: 1px solid var(--grid-border-color);
 }
 
 /* GRID CELL STYLES */

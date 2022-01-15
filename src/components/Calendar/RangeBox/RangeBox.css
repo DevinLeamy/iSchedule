@@ -1,15 +1,15 @@
 .range-box-main {
   width: 100%;
-  border-radius: 10px; 
-  background-color: #001540; 
+  background-color: #07245e; 
   position: absolute;
 
   color: var(--white);
-  /* padding: 10px; */
+  padding: 5px;
 
   text-align: center;
   user-select: none; 
   z-index: 1;
+  box-shadow: 0 0 5px 5px #e4e4e4;
 }
 
 .range-box-main:hover {
@@ -17,23 +17,31 @@
   background-color: #4f669b; 
 }
 
-/* .rb-cell { */
-  /* height: var(--dts-cell-height); */
-  /* height: 15px;
-  width: 100%;
-} */
-
-/* .rb-cell:hover {
-  opacity: 0.8;
-  background-color: orange;
-  cursor: grab;
-}
-
-*/
 .rb-date-range {
-  font-size: 12px;
+  font-size: 13px;
   position: absolute;
   left: 5px;
+  top: 10px;
+  color: var(--off-white);
+  font-family: 'poppins-medium' 
+}
+
+.drag-bar-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.drag-bar-top { top: 3px; }
+.drag-bar-bottom { bottom: 3px; }
+
+.drag-bar {
+  width: 40px;
+  border-radius: 1px;
+  /* border: 1px solid var(--white); */
+  /* border: 1px solid rgb(0, 162, 255);  */
+  border: 1px solid var(--blue);
 }
 
 /*

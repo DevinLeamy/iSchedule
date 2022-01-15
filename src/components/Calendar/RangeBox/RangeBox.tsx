@@ -9,22 +9,6 @@ import {
 } from "react-rnd"
 import "./RangeBox.css";
 
-/*
-Handle resize:
-- Resize
-- Calls callback 
-- Adjust to fit grid
-- Resolve merges
-- Update state
-
-Handle drag:
-- Drag
-- Calls callback 
-- Adjust to fit grid
-- Resolve merges
-- Update state
-*/
-
 export type RangeBlockBox = {
   bRow: number, // bottom row (smaller value) 
   tRow: number, // top row    (heigher value)
@@ -50,7 +34,8 @@ type RangeBoxProps = {
 
 export type Time = {
   hour: number,
-  minute: number
+  minute: number,
+  am: boolean
 };
 
 const RangeBox: React.FC<RangeBoxProps> = ({
@@ -72,26 +57,50 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     height: cellHeight * (box.tRow - box.bRow + 1)
   };
 
-  const getTimeFromRow = (row: number) : Time => {
-    const minutes: number = row * 15;
+  const computeHourFrom24Hour = (totalHours: number) : number => {
+    if (totalHours === 0)
+      return 12
+    if (totalHours > 12) 
+      return totalHours - 12
+    return totalHours
+  }
 
-    return {
-      hour: Math.round(minutes / 60),
-      minute: minutes % 60
-    };
+  const getTimeFromRow = (row: number) : Time => {
+    let minutes: number = row * 15;
+    if (minutes === 24 * 60)
+      --minutes;
+
+    let totalHours = Math.floor(minutes / 60)
+    let hour = computeHourFrom24Hour(totalHours);
+    let minute = minutes % 60
+    let am = totalHours < 12
+
+    return { hour, minute, am };
+  }
+
+  const formatMinute = (minute: number) : string => {
+    return (minute < 10) ? `0${minute}` : `${minute}`
   }
 
   const getStringFromTime = (time: Time) : string => {
-    let AM : boolean = time.hour < 12;
+    if (time.minute === 0) 
+      return `${time.hour}`
 
-    return `${time.hour % 12}:${time.minute}${AM ? 'am' : 'pm'}`;
+    return `${time.hour}:${formatMinute(time.minute)}`;
   }
 
   const getCellDisplayText = () : string => {
     const startTime = getTimeFromRow(box.bRow);
-    const endTime = getTimeFromRow(box.tRow);
+    const endTime = getTimeFromRow(box.tRow + 1);
 
-    return `${getStringFromTime(startTime)} - ${getStringFromTime(endTime)}`;
+    const startS = getStringFromTime(startTime)
+    const endS = getStringFromTime(endTime)
+
+    let frame = endTime.am ? 'am' : 'pm'
+
+    if (startTime.am === endTime.am) 
+      return `${startS} - ${endS}${frame}` 
+    return `${startS}am - ${endS}pm` 
   } 
 
   const renderDateRange = () : React.ReactNode => {
@@ -130,11 +139,11 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     <Rnd
       key={id}
       dragAxis="y"
-      dragGrid={[15, 15]}
-      resizeGrid={[15, 15]}
       bounds="parent"
       position={position}
       size={size}
+      dragGrid={[15, 15]}
+      resizeGrid={[15, 15]}
       onResize={handleResize}
       onResizeStop={handleResize}
       onDragStop={handleDrag}
@@ -147,7 +156,13 @@ const RangeBox: React.FC<RangeBoxProps> = ({
         bottom: true
       }}
     >
+      <div className="drag-bar-container drag-bar-top">
+        <div className="drag-bar" />
+      </div>
       {renderDateRange()}
+      <div className="drag-bar-container drag-bar-bottom">
+        <div className="drag-bar" />
+      </div>
     </Rnd>
   );
 }
