@@ -16,12 +16,56 @@
   height: var(--cal-top-bar-sz);
   display: flex;
   position: relative;
+  padding: 4px;
 
   --button-sz: calc(var(--cal-top-bar-sz) - 10px); 
-  padding: 4px;
 
   box-sizing: border-box;
   border: var(--calendar-border);
+}
+
+.calendar-days-main {
+  --cal-days-bar-sz: 100px;
+  height: var(--cal-days-bar-sz);
+
+  display: flex;
+  /* -15px to account for the scroll bar */
+  width: calc(100% - 15px);
+}
+
+.calendar-dates-spacer {
+  width: 50px;
+}
+
+.calendar-days {
+  height: 100%;
+  width: calc(100% - 50px);
+  display: flex;
+}
+
+.calendar-day {
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  border-right: 1px solid rgb(211, 211, 211);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cd-month {
+  font-size: 13px;
+}
+
+.cd-day {
+  font-size: 55px;
+  /* font-family: var(--header-font); */
+  font-family: var(--mom-cake);
+  color: var(--blue);
+}
+
+.cd-weekday {
+  font-size: 13px;
 }
 
 .calendar-topbar {
@@ -105,7 +149,7 @@
 
 /* GRID STYLES */
 .rs-main {
-  max-height: calc(100% - 2 * var(--cal-top-bar-sz));
+  max-height: calc(100% - var(--cal-top-bar-sz) - 100px);
   width: 100%;
 
   overflow-y: scroll;
@@ -125,7 +169,7 @@
   transform: translateY(-7.5px);
   text-align: center;
 
-  font-size: 13px;
+  font-size: 11px;
   /* color: var(--grey); */
   color: grey;
   font-family: 'poppins-medium' 

@@ -1,17 +1,41 @@
-// const MONTHS = [
-//   { name: "January",  monthIndex: 0,  days: 31 }, 
-//   { name: "February", monthIndex: 1,  days: 28 }, 
-//   { name: "March",    monthIndex: 2,  days: 31 }, 
-//   { name: "April",    monthIndex: 3,  days: 30 }, 
-//   { name: "May",      monthIndex: 4,  days: 31 }, 
-//   { name: "June",     monthIndex: 5,  days: 30 }, 
-//   { name: "July",     monthIndex: 6,  days: 31 }, 
-//   { name: "August",   monthIndex: 7,  days: 31 }, 
-//   { name: "September",monthIndex: 8,  days: 30 }, 
-//   { name: "October",  monthIndex: 9,  days: 31 }, 
-//   { name: "November", monthIndex: 10, days: 30 }, 
-//   { name: "December", monthIndex: 11, days: 31 }
-// ]
+const MONTHS = [
+  { name: "January",   monthIndex: 0,  days: 31 }, 
+  { name: "February",  monthIndex: 1,  days: 28 }, 
+  { name: "March",     monthIndex: 2,  days: 31 }, 
+  { name: "April",     monthIndex: 3,  days: 30 }, 
+  { name: "May",       monthIndex: 4,  days: 31 }, 
+  { name: "June",      monthIndex: 5,  days: 30 }, 
+  { name: "July",      monthIndex: 6,  days: 31 }, 
+  { name: "August",    monthIndex: 7,  days: 31 }, 
+  { name: "September", monthIndex: 8,  days: 30 }, 
+  { name: "October",   monthIndex: 9,  days: 31 }, 
+  { name: "November",  monthIndex: 10, days: 30 }, 
+  { name: "December",  monthIndex: 11, days: 31 }
+]
+
+const WEEKDAYS = [
+  { name: "Monday",    weekdayIndex: 0 },
+  { name: "Tuesday",   weekdayIndex: 0 },
+  { name: "Wednesday", weekdayIndex: 0 },
+  { name: "Thursday",  weekdayIndex: 0 },
+  { name: "Friday",    weekdayIndex: 0 },
+  { name: "Saturday",  weekdayIndex: 0 },
+  { name: "Sunday",    weekdayIndex: 0 }
+]
+
+export type SDate = {
+  month: string,
+  day: string,
+  weekday: string
+}
+
+const getSDate = (date: Date) : SDate => {
+  let month = MONTHS[date.getMonth()].name
+  let day = `${date.getDate()}`
+  let weekday = WEEKDAYS[date.getDay()].name
+
+  return { month, day, weekday };
+}
 
 // const getDate = (inDays: number = 0) : Date => {
 //   let now = new Date(); 
@@ -43,4 +67,4 @@
 // }
 
 // export { getDate, getNextDate, formatDate };
-export {}
+export { getSDate }

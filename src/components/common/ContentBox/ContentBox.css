@@ -1,8 +1,7 @@
 .cbox-main {
   box-sizing: border-box;
-  border: 3px solid rgb(227, 227, 227); 
   border-radius: 5px;
-  width: 800px;
+  width: 1000px;
   height: 1000px; 
   margin: auto;
   /* display: flex; 

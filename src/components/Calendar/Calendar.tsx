@@ -2,6 +2,7 @@ import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from
 import classNames from "classnames";
 import { DateRange, Coords } from "../../types/types";
 import { useMouseCapture, Position } from "../../hooks/useMouseCapture";
+import { getSDate, SDate } from "../../utilities/dates";
 import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
 import "./Calendar.css"
 
@@ -12,9 +13,26 @@ type CalendarProps = {
   onDateRangeChange?: (newRanges: DateRange[]) => void
 };
 
+/*
+FEATURES TO ADD:
+- Monthly calendar
+- Vertical drag on weekly calendar
+- Vertical + Horizontal drag on weekly calendar
+- Delete blocks
+- Squish blocks against top/bottom border
+- Drag blocks between columns
+- Better way to extend blocks 
+- Select all-day blocks
+
+TODO:
+- Code review
+- Implement the backend
+- Testing
+*/
+
 const TOTAL_MINUTES: number = 60 * 24;
 const TOTAL_ROWS: number = 24 * 4;
-const TOTAL_COLS: number = 4;
+const TOTAL_COLS: number = 7;
 
 export type Time = {
   hour: number,
@@ -29,13 +47,13 @@ const Calendar: React.FC<CalendarProps> = ({
   onDateRangeChange
 }) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
-
+  const [weekStart, setWeekStart] = useState<Date>(new Date());
   const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
 
   const createRangeBox = (row: number, col: number) => {
     const rangeBlockBox: RangeBlockBox = {
       bRow: row,
-      tRow: Math.min(TOTAL_ROWS - 1, row + 4), // one hour
+      tRow: Math.min(TOTAL_ROWS - 1, row + 3), // one hour
       col: col
     };
 
@@ -60,6 +78,10 @@ const Calendar: React.FC<CalendarProps> = ({
         );
       return <></>;
    });
+  }
+
+  const updateDateRanges = (rangeBoxes: RangeBlockBox) : void => {
+
   }
 
   const onRangeBoxChange = (boxId: number, row: number, heightInCells: number) => {
@@ -119,33 +141,12 @@ const Calendar: React.FC<CalendarProps> = ({
     redrawRangeBoxes(updated);
   }
 
-  // const getRelativeCoords = (event: any) : Coords => {
-  //   if (rangeSelectorBounds) {
-  //     let x = event.clientX - rangeSelectorBounds().left;
-  //     let y = event.clientY - rangeSelectorBounds().top;
-  //     return {x: x, y: y};
-  //   }
-
-  //   return {x: -1, y: -1};
-  // };
-
-  // const updateGridState = (row: number, col: number) : void => {
-  //   let cloned = gridState.map((arr) => arr.slice());
-  //   cloned[row][col] = !gridState[row][col];
-
-  //   setGridState(cloned);
-  // }
-
   const rangeSelectorBounds = () : DOMRect => {
     if (rangeSelectorRef?.current)
       return rangeSelectorRef.current.getBoundingClientRect();
     return new DOMRect();
   }
 
-
-  // const getRowFromCoords = (coords: Coords) : number => {
-  //   return Math.floor((coords.y / rangeSelectorBounds().height) * TOTAL_ROWS);
-  // }
 
   const renderGridRow = (col: number) : React.ReactNode => {
     return (
@@ -166,7 +167,7 @@ const Calendar: React.FC<CalendarProps> = ({
           "grid-cell",
           { "grid-cell-hour" : onHourBound }
         )}
-        onClick={() => createRangeBox(row, col)}
+        onMouseDown={() => createRangeBox(row, col)}
       />
     );
   }
@@ -231,16 +232,46 @@ const Calendar: React.FC<CalendarProps> = ({
     );
   }
 
+  const renderCalendarDay = (date: Date) : React.ReactNode => {
+    const sdate = getSDate(date)
+
+    return (
+      <div className="calendar-day">
+        <div className="cd-month">{sdate.month.slice(0, 3)}</div>
+        <div className="cd-day">{sdate.day}</div>
+        <div className="cd-weekday">{sdate.weekday}</div>
+      </div>
+    )
+  }
+
   const renderRangeSelectorTopBar = () : React.ReactNode => {
     return (
-      <div className="calendar-header">
-        <div> January 7th </div>
-        <div> January 7th </div>
-        <div> January 7th </div>
-        <div> January 7th </div>
-        <div> January 7th </div>
-      </div>
+      <div className="calendar-days-main">
+        <div className="calendar-dates-spacer" />
+        <div className="calendar-days">
+          {[...Array(TOTAL_COLS)].map((_, i) => {
+            let day = new Date(weekStart.getTime())
+            day.setDate(day.getDate() + i)
+
+            return renderCalendarDay(day);
+           })}
+        </div>
+     </div>
     );
+  }
+
+  const gotoNextWeek = () : void => {
+    let newWeekStart = new Date(weekStart.getTime())
+    newWeekStart.setDate(newWeekStart.getDate() + TOTAL_COLS)
+
+    setWeekStart(newWeekStart)
+  }
+
+  const gotoPreviousWeek = () : void => {
+    let newWeekStart = new Date(weekStart.getTime())
+    newWeekStart.setDate(newWeekStart.getDate() - TOTAL_COLS)
+
+    setWeekStart(newWeekStart)
   }
 
   const renderCalenderHeader = () : React.ReactNode => {
@@ -248,10 +279,7 @@ const Calendar: React.FC<CalendarProps> = ({
       <div className="calendar-header">
           <div 
           className="change-week-btn change-week-left"
-          // onClick={() => {
-          //   let newWeekStart: Date = getNextDate(weekStart, -props.days);
-          //   setWeekStart(newWeekStart);
-          // }}
+          onClick={() => gotoPreviousWeek()}
         >
           {"<"}
         </div>
@@ -259,6 +287,7 @@ const Calendar: React.FC<CalendarProps> = ({
         </div>
         <div 
           className="change-week-btn change-week-right"
+          onClick={() => gotoNextWeek()}
         >
           {">"}
         </div>
