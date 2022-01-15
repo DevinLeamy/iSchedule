@@ -117,7 +117,7 @@ const RangeBox: React.FC<RangeBoxProps> = (props) => {
     <Draggable
       axis="y"
       handle=".handle"
-      defaultPosition={{x: 0, y: 20 * props.box.bRow}}
+      defaultPosition={{x: 0, y: 15 * props.box.bRow}}
       position={undefined}
       bounds={{top: 0, bottom: 24 * 4 * 20}}
       grid={[15, 15]}

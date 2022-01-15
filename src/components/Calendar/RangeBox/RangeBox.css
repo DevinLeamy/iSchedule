@@ -1,7 +1,7 @@
 .range-box-main {
   width: 100%;
   border-radius: 10px; 
-  background-color: rgb(4, 42, 164);
+  background-color: rgb(8, 8, 19);
   position: absolute;
 
   color: var(--white);
@@ -19,7 +19,7 @@
 .rb-cell:hover {
   opacity: 0.8;
   background-color: orange;
-  cursor: move;
+  cursor: grab;
 }
 
 .rb-date-range {

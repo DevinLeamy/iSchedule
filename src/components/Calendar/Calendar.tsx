@@ -1,7 +1,7 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { DateRange, Coords } from "../../types/types";
-import RangeBox from "./RangeBox/RangeBox";
+import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
 import "./Calendar.css"
 
 type CalendarProps = {
@@ -26,11 +26,58 @@ We return the interpretation of the selected tiles as time intervals
 
 const Calendar: React.FC<CalendarProps> = (props) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
+  const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
   const [gridState, setGridState] = useState<boolean[][]>(
     Array.from(Array(TOTAL_ROWS), () => new Array(TOTAL_COLS))
   );
 
   const [mouseDown, setMouseDown] = useState<boolean>(false);
+
+  const createRangeBox = (row: number, col: number) => {
+    const rangeBlockBox: RangeBlockBox = {
+      bRow: row,
+      tRow: Math.min(TOTAL_ROWS - 1, row + 4), // one hour
+      col: col
+    };
+
+    const clone = rangeBoxes.slice();
+    clone.push(rangeBlockBox);
+
+    // TODO: reconcile merges
+
+    setRangeBoxes(clone);
+  }
+
+  const getRangeBoxesInCol = (col: number) : RangeBlockBox[] => {
+    let colRangeBoxes: RangeBlockBox[] = [];
+
+    for (let rangeBox of rangeBoxes) {
+      if (rangeBox.col == col)
+        colRangeBoxes.push(rangeBox)
+    }
+
+    return colRangeBoxes;
+  }
+
+  const renderRangeBoxesInCol = (col: number) : React.ReactNode => {
+    let colRangeBoxes = getRangeBoxesInCol(col);
+
+    return colRangeBoxes.map((rangeBox, id) =>
+      <RangeBox
+        id={id}
+        box={rangeBox}
+        onRelease={onRangeBoxRelease}
+        onExtend={onRangeBoxExtend}
+        onDelete={onRangeBoxDelete}
+        onChange={() => {}}
+      />
+    );
+  }
+
+  const onRangeBoxRelease = () => {}
+  const onRangeBoxExtend = (boxId: number) => {}
+  // const onRangeBoxChange = () => {}
+  const onRangeBoxDelete = (boxId: number) => {}
 
   const getRelativeCoords = (event: any) : Coords => {
     if (rangeSelectorBounds) {
@@ -96,30 +143,26 @@ const Calendar: React.FC<CalendarProps> = (props) => {
   const renderGridRow = (col: number) : React.ReactNode => {
     return (
       <div className="rs-grid-row">
-        {[...Array(TOTAL_ROWS)].map((_, row) => { 
-          return renderGridCell(row, gridState[row][col]);
-        })}
-        <RangeBox 
-          id={0}
-          box={{ bRow: 1, tRow: 10, col: col }}
-          onRelease={() => {}}
-          onExtend={(id: number) => {}}
-          onChange={() => {}}
-          onDelete={(id: number) => {}}
-        />
+        {[...Array(TOTAL_ROWS)].map((_, row) => renderGridCell(row, col))}
+        {renderRangeBoxesInCol(col)} 
       </div>
    );
   }
 
-  const renderGridCell = (row: number, selected: boolean) : React.ReactNode => {
+  const renderGridCell = (row: number, col: number) : React.ReactNode => {
     const onHourBound = row % 4 == 0;
+    const selected = gridState[row][col];
 
     return (
-      <div key={row * 999 } className={classNames(
-        "grid-cell",
-        { "grid-cell-hour" : onHourBound },
-        { "grid-cell-selected": selected } 
-      )}/>
+      <div 
+        key={row * 999 } 
+        className={classNames(
+          "grid-cell",
+          { "grid-cell-hour" : onHourBound },
+          { "grid-cell-selected": selected } 
+        )}
+        onClick={() => createRangeBox(row, col)}
+      />
     );
   }
 
