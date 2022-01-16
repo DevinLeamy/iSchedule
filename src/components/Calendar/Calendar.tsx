@@ -15,14 +15,14 @@ type CalendarProps = {
 
 /*
 FEATURES TO ADD:
-- Monthly calendar
-- Vertical drag on weekly calendar
-- Vertical + Horizontal drag on weekly calendar
-- Delete blocks
-- Squish blocks against top/bottom border
-- Drag blocks between columns
-- Better way to extend blocks 
-- Select all-day blocks
+- [ ] Monthly calendar
+- [ ] Vertical drag on weekly calendar
+- [ ] Vertical + Horizontal drag on weekly calendar
+- [x] Delete blocks
+- [ ] Squish blocks against top/bottom border
+- [ ] Drag blocks between columns
+- [ ] Better way to extend blocks 
+- [ ] Select all-day blocks
 
 TODO:
 - Code review

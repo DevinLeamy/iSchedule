@@ -46,12 +46,12 @@
 
 .delete-range {
   position: absolute;
-  bottom: 0px;
+  top: 0px;
   right: -3px;
 
   text-align: center;
 
-  color: var(--white);
+  color: var(--black);
   transform: scale(0.8);
   visibility: hidden;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ResizeDirection } from "re-resizable";
 import { DraggableEvent } from 'react-draggable';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { 
   Rnd, 
   ResizableDelta, 
@@ -163,7 +163,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       </div>
       {renderDateRange()}
       <div onClick={() => onDelete(id)}>
-        <DeleteForeverIcon className="delete-range" />
+        <DeleteOutlineIcon className="delete-range" />
       </div>
      <div className="drag-bar-container drag-bar-bottom">
         <div className="drag-bar" />
