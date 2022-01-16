@@ -1,18 +1,10 @@
 type DateRange = {
-  start: Date,
-  end: Date 
+  startMinute: number,
+  endMinute: number, 
+  month: number,
+  day: number,
+  year: number,
+  timezone: string
 };
 
-type Coords = {
-  x: number,
-  y: number
-}
-
-// type Bounds = {
-//   left: number,
-//   right: number,
-//   bottom: number,
-//   top: number
-// };
-
-export type { DateRange, Coords } 
+export type { DateRange } 

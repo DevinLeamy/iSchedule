@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ResizeDirection } from "re-resizable";
 import { DraggableEvent } from 'react-draggable';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { 
   Rnd, 
   ResizableDelta, 
@@ -8,6 +9,7 @@ import {
   Position
 } from "react-rnd"
 import "./RangeBox.css";
+import { Icon } from "@mui/material";
 
 export type RangeBlockBox = {
   bRow: number, // bottom row (smaller value) 
@@ -105,9 +107,9 @@ const RangeBox: React.FC<RangeBoxProps> = ({
 
   const renderDateRange = () : React.ReactNode => {
     return (
-      <span className="rb-date-range">
+      <div className="rb-date-range">
         {getCellDisplayText()}
-      </span>
+      </div>
     );
   }
 
@@ -160,10 +162,13 @@ const RangeBox: React.FC<RangeBoxProps> = ({
         <div className="drag-bar" />
       </div>
       {renderDateRange()}
-      <div className="drag-bar-container drag-bar-bottom">
+      <div onClick={() => onDelete(id)}>
+        <DeleteForeverIcon className="delete-range" />
+      </div>
+     <div className="drag-bar-container drag-bar-bottom">
         <div className="drag-bar" />
       </div>
-    </Rnd>
+   </Rnd>
   );
 }
 

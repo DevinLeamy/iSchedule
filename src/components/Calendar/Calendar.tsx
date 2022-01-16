@@ -1,16 +1,16 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import classNames from "classnames";
-import { DateRange, Coords } from "../../types/types";
-import { useMouseCapture, Position } from "../../hooks/useMouseCapture";
-import { getSDate, SDate } from "../../utilities/dates";
+import { DateRange } from "../../types/types";
+import { getSDate, getDateInDays, SDate } from "../../utilities/dates";
 import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
+import { ITimezone } from "react-timezone-select";
 import "./Calendar.css"
 
 type CalendarProps = {
-  weekView?: boolean,
   days: number,
-  dateRanges?: DateRange[],
-  onDateRangeChange?: (newRanges: DateRange[]) => void
+  dateRanges: DateRange[],
+  timezone: string, 
+  onDateRangeChange: (newRanges: DateRange[]) => void
 };
 
 /*
@@ -41,8 +41,8 @@ export type Time = {
 };
 
 const Calendar: React.FC<CalendarProps> = ({
-  weekView,
   days,
+  timezone,
   dateRanges,
   onDateRangeChange
 }) => {
@@ -80,8 +80,27 @@ const Calendar: React.FC<CalendarProps> = ({
    });
   }
 
-  const updateDateRanges = (rangeBoxes: RangeBlockBox) : void => {
+  const updateDateRanges = (rangeBoxes: RangeBlockBox[]) : void => {
+    const dateRanges: DateRange[] = []
 
+    for (let rangeBox of rangeBoxes) {
+      let startRow = rangeBox.bRow;
+      let endRow = rangeBox.tRow;
+
+      let dayOffset = rangeBox.col;
+      let date = getDateInDays(dayOffset);
+
+      dateRanges.push({
+        startMinute: startRow * 15,
+        endMinute: endRow * 15,
+        month: date.getMonth(),
+        day: date.getDay(),
+        year: date.getFullYear(),
+        timezone
+      })
+    }
+
+    onDateRangeChange(dateRanges);
   }
 
   const onRangeBoxChange = (boxId: number, row: number, heightInCells: number) => {

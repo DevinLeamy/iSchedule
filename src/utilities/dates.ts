@@ -37,6 +37,13 @@ const getSDate = (date: Date) : SDate => {
   return { month, day, weekday };
 }
 
+const getDateInDays = (days: number) : Date => {
+  let date = new Date();
+  date.setTime(date.getTime() + days)
+
+  return date;
+}
+
 // const getDate = (inDays: number = 0) : Date => {
 //   let now = new Date(); 
 //   now.setDate(now.getDate() + inDays);
@@ -67,4 +74,4 @@ const getSDate = (date: Date) : SDate => {
 // }
 
 // export { getDate, getNextDate, formatDate };
-export { getSDate }
+export { getSDate, getDateInDays }
