@@ -1,13 +1,14 @@
 import React, { useState, useRef, useLayoutEffect, useEffect, useCallback } from "react";
 import classNames from "classnames";
 import { DateRange } from "../../types/types";
-import { getSDate, getDateInDays, SDate } from "../../utilities/dates";
+import { getDateInDays } from "../../utilities/dates";
 import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
+import CalendarHeader from "./CalendarHeader";
+import CalendarDatesBar from "./CalendarDatesBar";
 import { ITimezone } from "react-timezone-select";
 import "./Calendar.css"
 
 type CalendarProps = {
-  days: number,
   dateRanges: DateRange[],
   timezone: string, 
   onDateRangeChange: (newRanges: DateRange[]) => void
@@ -30,9 +31,9 @@ TODO:
 - Testing
 */
 
-const TOTAL_MINUTES: number = 60 * 24;
 const TOTAL_ROWS: number = 24 * 4;
 const TOTAL_COLS: number = 7;
+const CELL_HEIGHT: number = 15;
 
 export type Time = {
   hour: number,
@@ -40,16 +41,44 @@ export type Time = {
   am: boolean
 };
 
+
 const Calendar: React.FC<CalendarProps> = ({
-  days,
   timezone,
   dateRanges,
   onDateRangeChange
 }) => {
+  const getRangeBoxesFromDateRanges = (dateRanges: DateRange[]) : RangeBlockBox[] => {
+    let rangeBoxes : RangeBlockBox[] = []
+
+    for (let dateRange of dateRanges) {
+      let rangeBox = getRangeBoxFromDateRange(dateRange)
+
+      if (rangeBox)
+        rangeBoxes.push(rangeBox)
+    }
+
+    return rangeBoxes;
+  }
+
+  const getRangeBoxFromDateRange = (dateRange: DateRange) : RangeBlockBox | undefined => {
+    let startDate = new Date(dateRange.year, dateRange.month, dateRange.day, Math.round(dateRange.startMinute / 60), dateRange.startMinute % 60)
+
+    let weekEnd = getDateInDays(TOTAL_COLS - 1);
+
+    if (weekStart.getTime() > startDate.getTime() || startDate.getTime() > weekEnd.getTime()) 
+      return undefined;
+    
+    return {
+      bRow: Math.round(dateRange.startMinute / 15),
+      tRow: Math.round(dateRange.endMinute / 15),
+      col: startDate.getDate() - weekStart.getDate() 
+    }
+  }
+
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
   const [weekStart, setWeekStart] = useState<Date>(new Date());
-  const [rangeBoxes, setRangeBoxes] = useState<RangeBlockBox[]>([]);
-
+  const rangeBoxes = getRangeBoxesFromDateRanges(dateRanges)
+  
   const createRangeBox = (row: number, col: number) => {
     const rangeBlockBox: RangeBlockBox = {
       bRow: row,
@@ -60,7 +89,7 @@ const Calendar: React.FC<CalendarProps> = ({
     const updated = rangeBoxes.slice();
     updated.push(rangeBlockBox);
 
-    redrawRangeBoxes(updated);
+    updateDateRanges(redrawRangeBoxes(updated));
   }
 
   const renderRangeBoxesInCol = (col: number) : React.ReactNode => {
@@ -88,13 +117,15 @@ const Calendar: React.FC<CalendarProps> = ({
       let endRow = rangeBox.tRow;
 
       let dayOffset = rangeBox.col;
-      let date = getDateInDays(dayOffset);
+      let date = getDateInDays(dayOffset, weekStart);
+      
 
+      console.log(date.getDate())
       dateRanges.push({
         startMinute: startRow * 15,
         endMinute: endRow * 15,
         month: date.getMonth(),
-        day: date.getDay(),
+        day: date.getDate(),
         year: date.getFullYear(),
         timezone
       })
@@ -112,10 +143,11 @@ const Calendar: React.FC<CalendarProps> = ({
 
     updated[boxId] = rangeBox;
 
-    redrawRangeBoxes(updated)
+    updated = redrawRangeBoxes(updated)
+    updateDateRanges(updated)
   }
 
-  const redrawRangeBoxes = (updatedBoxes: RangeBlockBox[]) : void => {
+  const redrawRangeBoxes = (updatedBoxes: RangeBlockBox[]) : RangeBlockBox[] => {
     let cellCovered: boolean[][] = [...Array(TOTAL_ROWS)].map(() => new Array(TOTAL_COLS).fill(false));
 
     for (let rangeBox of updatedBoxes) {
@@ -150,7 +182,7 @@ const Calendar: React.FC<CalendarProps> = ({
       }
     }
 
-    setRangeBoxes(newRangeBoxes)
+    return newRangeBoxes
   }
 
   const onRangeBoxDelete = (boxId: number) => {
@@ -251,34 +283,6 @@ const Calendar: React.FC<CalendarProps> = ({
     );
   }
 
-  const renderCalendarDay = (date: Date) : React.ReactNode => {
-    const sdate = getSDate(date)
-
-    return (
-      <div className="calendar-day">
-        <div className="cd-month">{sdate.month.slice(0, 3)}</div>
-        <div className="cd-day">{sdate.day}</div>
-        <div className="cd-weekday">{sdate.weekday}</div>
-      </div>
-    )
-  }
-
-  const renderRangeSelectorTopBar = () : React.ReactNode => {
-    return (
-      <div className="calendar-days-main">
-        <div className="calendar-dates-spacer" />
-        <div className="calendar-days">
-          {[...Array(TOTAL_COLS)].map((_, i) => {
-            let day = new Date(weekStart.getTime())
-            day.setDate(day.getDate() + i)
-
-            return renderCalendarDay(day);
-           })}
-        </div>
-     </div>
-    );
-  }
-
   const gotoNextWeek = () : void => {
     let newWeekStart = new Date(weekStart.getTime())
     newWeekStart.setDate(newWeekStart.getDate() + TOTAL_COLS)
@@ -293,39 +297,30 @@ const Calendar: React.FC<CalendarProps> = ({
     setWeekStart(newWeekStart)
   }
 
-  const renderCalenderHeader = () : React.ReactNode => {
-    return (
-      <div className="calendar-header">
-          <div 
-          className="change-week-btn change-week-left"
-          onClick={() => gotoPreviousWeek()}
-        >
-          {"<"}
-        </div>
-        <div className="week-header">
-        </div>
-        <div 
-          className="change-week-btn change-week-right"
-          onClick={() => gotoNextWeek()}
-        >
-          {">"}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="calendar-main">
-      {renderCalenderHeader()}
-      {renderRangeSelectorTopBar()}
+      <CalendarHeader 
+        onNextWeek={gotoNextWeek}
+        onPreviousWeek={gotoPreviousWeek}
+      />
+      <CalendarDatesBar 
+        startDate={weekStart} 
+        totalDays={TOTAL_COLS}
+      />
       {renderRangeSelector()}
    </div>
   );
 }
 
-Calendar.defaultProps = {
-  days: 7
-};
+// const CalendarRangeSelector = () => {
+
+//   return (
+
+//   )
+// }
+
+
+
 
 export default Calendar;
 

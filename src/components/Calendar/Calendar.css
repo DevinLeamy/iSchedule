@@ -58,9 +58,9 @@
 }
 
 .cd-day {
-  font-size: 55px;
-  /* font-family: var(--header-font); */
-  font-family: var(--mom-cake);
+  font-size: 35px;
+  font-family: var(--header-font);
+  /* font-family: var(--mom-cake); */
   color: var(--blue);
 }
 
