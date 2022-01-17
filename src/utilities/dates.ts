@@ -1,3 +1,5 @@
+import { AbsTime, Time } from "../types/types"
+
 const MONTHS = [
   { name: "January",   monthIndex: 0,  days: 31 }, 
   { name: "February",  monthIndex: 1,  days: 28 }, 
@@ -37,41 +39,41 @@ const getSDate = (date: Date) : SDate => {
   return { month, day, weekday };
 }
 
-const getDateInDays = (days: number) : Date => {
-  let date = new Date();
-  date.setTime(date.getTime() + days)
+const getDateInDays = (days: number, currentDate: Date = new Date()) : Date => {
+  let newDate = new Date(currentDate.getTime())
+  newDate.setDate(newDate.getDate() + days)
 
-  return date;
+  return newDate;
 }
 
-// const getDate = (inDays: number = 0) : Date => {
-//   let now = new Date(); 
-//   now.setDate(now.getDate() + inDays);
-  
-//   const day: number = now.getDate();
-//   const month: number = now.getMonth();
-//   // add year later
+const minToAbsTime = (minute: number) : AbsTime => {
+  return {
+    hour: Math.floor(minute / 60),
+    minute: minute % 60
+  }
+}
 
-//   return { day, month: MONTHS[month] };
-// }
 
-// const formatDate = (date: Date, shorthand: boolean = false) => {
-//   if (shorthand)
-//     return `${date.month.name.slice(0, 3)} ${date.day}`;
+const computeHourFrom24Hour = (totalHours: number) : number => {
+  if (totalHours === 0) return 12
+  if (totalHours > 12) return totalHours - 12
+  return totalHours
+}
 
-//   return `${date.month.name} ${date.day}`;
-// }
+const absTimeToTime = (absTime: AbsTime) : Time => {
+  return {
+    hour: computeHourFrom24Hour(absTime.hour),
+    minute: absTime.minute, 
+    am: absTime.hour < 12
+  };
+}
 
-// const getNextDate = (currentDate: Date, daysFromCurrent: number = 1) : Date => {
-//   let now = new Date(2022, currentDate.month.monthIndex, currentDate.day); 
-//   now.setDate(now.getDate() + daysFromCurrent);
-  
-//   const day: number = now.getDate();
-//   const month: number = now.getMonth();
-//   // add year later
+const minToTime = (minutes: number) : Time => {
+  return absTimeToTime(minToAbsTime(minutes));
+}
 
-//   return { day, month: MONTHS[month] };
-// }
+const dateInRange = (date: Date, rangeLow: Date, rangeHigh: Date) : boolean => {
+  return (rangeLow.getTime() <= date.getTime() && date.getTime() <= rangeHigh.getTime());
+}
 
-// export { getDate, getNextDate, formatDate };
-export { getSDate, getDateInDays }
+export { getSDate, getDateInDays, absTimeToTime, minToAbsTime, minToTime, dateInRange }

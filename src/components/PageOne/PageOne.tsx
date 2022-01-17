@@ -38,7 +38,6 @@ const PageOne: React.FC = () => {
       <ContentBox>
         <div className='h-center-contents'>
           <TextField 
-            // id="standard-basic" 
             label="" 
             variant="standard" 
             placeholder="Your event name"
@@ -70,7 +69,6 @@ const PageOne: React.FC = () => {
         <div className="spacer"/>
         <Box>
           Select you timezone
-          {/* npm run build && serve -s build */}
           <TimezoneSelect 
             value={timezone}
             onChange={setTimezone}
@@ -81,7 +79,6 @@ const PageOne: React.FC = () => {
         <div className='calendar-container'>
           <Calendar 
             timezone={typeof(timezone) === "string" ? timezone : timezone.value}
-            days={7}
             dateRanges={dateRanges}
             onDateRangeChange={onDateRangeChange}
           />

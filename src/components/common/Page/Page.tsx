@@ -1,6 +1,5 @@
 import React from 'react';
 import './Page.css'
-import Navbar from "../../../components/Navbar/Navbar";
 import ContentPane from "../../../components/common/ContentPane/ContentPane";
 
 
