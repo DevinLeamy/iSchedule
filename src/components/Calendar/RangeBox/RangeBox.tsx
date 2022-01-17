@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { ResizeDirection } from "re-resizable";
 import { DraggableEvent } from 'react-draggable';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { Time, Size } from "../../../types/types";
+import { minToTime } from "../../../utilities/dates";
 import { 
   Rnd, 
   ResizableDelta, 
@@ -9,35 +11,20 @@ import {
   Position
 } from "react-rnd"
 import "./RangeBox.css";
-import { Icon } from "@mui/material";
 
 export type RangeBlockBox = {
-  bRow: number, // bottom row (smaller value) 
-  tRow: number, // top row    (heigher value)
-  col: number   // column
-}
-
-export type Size = {
-  width: number,
-  height: number
+  bRow: number, 
+  tRow: number,
+  col: number  
 }
 
 type RangeBoxProps = {
   id: number,
-
   box: RangeBlockBox,
-
   cellWidth: number,
   cellHeight: number,
-
   onChange: (id: number, row: number, heightInCells: number) => void,
   onDelete: (id: number) => void
-};
-
-export type Time = {
-  hour: number,
-  minute: number,
-  am: boolean
 };
 
 const RangeBox: React.FC<RangeBoxProps> = ({
@@ -51,67 +38,13 @@ const RangeBox: React.FC<RangeBoxProps> = ({
 }) => {
   const position: Position = {
     x: 0, 
-    y: cellHeight * box.bRow
+    y: rowsToPixels(box.bRow, cellHeight)
   };
 
-  const size = {
+  const size: Size = {
     width: cellWidth - 20,
-    height: cellHeight * (box.tRow - box.bRow + 1)
+    height: rowsToPixels(box.tRow - box.bRow + 1, cellHeight)
   };
-
-  const computeHourFrom24Hour = (totalHours: number) : number => {
-    if (totalHours === 0)
-      return 12
-    if (totalHours > 12) 
-      return totalHours - 12
-    return totalHours
-  }
-
-  const getTimeFromRow = (row: number) : Time => {
-    let minutes: number = row * 15;
-    if (minutes === 24 * 60)
-      --minutes;
-
-    let totalHours = Math.floor(minutes / 60)
-    let hour = computeHourFrom24Hour(totalHours);
-    let minute = minutes % 60
-    let am = totalHours < 12
-
-    return { hour, minute, am };
-  }
-
-  const formatMinute = (minute: number) : string => {
-    return (minute < 10) ? `0${minute}` : `${minute}`
-  }
-
-  const getStringFromTime = (time: Time) : string => {
-    if (time.minute === 0) 
-      return `${time.hour}`
-
-    return `${time.hour}:${formatMinute(time.minute)}`;
-  }
-
-  const getCellDisplayText = () : string => {
-    const startTime = getTimeFromRow(box.bRow);
-    const endTime = getTimeFromRow(box.tRow + 1);
-
-    const startS = getStringFromTime(startTime)
-    const endS = getStringFromTime(endTime)
-
-    let frame = endTime.am ? 'am' : 'pm'
-
-    if (startTime.am === endTime.am) 
-      return `${startS} - ${endS}${frame}` 
-    return `${startS}am - ${endS}pm` 
-  } 
-
-  const renderDateRange = () : React.ReactNode => {
-    return (
-      <div className="rb-date-range">
-        {getCellDisplayText()}
-      </div>
-    );
-  }
 
   const handleResize = (
     event: MouseEvent | TouchEvent, 
@@ -120,19 +53,16 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     delta: ResizableDelta,
     position: Position
   ) => {
-    const row = Math.round(position.y / cellHeight);
+    const row = pixelsToRows(position.y, cellHeight);
     const height = elementRef.getBoundingClientRect().height;
-    const heightInCells = Math.round(height / cellHeight);
+    const heightInCells = pixelsToRows(height, cellHeight)
 
     onChange(id, row, heightInCells);
   }
 
-  const handleDrag = (
-    event: DraggableEvent, 
-    data: DraggableData
-  ) => {
-    const row = Math.round(data.y / cellHeight);
-    const heightInCells = Math.round(size.height / cellHeight);
+  const handleDrag = (event: DraggableEvent, data: DraggableData) => {
+    const row = pixelsToRows(data.y, cellHeight); 
+    const heightInCells = pixelsToRows(size.height, cellHeight);
 
     onChange(id, row, heightInCells);
   }
@@ -161,7 +91,11 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       <div className="drag-bar-container drag-bar-top">
         <div className="drag-bar" />
       </div>
-      {renderDateRange()}
+      <RBDateRange
+        bottomRow={box.bRow}
+        topRow={box.tRow}
+        cellHeight={cellHeight}
+      />
       <div onClick={() => onDelete(id)}>
         <DeleteOutlineIcon className="delete-range" />
       </div>
@@ -170,6 +104,65 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       </div>
    </Rnd>
   );
+}
+
+type RBDateRangeProps = {
+  bottomRow: number,
+  topRow: number,
+  cellHeight: number
+}
+
+const RBDateRange: React.FC<RBDateRangeProps> = ({
+  bottomRow,
+  topRow,
+  cellHeight
+}) => {
+  const startTime = getTimeFromRow(bottomRow, cellHeight);
+  const endTime = getTimeFromRow(topRow + 1, cellHeight);
+
+  const getCellDisplayText = () : string => {
+    const startS = getStringFromTime(startTime)
+    const endS = getStringFromTime(endTime)
+
+    let frame = endTime.am ? 'am' : 'pm'
+
+    if (startTime.am === endTime.am) 
+      return `${startS} - ${endS}${frame}` 
+    return `${startS}am - ${endS}pm` 
+  } 
+
+  return (
+    <div className="rb-date-range">
+      {getCellDisplayText()}
+    </div>
+  );
+}
+
+const getTimeFromRow = (row: number, cellHeight: number) : Time => {
+  let minutes: number = row * cellHeight;
+  if (minutes === 24 * 60)
+    --minutes;
+  
+  return minToTime(minutes);
+}
+
+const pixelsToRows = (pixels: number, cellHeight: number) : number => {
+  return Math.round(pixels / cellHeight);
+}
+
+const rowsToPixels = (rows: number, cellHeight: number) : number => {
+  return rows * cellHeight;
+}
+
+const formatMinute = (minute: number) : string => {
+  return (minute < 10) ? `0${minute}` : `${minute}`
+}
+
+const getStringFromTime = (time: Time) : string => {
+  if (time.minute === 0) 
+    return `${time.hour}`
+
+  return `${time.hour}:${formatMinute(time.minute)}`;
 }
 
 export default RangeBox;
