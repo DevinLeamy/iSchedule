@@ -13,7 +13,7 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
     <div className="calendar-header">
       <div 
         className="change-week-btn change-week-left"
-        onClick={onNextWeek}
+        onClick={onPreviousWeek}
       >
         {"<"}
     </div>
@@ -21,7 +21,7 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
       </div>
       <div 
         className="change-week-btn change-week-right"
-        onClick={onPreviousWeek}
+        onClick={onNextWeek}
       >
         {">"}
       </div>

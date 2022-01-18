@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { DateRange } from "../../types/types";
-import { getDateInDays, dateInRange } from "../../utilities/dates";
+import { 
+  getDateInDays, 
+  dateInRange, 
+  daysBetween,
+  getAbsYMD,
+  getEndOfTheDay
+} from "../../utilities/dates";
 import { RangeBlockBox } from "./RangeBox/RangeBox";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDatesBar from "./CalendarDatesBar";
@@ -40,6 +46,10 @@ const Calendar: React.FC<CalendarProps> = ({
   dateRanges,
   onDateRangeChange
 }) => {
+  const weekContainsDate = (date: Date) : boolean => {
+    return dateInRange(date, weekStart, getWeekEnd(weekStart));
+  }
+
   const getRangeBoxesFromDateRanges = (dateRanges: DateRange[]) : RangeBlockBox[] => {
     return dateRanges
       .map(dateRange => getRangeBoxFromDateRange(dateRange))
@@ -47,39 +57,43 @@ const Calendar: React.FC<CalendarProps> = ({
   }
 
   const getRangeBoxFromDateRange = (dateRange: DateRange) : RangeBlockBox | undefined => {
-    let startDate = new Date(
-      dateRange.year, 
-      dateRange.month, 
-      dateRange.day, 
-      Math.round(dateRange.startMinute / 60), 
-      dateRange.startMinute % 60
-    )
+    let startDate = getDateRangeStartDate(dateRange) 
 
-    let weekEnd = getDateInDays(TOTAL_COLS - 1);
-
-    if (dateInRange(startDate, weekStart, weekEnd))
+    if (weekContainsDate(startDate)) {
       return {
         bRow: Math.round(dateRange.startMinute / CELL_HEIGHT),
         tRow: Math.round(dateRange.endMinute / CELL_HEIGHT),
-        col: startDate.getDate() - weekStart.getDate() 
+        col: daysBetween(startDate, weekStart) 
       }
-    return undefined;
+ 
+    }
+   return undefined;
   }
 
-  const [weekStart, setWeekStart] = useState<Date>(new Date());
+  const [weekStart, setWeekStart] = useState<Date>(
+    getAbsYMD(new Date())
+  );
   const rangeBoxes = getRangeBoxesFromDateRanges(dateRanges)
-  
-  const updateDateRanges = (rangeBoxes: RangeBlockBox[]) : void => {
-    const dateRanges: DateRange[] = []
 
-    for (let rangeBox of rangeBoxes) {
+  const updateDateRanges = (updatedRangeBoxes: RangeBlockBox[]) : void => {
+    const updatedDateRanges: DateRange[] = [] 
+    
+    // Keep dates that lie outside of the current week, discard the rest.
+    for (let dateRange of dateRanges) {
+      const startDate = getDateRangeStartDate(dateRange)
+
+      if (!weekContainsDate(startDate)) 
+        updatedDateRanges.push({...dateRange})
+    }
+
+    for (let rangeBox of updatedRangeBoxes) {
       let startRow = rangeBox.bRow;
       let endRow = rangeBox.tRow;
 
       let dayOffset = rangeBox.col;
       let date = getDateInDays(dayOffset, weekStart);
 
-      dateRanges.push({
+      updatedDateRanges.push({
         startMinute: startRow * CELL_MINUTES,
         endMinute: endRow * CELL_MINUTES,
         month: date.getMonth(),
@@ -89,22 +103,16 @@ const Calendar: React.FC<CalendarProps> = ({
       })
     }
 
-    onDateRangeChange(dateRanges);
+    onDateRangeChange(updatedDateRanges);
   }
 
   const gotoNextWeek = () : void => {
-    let newWeekStart = new Date(weekStart.getTime())
-    newWeekStart.setDate(newWeekStart.getDate() + TOTAL_COLS)
-
-    setWeekStart(newWeekStart)
+    setWeekStart(getDateInDays(TOTAL_COLS, weekStart))
   }
 
   const gotoPreviousWeek = () : void => {
-    let newWeekStart = new Date(weekStart.getTime())
-    newWeekStart.setDate(newWeekStart.getDate() - TOTAL_COLS)
-
-    setWeekStart(newWeekStart)
-  }
+    setWeekStart(getDateInDays(-TOTAL_COLS, weekStart))
+  } 
 
   return (
     <div className="calendar-main">
@@ -126,6 +134,29 @@ const Calendar: React.FC<CalendarProps> = ({
   );
 }
 
+const getDateRangeStartDate = (dateRange: DateRange) : Date => {
+  return new Date(
+    dateRange.year, 
+    dateRange.month, 
+    dateRange.day, 
+    Math.round(dateRange.startMinute / 60), 
+    dateRange.startMinute % 60
+  ) 
+}
+
+const getDateRangeEndDate = (dateRange: DateRange) : Date => {
+  return new Date(
+    dateRange.year, 
+    dateRange.month, 
+    dateRange.day, 
+    Math.round(dateRange.endMinute / 60), 
+    dateRange.endMinute % 60
+  )
+}
+
+const getWeekEnd = (weekStart: Date) : Date => {
+  return getEndOfTheDay(getDateInDays(TOTAL_COLS - 1, weekStart));
+}
 
 
 

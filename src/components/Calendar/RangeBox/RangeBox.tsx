@@ -11,6 +11,7 @@ import {
   Position
 } from "react-rnd"
 import "./RangeBox.css";
+import { MINUTES_PER_DAY } from "../../../constants";
 
 export type RangeBlockBox = {
   bRow: number, 
@@ -140,7 +141,7 @@ const RBDateRange: React.FC<RBDateRangeProps> = ({
 
 const getTimeFromRow = (row: number, cellHeight: number) : Time => {
   let minutes: number = row * cellHeight;
-  if (minutes === 24 * 60)
+  if (minutes === MINUTES_PER_DAY)
     --minutes;
   
   return minToTime(minutes);

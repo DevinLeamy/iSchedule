@@ -28,6 +28,9 @@ body {
   padding: 0px;
   font-family: var(--default-font);
   /* font-family: "landasans-medium"; */
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 div {

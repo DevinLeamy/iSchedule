@@ -1,3 +1,4 @@
+import { MILLISECONDS_PER_DAY } from "../constants"
 import { AbsTime, Time } from "../types/types"
 
 const MONTHS = [
@@ -41,7 +42,7 @@ const getSDate = (date: Date) : SDate => {
 
 const getDateInDays = (days: number, currentDate: Date = new Date()) : Date => {
   let newDate = new Date(currentDate.getTime())
-  newDate.setDate(newDate.getDate() + days)
+  newDate.setDate(newDate.getDate() + days) 
 
   return newDate;
 }
@@ -76,4 +77,32 @@ const dateInRange = (date: Date, rangeLow: Date, rangeHigh: Date) : boolean => {
   return (rangeLow.getTime() <= date.getTime() && date.getTime() <= rangeHigh.getTime());
 }
 
-export { getSDate, getDateInDays, absTimeToTime, minToAbsTime, minToTime, dateInRange }
+const getAbsYMD = (date: Date) : Date => {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+const daysBetween = (startDate: Date, endDate: Date) : number => {
+  let absStartDate = getAbsYMD(startDate) 
+  let absEndDate = getAbsYMD(endDate);
+
+  let diffInMilliseconds = Math.abs(absStartDate.getTime() - absEndDate.getTime())
+
+  return Math.round(diffInMilliseconds / MILLISECONDS_PER_DAY)
+}
+
+const getEndOfTheDay = (date: Date) : Date => {
+  const getAbsDate = getAbsYMD(date)
+  return new Date(getAbsDate.getTime() + MILLISECONDS_PER_DAY - 1);
+}
+
+export { 
+  getSDate, 
+  getDateInDays, 
+  absTimeToTime, 
+  minToAbsTime, 
+  minToTime, 
+  dateInRange,
+  daysBetween,
+  getAbsYMD,
+  getEndOfTheDay
+}
