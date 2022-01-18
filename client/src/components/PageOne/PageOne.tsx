@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './PageOne.css';
 import Page from "../../components/common/Page/Page";
 import Header from "../../components/common/Header/Header";
@@ -19,8 +19,8 @@ const PageOne: React.FC = () => {
   const [timezone, setTimezone] = useState<ITimezone>(
     Intl.DateTimeFormat().resolvedOptions().timeZone
   );
+  const eventNameRef = useRef<HTMLInputElement>();
   const [dateRanges, setDateRanges] = useState<DateRange[]>([])
-
   const [calendarType, setCalendarType] = React.useState<string>(WEEK_C);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,6 +29,15 @@ const PageOne: React.FC = () => {
 
   const onDateRangeChange = (dateRanges: DateRange[]) : void => {
     setDateRanges(dateRanges);
+  }
+
+  const onCreateEvent = () : void => {
+    if (eventNameRef === undefined || eventNameRef.current === undefined) {
+      alert("Enter an event name");
+      return;
+    }
+
+    let eventName: string = eventNameRef.current.value;
   }
 
 
@@ -41,6 +50,7 @@ const PageOne: React.FC = () => {
             label="" 
             variant="standard" 
             placeholder="Your event name"
+            inputRef={eventNameRef}
             style={{minWidth: "60%"}}
             inputProps={{style: {
               textAlign: "center", 
