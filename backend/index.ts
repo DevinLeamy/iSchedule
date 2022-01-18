@@ -1,4 +1,5 @@
 import express from "express";
+import { connect } from "mongoose";
 import bodyParser from "body-parser";
 import SERVER_CONFIG from "./config/index.config";
 import path from "path";

@@ -7,13 +7,9 @@ import Calendar from "../../components/Calendar/Calendar";
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Button from "@mui/material/Button";
-import Radio from '@mui/material/Radio';
 import { DateRange } from "../../types/types";
 
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
-
-let MONTH_C: string = "MONTH_C";
-let WEEK_C: string = "WEEK_C";
 
 const PageOne: React.FC = () => {
   const [timezone, setTimezone] = useState<ITimezone>(
@@ -21,11 +17,7 @@ const PageOne: React.FC = () => {
   );
   const eventNameRef = useRef<HTMLInputElement>();
   const [dateRanges, setDateRanges] = useState<DateRange[]>([])
-  const [calendarType, setCalendarType] = React.useState<string>(WEEK_C);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCalendarType(event.target.value);
-  };
 
   const onDateRangeChange = (dateRanges: DateRange[]) : void => {
     setDateRanges(dateRanges);
@@ -39,7 +31,6 @@ const PageOne: React.FC = () => {
 
     let eventName: string = eventNameRef.current.value;
   }
-
 
   return (
     <Page>
@@ -62,20 +53,7 @@ const PageOne: React.FC = () => {
           />
         </div>
         <div className="spacer"/>
-        <div className="c-type-toggle-container">
-          <span className="c-type-label">Week</span>
-          <Radio
-            checked={calendarType === WEEK_C}
-            onChange={handleChange}
-            value={WEEK_C}
-          />
-          <span className="c-type-label">Month</span>
-          <Radio
-            checked={calendarType === MONTH_C}
-            onChange={handleChange}
-            value={MONTH_C}
-          />
-        </div>
+        
         <div className="spacer"/>
         <Box>
           Select you timezone

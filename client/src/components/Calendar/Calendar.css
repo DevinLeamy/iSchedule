@@ -4,6 +4,7 @@
   background-color: var(--white);
   box-sizing: border-box;
   --calendar-border: 1px solid rgb(164, 196, 244); 
+  --grid-border: 1px solid rgb(211, 211, 211);
 
   border: var(--calendar-border);
 
@@ -21,11 +22,11 @@
   --button-sz: calc(var(--cal-top-bar-sz) - 10px); 
 
   box-sizing: border-box;
-  border: var(--calendar-border);
+  /* border: var(--calendar-border); */
 }
 
 .calendar-days-main {
-  --cal-days-bar-sz: 100px;
+  --cal-days-bar-sz: 80px;
   height: var(--cal-days-bar-sz);
 
   display: flex;
@@ -41,6 +42,7 @@
   height: 100%;
   width: calc(100% - 50px);
   display: flex;
+  border-bottom: 1px solid rgb(211, 211, 211); 
 }
 
 .calendar-day {
@@ -58,7 +60,7 @@
 }
 
 .cd-day {
-  font-size: 35px;
+  font-size: 25px;
   font-family: var(--header-font);
   /* font-family: var(--mom-cake); */
   color: var(--blue);
@@ -78,8 +80,7 @@
   padding: 4px;
 
   box-sizing: border-box;
-  border: var(--calendar-border);
-
+  /* border: var(--calendar-border); */
 }
 
 .change-week-btn {
@@ -131,7 +132,6 @@
   display: flex;
   flex-direction: column;
   width: var(--dts-dates-width);
-  /* background-color: orange; */
 }
 
 .c-times-header-spacer {
@@ -145,14 +145,16 @@
   color: grey;
   font-size: 12px;
   transform: translateY(-7px);
+  border-bottom: 1px solid rgb(211, 211, 211); 
 }
 
 /* GRID STYLES */
 .rs-main {
-  max-height: calc(100% - var(--cal-top-bar-sz) - 100px);
+  max-height: calc(100% - var(--cal-top-bar-sz) - 80px);
   width: 100%;
 
   overflow-y: scroll;
+  overflow-x: hidden;
   display: flex;
 
   --calendar-dates-width: 50px;
@@ -189,8 +191,7 @@
   width: 100%;
   position: relative;
 
-  --grid-border-color: rgb(211, 211, 211);
-  border-right: 1px solid var(--grid-border-color);
+  border-right: var(--grid-border);
 }
 
 /* GRID CELL STYLES */
@@ -199,7 +200,7 @@
   height: 15px;
   /* height: var(--dts-cell-height); */
   box-sizing: border-box;
-  border-top: 1px dashed var(--grid-border-color);
+  /* border-top: 1px dashed var(--grid-border-color); */
 }
 
 .grid-cell:hover {
@@ -209,7 +210,7 @@
 }
 
 .grid-cell-hour {
-  border-top: 1px solid var(--grid-border-color);
+  border-top: var(--grid-border);
 }
 
 .grid-cell-selected {
@@ -219,3 +220,15 @@
   border-top: none; 
 }
 
+.c-type-toggle-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  --c-type-container-sz: 50px;
+  height: var(--c-type-container-sz);
+}
+
+.c-type-label {
+  line-height: var(--c-type-container-sz);
+}

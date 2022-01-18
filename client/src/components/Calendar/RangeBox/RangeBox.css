@@ -10,7 +10,7 @@
   text-align: center;
   user-select: none; 
   z-index: 1;
-  box-shadow: 0 0 5px 5px #e4e4e4;
+  box-shadow: 0 0 3px 3px #d0d0d0;
 }
 
 .range-box-main:hover {

@@ -1,14 +1,11 @@
 .navbar-main {
   box-sizing: border-box;
-  height: 50px;
+  /* height: 20px; */
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 5px;
-  margin-bottom: 20px;
 }
-
-/* .navbar-content {} */
 
 .navbar-left {
   float: left;
