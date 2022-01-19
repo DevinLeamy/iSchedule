@@ -1,11 +1,9 @@
 import React from 'react';
 import './App.css';
-import PageOne from '../PageOne/PageOne';
+import { Navigator } from "../Navigator/Navigator";
 
 const App: React.FC = () => {
-  return (
-    <PageOne />
-  );
+  return <Navigator />;
 }
 
 export default App;

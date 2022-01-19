@@ -31,6 +31,7 @@ body {
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 div {
@@ -43,6 +44,7 @@ div {
 }
 
 .h-center-contents {
+  margin-top: 10px;
   width: 100%;
   display: flex;
   justify-content: center;
