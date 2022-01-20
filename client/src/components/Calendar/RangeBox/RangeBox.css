@@ -10,7 +10,8 @@
   text-align: center;
   user-select: none; 
   z-index: 1;
-  box-shadow: 0 0 3px 3px #d0d0d0;
+  /* box-shadow: 0 0 2px 2px #d0d0d0; */
+  /* box-shadr */
 }
 
 .range-box-main:hover {

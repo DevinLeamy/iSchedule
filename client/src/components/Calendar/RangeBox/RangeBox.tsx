@@ -43,7 +43,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   };
 
   const size: Size = {
-    width: cellWidth - 20,
+    width: cellWidth - 40,
     height: rowsToPixels(box.tRow - box.bRow + 1, cellHeight)
   };
 

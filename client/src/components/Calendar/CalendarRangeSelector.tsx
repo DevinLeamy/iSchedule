@@ -1,7 +1,8 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import classNames from "classnames";
 import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
-import { Time } from "../../types/types";
+import { Time, Position } from "../../types/types";
+import { useMouseCapture } from "../../hooks/useMouseCapture";
 
 
 type CalendarRangeSelectorProps = {
@@ -18,6 +19,8 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
   cols
 }) => {
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
+  const mousePosition = useMouseCapture(rangeSelectorRef, rows, cols);
+  const [startPosition, setStartPosition] = useState<Position>();
 
   const onRangeBoxChange = (boxId: number, row: number, heightInCells: number) => {
     let updated = [...rangeBoxes];
@@ -74,11 +77,24 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
     onRangeBoxesChange(redrawRangeBoxes(updated));
   }
 
+  const onMouseUp = () => {
+    if (startPosition && mousePosition && startPosition.col === mousePosition.col) {
+      const length = Math.abs(startPosition.row - mousePosition.row);
+      const startRow = Math.min(startPosition.row, mousePosition.row);
 
-  const createRangeBox = (row: number, col: number) => {
+      createRangeBox(startRow, startPosition.col, length);
+    }
+    setStartPosition(undefined);
+  }
+
+  const onMouseDown = (row: number, col: number) => {
+    setStartPosition({ row, col });
+  }
+
+  const createRangeBox = (row: number, col: number, length: number = 3) => {
     const rangeBlockBox: RangeBlockBox = {
       bRow: row,
-      tRow: Math.min(rows - 1, row + 3), // one hour
+      tRow: Math.min(rows - 1, row + Math.max(3, length)),
       col: col
     };
 
@@ -113,6 +129,20 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
       </div>
    );
   }
+  
+  const cellInSelectedRange = (row: number, col: number) : boolean => {
+    if (startPosition === undefined || mousePosition === undefined) 
+      return false;
+
+    if (col === startPosition.col && col === mousePosition.col) {
+      let minRow = Math.min(mousePosition.row, startPosition.row)
+      let maxRow = Math.max(mousePosition.row, startPosition.row)
+
+      return (minRow <= row && row <= maxRow);
+    }
+
+    return false;
+  }
 
   const renderGridCell = (row: number, col: number) : React.ReactNode => {
     const onHourBound = row % 4 == 0;
@@ -122,9 +152,10 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
         key={row * 999 } 
         className={classNames(
           "grid-cell",
-          { "grid-cell-hour" : onHourBound }
+          { "grid-cell-hour" : onHourBound },
+          { "grid-cell-selected" : cellInSelectedRange(row, col) } 
         )}
-        onMouseDown={() => createRangeBox(row, col)}
+        onMouseDown={() => onMouseDown(row, col)}
       />
     );
   }
@@ -137,17 +168,19 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
 
 
   return (
-    <div className="rs-main">
+    <div 
+      className="rs-main"
+      onMouseUp={() => onMouseUp()}
+    >
       <div className="calendar-dates">
         {[...Array(rows)].map((_, row) => {
-          if (row === 0) return <div className="calendar-date" />;
-          if (row === rows) return <div className="calendar-date" />;
-          if (row % 4 !== 0) return <div className="calendar-date" />;
-          return (
-            <div className="calendar-date">
-              {getStringFromTime(getTimeFromRow(row))}
-            </div> 
-          )
+          if (row % 4 === 0 && row !== rows && row !== 0) {
+            return (
+              <div className="calendar-date">
+                {getStringFromTime(getTimeFromRow(row))}
+              </div> 
+            )
+          } else return <div className="calendar-date" />; 
         })}
       </div>
       <div 

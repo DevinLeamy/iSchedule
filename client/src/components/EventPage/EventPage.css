@@ -1,0 +1,31 @@
+.copy-event-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  --copy-link-height: 40px;
+  --copy-button-width: 120px;
+
+  height: var(--copy-link-height);
+}
+
+.event-link-container {
+  display: flex;
+  height: 100%;
+  width: calc(100% - var(--copy-button-width));
+  line-height: var(--copy-link-height);
+  border: 1px solid gray;
+}
+
+.event-link {
+  text-align: center;
+  font-size: 16px;
+  width: 100%;
+}
+
+.event-link-icon {
+  padding-right: 10px;
+}
+
+.copy-event-button {
+  width: var(--copy-button-width);
+}

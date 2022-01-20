@@ -217,9 +217,9 @@
 
 .grid-cell-selected {
   background-color: var(--blue); 
-  opacity: 1;
+  opacity: 0.4;
 
-  border-top: none; 
+  border-top: var(--grid-border); 
 }
 
 .c-type-toggle-container {

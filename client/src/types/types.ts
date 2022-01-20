@@ -34,3 +34,8 @@ export type Event = {
   dateRanges: DateRange[],
   userIds: string[] 
 }
+
+export type Position = {
+  row: number,
+  col: number
+}

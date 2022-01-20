@@ -19,7 +19,10 @@
   /* Fonts */
   --default-font: 'poppins-regular';
   --header-font: 'poppins-semibold';
-  --mom-cake: 'momcake'
+  --mom-cake: 'momcake';
+
+  /* Other */
+  --small-shadow: 0 0 2px 2px #d0d0d0; 
 }
 
 body {
