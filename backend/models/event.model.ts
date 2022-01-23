@@ -9,6 +9,7 @@ interface DateRange {
 // interface representing a document in MongoDB
 interface Event {
   _id: ObjectId,
+  name: string,
   dateRanges: DateRange[],
   timezone: string,
   userIds: string[]
@@ -17,8 +18,9 @@ interface Event {
 // Schema corresponsing to the document interface
 const EventSchema = new Schema<Event>({
   // _id: { type: Schema.Types.ObjectId, required: true },
+  name: { type: String },
   dateRanges: [{
-    start: { type: Date, required: true },
+    startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
   }],
   timezone: { type: String, required: true },

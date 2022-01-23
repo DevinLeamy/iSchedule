@@ -7,7 +7,14 @@ import path from "path";
 
 dotenv.config();
 
-connect(process.env.DB_URL ?? 'ERROR');
+connect(process.env.DB_URL ?? 'ERROR', (err) => {
+  if (err) {
+    console.log(err.message)
+    console.log(err)
+  } else {
+    console.log("Connected to MongoDb")
+  }
+});
 
 /*
 0: disconnected

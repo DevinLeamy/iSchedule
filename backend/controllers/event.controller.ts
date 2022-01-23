@@ -1,26 +1,36 @@
 import { Request, Response, NextFunction } from "express";
 import { HydratedDocument } from "mongoose";
 import { EventModel, Event } from "../models";
+import { respond } from "../utils";
 
-export const EVENT_CTRL = {
+const EVENT_CTRL = {
   createEvent: async (req: Request, res: Response, next: NextFunction) => {
     const payload: Event = req.body; 
 
-    // let newEvent: HydratedDocument<Event> = new EventModel(payload);
-    const newEvent: HydratedDocument<Event> = new EventModel({
-      dateRanges: [],
-      timezone: "America/Edmonton",
-      userIds: []
-    });
+    console.log(payload);
 
+    let newEvent: HydratedDocument<Event> = new EventModel(payload);
     await newEvent.save();
 
-    console.log("New Event Created", newEvent._id)
+    respond(res, { _id: newEvent._id })
+  },
 
-    res.json({
-      status: 1,
-      data: undefined,
-      message: "A new event was created"
-    })
+  getEventById: async (req: Request, res: Response, next: NextFunction) : Promise<void> => {
+    let eventId: string = req.params._id;
+
+    try {
+      let event = await EventModel.findById(eventId, { versionKey: false }).exec();
+      respond(res, event?.toJSON({ versionKey: false }));
+    } catch (err) {
+      console.log(err)
+      respond(res, null, {status: 1, message: "error getting event by id"})
+    }
+
+    EventModel
+      .findById(eventId, { versionKey: false }, (err: Error, event: HydratedDocument<Event>) => {
+        respond(res, event.toJSON({ versionKey: false }));
+      })
   }
 }
+
+export { EVENT_CTRL }
