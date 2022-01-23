@@ -22,10 +22,11 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
   const mousePosition = useMouseCapture(rangeSelectorRef, rows, cols);
   const [startPosition, setStartPosition] = useState<Position>();
 
-  const onRangeBoxChange = (boxId: number, row: number, heightInCells: number) => {
+  const onRangeBoxChange = (boxId: number, row: number, col: number, heightInCells: number) => {
     let updated = [...rangeBoxes];
 
     let rangeBox = {...rangeBoxes[boxId]};
+    rangeBox.col = col;
     rangeBox.bRow = row;
     rangeBox.tRow = row + heightInCells - 1;
 
@@ -39,8 +40,10 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
 
     for (let rangeBox of updatedBoxes) {
       // TODO: boxes get negative bRow when merged by draw from the bottom 
-      for (let row = rangeBox.bRow; row <= rangeBox.tRow; ++row)
+
+      for (let row = rangeBox.bRow; row <= rangeBox.tRow; ++row) {
         cellCovered[row][rangeBox.col] = true;
+      }
     }
 
     let newRangeBoxes: RangeBlockBox[] = [];
@@ -111,7 +114,7 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
           <RangeBox
             id={id}
             box={rangeBox}
-            cellWidth={Math.round(rangeSelectorBounds().width / rows)}
+            cellWidth={Math.round(rangeSelectorBounds().width / cols)}
             cellHeight={Math.round(rangeSelectorBounds().height / rows)}
             onChange={onRangeBoxChange}
             onDelete={onRangeBoxDelete}

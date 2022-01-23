@@ -24,7 +24,7 @@ type RangeBoxProps = {
   box: RangeBlockBox,
   cellWidth: number,
   cellHeight: number,
-  onChange: (id: number, row: number, heightInCells: number) => void,
+  onChange: (id: number, row: number, col: number, heightInCells: number) => void,
   onDelete: (id: number) => void
 };
 
@@ -43,7 +43,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   };
 
   const size: Size = {
-    width: cellWidth - 40,
+    width: cellWidth - 10,
     height: rowsToPixels(box.tRow - box.bRow + 1, cellHeight)
   };
 
@@ -55,17 +55,20 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     position: Position
   ) => {
     const row = pixelsToRows(position.y, cellHeight);
+
     const height = elementRef.getBoundingClientRect().height;
     const heightInCells = pixelsToRows(height, cellHeight)
 
-    onChange(id, row, heightInCells);
+    onChange(id, row, box.col, heightInCells);
   }
 
   const handleDrag = (event: DraggableEvent, data: DraggableData) => {
     const row = pixelsToRows(data.y, cellHeight); 
+    const col = box.col // + pixelsToCols(data.x, cellWidth);
+
     const heightInCells = pixelsToRows(size.height, cellHeight);
 
-    onChange(id, row, heightInCells);
+    onChange(id, row, col, heightInCells);
   }
 
   return (
@@ -75,7 +78,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       bounds="parent"
       position={position}
       size={size}
-      dragGrid={[15, 15]}
+      dragGrid={[cellWidth, 15]}
       resizeGrid={[15, 15]}
       onResize={handleResize}
       onResizeStop={handleResize}
@@ -151,9 +154,14 @@ const pixelsToRows = (pixels: number, cellHeight: number) : number => {
   return Math.round(pixels / cellHeight);
 }
 
+const pixelsToCols = (pixels: number, cellWidth: number) : number => {
+  return Math.round(pixels / cellWidth);
+}
+
 const rowsToPixels = (rows: number, cellHeight: number) : number => {
   return rows * cellHeight;
 }
+
 
 const formatMinute = (minute: number) : string => {
   return (minute < 10) ? `0${minute}` : `${minute}`
