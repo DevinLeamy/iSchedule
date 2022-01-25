@@ -13,17 +13,18 @@ const EventPage: React.FC = () => {
   const { _id } = useParams();
   const [event, setEvent] = useState<Event>();
 
-  console.log(event)
+  console.log("Event ID:", _id)
+  console.log("Event: ", event)
 
   useEffect(() => {
     if (_id === undefined)
       return;
 
     const getEvent = async () : Promise<void> => {
-      const event: Event | undefined = await getEventById(_id);
+      const fetchedEvent: Event | undefined = await getEventById(_id);
 
-      if (event !== undefined)
-        setEvent(event)
+      if (fetchedEvent !== undefined)
+        setEvent(fetchedEvent)
     }
 
     getEvent();
@@ -32,12 +33,13 @@ const EventPage: React.FC = () => {
   return (
     <Page>
       <Header content="Set your availability" />
+      <Header content={`Event: ${event?.name}`} />
       <ContentBox>
         <div>Share the event</div>
         <div className="copy-event-container">
           <div className="event-link-container">
             <div className="event-link">
-              https://findatime.com/3jh4h91
+              {`http://localhost:3000/event/${_id}`}
             </div>
           </div>
           <Button 

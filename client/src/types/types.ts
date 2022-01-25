@@ -27,11 +27,6 @@ export type User = {
   ranges: DateRange[]
 }
 
-export type PreEvent = {
-  dateRanges: DateRange[],
-  userIds: string[] 
-}
-
 export type Event = {
   _id: string,
   name: string,

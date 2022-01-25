@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import './CreateEventPage.css';
+import { createEvent } from "../../api";
 import Page from "../common/Page/Page";
 import Header from "../common/Header/Header";
 import ContentBox from "../common/ContentBox/ContentBox";
@@ -9,7 +10,6 @@ import Box from '@mui/material/Box';
 import Button from "@mui/material/Button";
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import { DateRange, AbsTime } from "../../types/types";
-import { minToAbsTime } from "../../utilities/dates";
 import { useNavigate } from "react-router-dom";
 
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
@@ -27,11 +27,8 @@ const CreateEventPage: React.FC = () => {
     setDateRanges(dateRanges);
   }
 
-  const mapDateRange = (dateRange: DateRange) : { startDate: Date, endDate: Date } => {
-    return { startDate: dateRange.startDate, endDate: dateRange.endDate }
-  }
-
   const onCreateEvent = async () : Promise<void> => {
+    // TODO: I don't like this control flow
     if (eventNameRef === undefined || eventNameRef.current === undefined) {
       alert("Enter an event name");
       return;
@@ -43,23 +40,10 @@ const CreateEventPage: React.FC = () => {
       alert("event data is incomplete");
     }
 
-    let res: any = await fetch("http://localhost:3000/events/create", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: eventName,
-        dateRanges: [...dateRanges].map(mapDateRange),
-        timezone: dateRanges[0].timezone,
-        userIds: []
-      })
-    })
+    const eventId = await createEvent(eventName, dateRanges, typeof(timezone) === "string" ? timezone : timezone.value);
 
-    res = await res.json();
-
-    const eventId = res._id;
-    navigate(`/event/${eventId}`);
+    if (eventId !== undefined)
+      navigate(`/event/${eventId}`);
   }
 
   return (

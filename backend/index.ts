@@ -16,15 +16,6 @@ connect(process.env.DB_URL ?? 'ERROR', (err) => {
   }
 });
 
-/*
-0: disconnected
-1: connected
-2: connecting
-3: disconnecting
-*/
-
-console.log(connection.readyState)
-
 // Import APIs
 import { VIEW_API } from "./routes/view.route";
 import { EVENT_API } from "./routes/event.route";

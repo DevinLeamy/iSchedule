@@ -32,13 +32,6 @@ const EventModel = model<Event>('Event', EventSchema)
 
 export { Event, EventSchema, EventModel };
 
-// // Using an instance (a document)
-// const myEvent: HydratedDocument<Event> = new EventModel({
-//   dateRanges: [],
-//   timezone: "America/Edmonton",
-//   userIds: []
-// });
-
 // type EventModelType = typeof myEvent;
 
 // const saveMyEvent = async (event: EventModelType) => {

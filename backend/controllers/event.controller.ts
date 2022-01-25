@@ -5,9 +5,14 @@ import { respond } from "../utils";
 
 const EVENT_CTRL = {
   createEvent: async (req: Request, res: Response, next: NextFunction) => {
-    const payload: Event = req.body; 
+    const payload = req.body; 
 
-    let newEvent: HydratedDocument<Event> = new EventModel(payload);
+    let newEvent: HydratedDocument<Event> = new EventModel({
+      name: payload.name,
+      dateRanges: payload.dateRanges,
+      userIds: [],
+      timezone: payload.timezone
+    });
     await newEvent.save();
 
     respond(res, { _id: newEvent._id })
@@ -23,11 +28,6 @@ const EVENT_CTRL = {
       console.log(err)
       respond(res, null, {status: 1, message: "error getting event by id"})
     }
-
-    EventModel
-      .findById(eventId, { versionKey: false }, (err: Error, event: HydratedDocument<Event>) => {
-        respond(res, event.toJSON({ versionKey: false }));
-      })
   }
 }
 
