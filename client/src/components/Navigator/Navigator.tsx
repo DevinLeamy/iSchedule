@@ -11,7 +11,7 @@ const Navigator = () => {
   return (
     <Routes>
       <Route path="/" element={<CreateEventPage />} />
-      <Route path="/event" element={<EventPage />} />
+      <Route path="/event/:_id" element={<EventPage />} />
     </Routes>
   );
 }

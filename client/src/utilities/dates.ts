@@ -95,6 +95,13 @@ const getEndOfTheDay = (date: Date) : Date => {
   return new Date(getAbsDate.getTime() + MILLISECONDS_PER_DAY - 1);
 }
 
+const getAbsMinutesFromDate = (date: Date) : number => {
+  let localMinutes = date.getMinutes();
+  let localHours = date.getHours();
+
+  return localHours * 60 + localMinutes; 
+}
+
 export { 
   getSDate, 
   getDateInDays, 
@@ -104,5 +111,6 @@ export {
   dateInRange,
   daysBetween,
   getAbsYMD,
-  getEndOfTheDay
+  getEndOfTheDay,
+  getAbsMinutesFromDate
 }

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { DateRange } from "../../types/types";
+import { DateRange, AbsTime } from "../../types/types";
 import { 
   getDateInDays, 
   dateInRange, 
   daysBetween,
   getAbsYMD,
-  getEndOfTheDay
+  getEndOfTheDay,
+  minToAbsTime,
+  getAbsMinutesFromDate
 } from "../../utilities/dates";
 import { RangeBlockBox } from "./RangeBox/RangeBox";
 import CalendarHeader from "./CalendarHeader";
@@ -22,8 +24,9 @@ type CalendarProps = {
 /*
 FEATURES TO ADD:
 - [ ] Monthly calendar
+- [x] Vertical drag on weekly calendar
 - [ ] Vertical drag on weekly calendar
-- [ ] Vertical + Horizontal drag on weekly calendar
+- [ ] Horizontal drag on weekly calendar
 - [x] Delete blocks
 - [ ] Squish blocks against top/bottom border
 - [ ] Drag blocks between columns
@@ -61,8 +64,8 @@ const Calendar: React.FC<CalendarProps> = ({
 
     if (weekContainsDate(startDate)) {
       return {
-        bRow: Math.round(dateRange.startMinute / CELL_HEIGHT),
-        tRow: Math.round(dateRange.endMinute / CELL_HEIGHT),
+        bRow: Math.round(getAbsMinutesFromDate(dateRange.startDate) / CELL_HEIGHT),
+        tRow: Math.round(getAbsMinutesFromDate(dateRange.endDate) / CELL_HEIGHT),
         col: daysBetween(startDate, weekStart) 
       }
  
@@ -93,14 +96,13 @@ const Calendar: React.FC<CalendarProps> = ({
       let dayOffset = rangeBox.col;
       let date = getDateInDays(dayOffset, weekStart);
 
-      updatedDateRanges.push({
-        startMinute: startRow * CELL_MINUTES,
-        endMinute: endRow * CELL_MINUTES,
-        month: date.getMonth(),
-        day: date.getDate(),
-        year: date.getFullYear(),
-        timezone
-      })
+      let startTime: AbsTime = minToAbsTime(startRow * CELL_MINUTES)
+      let startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), startTime.hour, startTime.minute)
+
+      let endTime: AbsTime = minToAbsTime(endRow * CELL_MINUTES)
+      let endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), endTime.hour, endTime.minute)
+
+      updatedDateRanges.push({ startDate, endDate, timezone })
     }
 
     onDateRangeChange(updatedDateRanges);
@@ -135,23 +137,11 @@ const Calendar: React.FC<CalendarProps> = ({
 }
 
 const getDateRangeStartDate = (dateRange: DateRange) : Date => {
-  return new Date(
-    dateRange.year, 
-    dateRange.month, 
-    dateRange.day, 
-    Math.round(dateRange.startMinute / 60), 
-    dateRange.startMinute % 60
-  ) 
+  return dateRange.startDate; 
 }
 
 const getDateRangeEndDate = (dateRange: DateRange) : Date => {
-  return new Date(
-    dateRange.year, 
-    dateRange.month, 
-    dateRange.day, 
-    Math.round(dateRange.endMinute / 60), 
-    dateRange.endMinute % 60
-  )
+  return dateRange.endDate;
 }
 
 const getWeekEnd = (weekStart: Date) : Date => {

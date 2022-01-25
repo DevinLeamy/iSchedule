@@ -1,18 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Event } from '../../types';
+import { getEventById } from "../../api";
 import "./EventPage.css";
 import Page from "../../components/common/Page/Page";
 import Header from "../../components/common/Header/Header";
 import ContentBox from "../../components/common/ContentBox/ContentBox";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Button from "@mui/material/Button";
+import { useParams } from "react-router-dom";
 
-interface EventPageProps {
-  eventId?: string
-}
+const EventPage: React.FC = () => {
+  const { _id } = useParams();
+  const [event, setEvent] = useState<Event>();
 
-const EventPage: React.FC<EventPageProps> = ({
-  eventId
-}) => {
+  console.log(event)
+
+  useEffect(() => {
+    if (_id === undefined)
+      return;
+
+    const getEvent = async () : Promise<void> => {
+      const event: Event | undefined = await getEventById(_id);
+
+      if (event !== undefined)
+        setEvent(event)
+    }
+
+    getEvent();
+  }, [])
+
   return (
     <Page>
       <Header content="Set your availability" />

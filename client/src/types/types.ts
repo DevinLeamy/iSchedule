@@ -1,9 +1,6 @@
 export type DateRange = {
-  startMinute: number,
-  endMinute: number, 
-  month: number,
-  day: number,
-  year: number,
+  startDate: Date,
+  endDate: Date,
   timezone: string
 };
 
@@ -30,9 +27,23 @@ export type User = {
   ranges: DateRange[]
 }
 
-export type Event = {
+export type PreEvent = {
   dateRanges: DateRange[],
   userIds: string[] 
+}
+
+export type Event = {
+  _id: string,
+  name: string,
+  dateRanges: DateRange[],
+  timezone: string,
+  userIds: string[]
+}
+
+export interface ResponseT {
+  status: 0 | 1,
+  data?: any,
+  message?: string
 }
 
 export type Position = {

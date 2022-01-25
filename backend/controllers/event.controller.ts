@@ -7,8 +7,6 @@ const EVENT_CTRL = {
   createEvent: async (req: Request, res: Response, next: NextFunction) => {
     const payload: Event = req.body; 
 
-    console.log(payload);
-
     let newEvent: HydratedDocument<Event> = new EventModel(payload);
     await newEvent.save();
 

@@ -10,11 +10,12 @@ import Button from "@mui/material/Button";
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import { DateRange, AbsTime } from "../../types/types";
 import { minToAbsTime } from "../../utilities/dates";
+import { useNavigate } from "react-router-dom";
 
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
-import { Icon } from '@mui/material';
 
 const CreateEventPage: React.FC = () => {
+  let navigate = useNavigate(); 
   const [timezone, setTimezone] = useState<ITimezone>(
     Intl.DateTimeFormat().resolvedOptions().timeZone
   );
@@ -27,13 +28,7 @@ const CreateEventPage: React.FC = () => {
   }
 
   const mapDateRange = (dateRange: DateRange) : { startDate: Date, endDate: Date } => {
-    const startTime: AbsTime = minToAbsTime(dateRange.startMinute)
-    const endTime = minToAbsTime(dateRange.endMinute)
-
-    const startDate = new Date(dateRange.year, dateRange.month, dateRange.day, startTime.hour, startTime.minute) 
-    const endDate = new Date(dateRange.year, dateRange.month, dateRange.day, endTime.hour, endTime.minute) 
-
-    return { startDate: startDate, endDate: endDate }
+    return { startDate: dateRange.startDate, endDate: dateRange.endDate }
   }
 
   const onCreateEvent = async () : Promise<void> => {
@@ -48,7 +43,7 @@ const CreateEventPage: React.FC = () => {
       alert("event data is incomplete");
     }
 
-    await fetch("http://localhost:3000/events/create", {
+    let res: any = await fetch("http://localhost:3000/events/create", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
@@ -60,6 +55,11 @@ const CreateEventPage: React.FC = () => {
         userIds: []
       })
     })
+
+    res = await res.json();
+
+    const eventId = res._id;
+    navigate(`/event/${eventId}`);
   }
 
   return (
