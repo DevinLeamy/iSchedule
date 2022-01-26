@@ -20,11 +20,10 @@ export type Size = {
   height: number
 };
 
-export type User = {
-  id: string,
+export type Member = {
   name: string,
   timezone: string,
-  ranges: DateRange[]
+  dateRanges: DateRange[]
 }
 
 export type Event = {
@@ -32,7 +31,7 @@ export type Event = {
   name: string,
   dateRanges: DateRange[],
   timezone: string,
-  userIds: string[]
+  members: Member[]
 }
 
 export interface ResponseT {

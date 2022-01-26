@@ -1,19 +1,5 @@
 import { Schema, model, ObjectId, HydratedDocument } from "mongoose";
-
-interface DateRange {
-  startDate: Date,
-  endDate: Date,
-  timezone: string
-}
-
-// interface representing a document in MongoDB
-interface Event {
-  _id: ObjectId,
-  name: string,
-  dateRanges: DateRange[],
-  timezone: string,
-  userIds: string[]
-}
+import { Event, Member } from "../types";
 
 // Schema corresponsing to the document interface
 const EventSchema = new Schema<Event>({
@@ -24,13 +10,26 @@ const EventSchema = new Schema<Event>({
     endDate: { type: Date, required: true },
   }],
   timezone: { type: String, required: true },
-  userIds: [{ type: Schema.Types.ObjectId }]
+  members: [{
+    // Member type
+    name: { type: String, required: true },
+    dateRanges: [{
+      startDate: { type: Date, required: true },
+      endDate: { type: Date, required: true },
+    }],
+    timezone: { type: String, required: true }
+  }]
 })
+
 
 // Create a model
 const EventModel = model<Event>('Event', EventSchema)
 
-export { Event, EventSchema, EventModel };
+EventSchema.methods.getEventMember = function (eventId: string, memberName: string) {
+  return EventModel.findOne({ _id: eventId })
+                   .select({ members: {$elemMatch: {name: memberName}}})
+}
+
 
 // type EventModelType = typeof myEvent;
 
@@ -45,3 +44,5 @@ export { Event, EventSchema, EventModel };
 // EventSchema.methods.findSimilarTypes = function (cb: any) { 
 //   return model('Event').find({ type: this.type }, cb)
 // }
+
+export { Event, EventSchema, EventModel };

@@ -1,4 +1,4 @@
-import { Event, DateRange, ResponseT } from "../types";
+import { Event, DateRange, ResponseT, Member } from "../types";
 
 const BASE_URL = "http://localhost:3000";
 
@@ -36,5 +36,19 @@ const createEvent = async (name: string, dateRanges: DateRange[], timezone: stri
   return undefined;
 }
 
+const getEventMember = async (name: string, eventId: string) : Promise<Member | undefined> => {
+  let rawRes = await fetch(`${BASE_URL}/events/${eventId}/members/${name}`);
+  let res: ResponseT = await rawRes.json(); 
 
-export { getEventById, createEvent }
+  if (res.status === 0) {
+    // GOOD
+    console.log(res.data);
+    return res.data as Member;
+  }
+
+  alert("Failed to fetch user");
+  return undefined
+}
+
+
+export { getEventById, getEventMember, createEvent }

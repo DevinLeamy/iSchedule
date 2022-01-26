@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HydratedDocument } from "mongoose";
-import { EventModel, Event } from "../models";
+import { EventModel, EventSchema, Event } from "../models";
 import { respond } from "../utils";
 
 const EVENT_CTRL = {
@@ -10,7 +10,7 @@ const EVENT_CTRL = {
     let newEvent: HydratedDocument<Event> = new EventModel({
       name: payload.name,
       dateRanges: payload.dateRanges,
-      userIds: [],
+      members: [],
       timezone: payload.timezone
     });
     await newEvent.save();
@@ -28,7 +28,22 @@ const EVENT_CTRL = {
       console.log(err)
       respond(res, null, {status: 1, message: "error getting event by id"})
     }
-  }
+  },
+
+  getEventMember: async (req: Request, res: Response, next: NextFunction) : Promise<void> => {
+    let eventId: string = req.params._id;
+    let memberName: string = req.params.name;
+
+    try {
+      let member = await EventSchema.methods.getEventMember(eventId, memberName);
+      respond(res, member);
+    } catch (err) {
+      console.log(err);
+      respond(res, null, {status: 1, message: "error getting event member"});
+    }
+  },
+
+  
 }
 
 export { EVENT_CTRL }
