@@ -14,7 +14,7 @@ const CalendarDatesBar : React.FC<CalendarDatesBarProps> = ({
     const sdate = getSDate(date)
 
     return (
-      <div className="calendar-day">
+      <div key={sdate.day} className="calendar-day">
         <div className="cd-month">{sdate.month.slice(0, 3)}</div>
         <div className="cd-day">{sdate.day}</div>
         <div className="cd-weekday">{sdate.weekday}</div>

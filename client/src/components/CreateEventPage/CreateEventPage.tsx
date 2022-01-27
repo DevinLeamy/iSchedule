@@ -1,16 +1,20 @@
-import React, { useState, useRef } from 'react';
-import './CreateEventPage.css';
+import React, { useState, useEffect, useRef } from 'react';
+import Box from '@mui/material/Box';
+import Button from "@mui/material/Button";
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import TextField from '@mui/material/TextField';
+import { useNavigate } from "react-router-dom";
+
+import { usePersistedValue } from "../../hooks";
 import { createEvent } from "../../api";
 import Page from "../common/Page/Page";
 import Header from "../common/Header/Header";
 import ContentBox from "../common/ContentBox/ContentBox";
 import Calendar from "../Calendar/Calendar";
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-import Button from "@mui/material/Button";
-import EventNoteIcon from '@mui/icons-material/EventNote';
 import { DateRange, AbsTime } from "../../types/types";
-import { useNavigate } from "react-router-dom";
+import { deserializeDateRanges, serializeDateRanges } from "../../utilities";
+
+import './CreateEventPage.css';
 
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 
@@ -19,25 +23,23 @@ const CreateEventPage: React.FC = () => {
   const [timezone, setTimezone] = useState<ITimezone>(
     Intl.DateTimeFormat().resolvedOptions().timeZone
   );
-  const eventNameRef = useRef<HTMLInputElement>();
-  const [dateRanges, setDateRanges] = useState<DateRange[]>([])
-
+  const [eventName, setEventName] = usePersistedValue<string>("", "eventName");
+  const [dateRanges, setDateRanges] = usePersistedValue<DateRange[]>([], "dateRanges", {
+    serialize: serializeDateRanges, deserialize: deserializeDateRanges 
+  });
 
   const onDateRangeChange = (dateRanges: DateRange[]) : void => {
     setDateRanges(dateRanges);
   }
 
+  const onEventNameChange = (event: React.ChangeEvent<HTMLInputElement>) : void => {
+    setEventName(event.currentTarget.value);
+  }
+
   const onCreateEvent = async () : Promise<void> => {
-    // TODO: I don't like this control flow
-    if (eventNameRef === undefined || eventNameRef.current === undefined) {
-      alert("Enter an event name");
-      return;
-    }
-
-    let eventName: string = eventNameRef.current.value;
-
-    if (eventName === '' || dateRanges.length === 0) {
+    if (eventName === "" || dateRanges.length === 0) {
       alert("event data is incomplete");
+      return;
     }
 
     const eventId = await createEvent(eventName, dateRanges, typeof(timezone) === "string" ? timezone : timezone.value);
@@ -55,7 +57,7 @@ const CreateEventPage: React.FC = () => {
             label="" 
             variant="standard" 
             placeholder="Your event name"
-            inputRef={eventNameRef}
+            value={eventName}
             style={{minWidth: "60%"}}
             inputProps={{style: {
               textAlign: "center", 
@@ -64,6 +66,7 @@ const CreateEventPage: React.FC = () => {
             InputLabelProps={{style: {
               visibility: "hidden"
             }}}
+            onChange={onEventNameChange}
           />
         </div>
         <div className="spacer"/>
@@ -72,6 +75,7 @@ const CreateEventPage: React.FC = () => {
         <Box>
           Select your timezone
           <TimezoneSelect 
+            className="timezone-select"
             value={timezone}
             onChange={setTimezone}
             timezones={{...allTimezones}}

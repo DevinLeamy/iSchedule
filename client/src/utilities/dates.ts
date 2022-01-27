@@ -1,5 +1,5 @@
 import { MILLISECONDS_PER_DAY } from "../constants"
-import { AbsTime, Time } from "../types/types"
+import { AbsTime, Time, DateRange } from "../types/types"
 
 const MONTHS = [
   { name: "January",   monthIndex: 0,  days: 31 }, 
@@ -77,6 +77,11 @@ const dateInRange = (date: Date, rangeLow: Date, rangeHigh: Date) : boolean => {
   return (rangeLow.getTime() <= date.getTime() && date.getTime() <= rangeHigh.getTime());
 }
 
+const serializeDate = (date: Date) : string => JSON.stringify(date);
+
+// .slice(1, -1) because dateString has quotes
+const deserializeDate = (dateString: any) => new Date(dateString.slice(1, -1));
+
 const getAbsYMD = (date: Date) : Date => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
@@ -110,6 +115,8 @@ export {
   minToTime, 
   dateInRange,
   daysBetween,
+  serializeDate,
+  deserializeDate,
   getAbsYMD,
   getEndOfTheDay,
   getAbsMinutesFromDate

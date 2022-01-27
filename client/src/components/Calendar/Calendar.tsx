@@ -7,12 +7,16 @@ import {
   getAbsYMD,
   getEndOfTheDay,
   minToAbsTime,
-  getAbsMinutesFromDate
+  getAbsMinutesFromDate,
+  serializeDate,
+  deserializeDate
 } from "../../utilities/dates";
+import { usePersistedValue } from "../../hooks";
 import { RangeBlockBox } from "./RangeBox/RangeBox";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDatesBar from "./CalendarDatesBar";
 import CalendarRangeSelector from "./CalendarRangeSelector";
+
 import "./Calendar.css"
 
 type CalendarProps = {
@@ -25,7 +29,6 @@ type CalendarProps = {
 FEATURES TO ADD:
 - [ ] Monthly calendar
 - [x] Vertical drag on weekly calendar
-- [ ] Vertical drag on weekly calendar
 - [ ] Horizontal drag on weekly calendar
 - [x] Delete blocks
 - [ ] Squish blocks against top/bottom border
@@ -73,8 +76,10 @@ const Calendar: React.FC<CalendarProps> = ({
    return undefined;
   }
 
-  const [weekStart, setWeekStart] = useState<Date>(
-    getAbsYMD(new Date())
+  const [weekStart, setWeekStart] = usePersistedValue<Date>(
+    getAbsYMD(new Date()),
+    "weekStart",
+    { serialize: serializeDate, deserialize: deserializeDate }
   );
   const rangeBoxes = getRangeBoxesFromDateRanges(dateRanges)
 

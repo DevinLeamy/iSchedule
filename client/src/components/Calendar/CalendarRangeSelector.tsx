@@ -113,9 +113,12 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
         return (
           <RangeBox
             id={id}
+            key={id}
             box={rangeBox}
-            cellWidth={Math.round(rangeSelectorBounds().width / cols)}
-            cellHeight={Math.round(rangeSelectorBounds().height / rows)}
+            // cellWidth={Math.round(rangeSelectorBounds().width / cols)}
+            // cellHeight={Math.round(rangeSelectorBounds().height / rows)}
+            cellWidth={130}
+            cellHeight={15}
             onChange={onRangeBoxChange}
             onDelete={onRangeBoxDelete}
           />
@@ -179,7 +182,7 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
         {[...Array(rows)].map((_, row) => {
           if (row % 4 === 0 && row !== rows && row !== 0) {
             return (
-              <div className="calendar-date">
+              <div key={row * 999} className="calendar-date">
                 {getStringFromTime(getTimeFromRow(row))}
               </div> 
             )
