@@ -1,6 +1,6 @@
 import React from 'react';
 import './Page.css'
-import ContentPane from "../../../components/common/ContentPane/ContentPane";
+import { ContentPane } from "../../../components/common";
 
 
 const Page: React.FC = ({children}) => {
@@ -13,4 +13,4 @@ const Page: React.FC = ({children}) => {
   );
 }
 
-export default Page
+export { Page };

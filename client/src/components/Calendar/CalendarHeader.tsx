@@ -1,9 +1,10 @@
 import React from "react";
-import Radio from '@mui/material/Radio';
+import { Radio, Button } from '@mui/material';
 
 type CalendarHeaderProps = {
   onNextWeek: () => void,
-  onPreviousWeek: () => void
+  onPreviousWeek: () => void,
+  onClearCalendar: () => void,
 };
 
 let MONTH_C: string = "MONTH_C";
@@ -11,7 +12,8 @@ let WEEK_C: string = "WEEK_C";
 
 const CalendarHeader : React.FC<CalendarHeaderProps> = ({
   onNextWeek,
-  onPreviousWeek
+  onPreviousWeek,
+  onClearCalendar
 }) => {
   const [calendarType, setCalendarType] = React.useState<string>(WEEK_C);
 
@@ -27,6 +29,12 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
       >
         {"<"}
       </div>
+      <Button 
+        onClick={onClearCalendar} 
+      >
+        Clear
+      </Button>
+
       <div className="c-type-toggle-container">
         <span className="c-type-label">Week</span>
         <Radio

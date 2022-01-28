@@ -12,4 +12,4 @@ const ContentPane: React.FC = ({children}) => {
  );
 }
 
-export default ContentPane;
+export { ContentPane };

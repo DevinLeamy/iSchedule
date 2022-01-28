@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import classNames from "classnames";
-import RangeBox, { RangeBlockBox } from "./RangeBox/RangeBox";
-import { Time, Position } from "../../types/types";
-import { useMouseCapture } from "../../hooks/useMouseCapture";
 
+import RangeBox from "../RangeBox/RangeBox";
+import { Time, Position, RangeBlockBox } from "../../../types/types";
+import { useMouseCapture } from "../../../hooks/useMouseCapture";
 
 type CalendarRangeSelectorProps = {
   rangeBoxes: RangeBlockBox[],
@@ -166,11 +166,11 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
     );
   }
 
-  const rangeSelectorBounds = () : DOMRect => {
-    if (rangeSelectorRef?.current)
-      return rangeSelectorRef.current.getBoundingClientRect();
-    return new DOMRect();
-  }
+  // const rangeSelectorBounds = () : DOMRect => {
+  //   if (rangeSelectorRef?.current)
+  //     return rangeSelectorRef.current.getBoundingClientRect();
+  //   return new DOMRect();
+  // }
 
 
   return (
@@ -234,4 +234,4 @@ const getStringFromTime = (time: Time) : string => {
   return `${time.hour}:${formatMinute(time.minute)} ${zone}`;
 }
 
-export default CalendarRangeSelector;
+export { CalendarRangeSelector };

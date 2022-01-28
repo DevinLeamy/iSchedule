@@ -51,5 +51,25 @@
   text-transform: none;
   border-radius: 0;
   margin-left: 10;
+}
 
+.event-dates-container {
+  margin-top: 30px;
+  padding: 10px 0px;
+  display: flex;
+
+  /* COPY of .calendar-main */
+  width: 100%;
+  height: 700px;
+  background-color: var(--white);
+  box-sizing: border-box;
+  --calendar-border: 1px solid rgb(164, 196, 244); 
+  --grid-border: 1px solid rgb(211, 211, 211);
+
+  border-radius: 5px;
+
+  border: var(--calendar-border);
+
+  --cal-top-bar-sz: 50px;
+  --dts-cell-height: 15px;
 }

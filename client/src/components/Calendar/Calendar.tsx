@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DateRange, AbsTime } from "../../types/types";
+import { DateRange, AbsTime, RangeBlockBox } from "../../types/types";
 import { 
   getDateInDays, 
   dateInRange, 
@@ -12,10 +12,9 @@ import {
   deserializeDate
 } from "../../utilities/dates";
 import { usePersistedValue } from "../../hooks";
-import { RangeBlockBox } from "./RangeBox/RangeBox";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDatesBar from "./CalendarDatesBar";
-import CalendarRangeSelector from "./CalendarRangeSelector";
+import { CalendarRangeSelector } from "./CalendarRangeSelector/CalendarRangeSelector";
 
 import "./Calendar.css"
 
@@ -121,11 +120,16 @@ const Calendar: React.FC<CalendarProps> = ({
     setWeekStart(getDateInDays(-TOTAL_COLS, weekStart))
   } 
 
+  const clearCalendar = () : void => {
+    onDateRangeChange([])
+  }
+
   return (
     <div className="calendar-main">
       <CalendarHeader 
         onNextWeek={gotoNextWeek}
         onPreviousWeek={gotoPreviousWeek}
+        onClearCalendar={clearCalendar}
       />
       <CalendarDatesBar 
         startDate={weekStart} 

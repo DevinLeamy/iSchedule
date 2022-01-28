@@ -9,4 +9,4 @@ const ContentBox: React.FC = ({children}) => {
   );
 }
 
-export default ContentBox;
+export { ContentBox };

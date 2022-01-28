@@ -35,8 +35,16 @@ const EVENT_CTRL = {
     let memberName: string = req.params.name;
 
     try {
-      let member = await EventSchema.methods.getEventMember(eventId, memberName);
-      respond(res, member);
+      // TODO: this is pretty hacky - refactor to only return one member 
+
+      // data: { _id: string, members: [members that have name=memberName]}
+      let data = await EventSchema.methods.getEventMember(eventId, memberName).exec();
+      if (data.members.length === 0) {
+        // create new member
+        await EventSchema.methods.createEventMember(eventId, memberName).exec();
+        data = await EventSchema.methods.getEventMember(eventId, memberName).exec()
+      }
+      respond(res, data.members[0]);
     } catch (err) {
       console.log(err);
       respond(res, null, {status: 1, message: "error getting event member"});

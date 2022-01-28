@@ -9,4 +9,4 @@ const Header: React.FC<{content: string}> = ({content}) => {
   );
 }
 
-export default Header;
+export { Header };

@@ -15,11 +15,12 @@
 }
 
 .calendar-header {
-  width: 100%;
+  width: 100%; 
+  padding: 4px 50px 4px 50px;
   height: var(--cal-top-bar-sz);
   display: flex;
   position: relative;
-  padding: 4px;
+  /* padding: 4px; */
 
   --button-sz: calc(var(--cal-top-bar-sz) - 10px); 
 

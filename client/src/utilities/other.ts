@@ -1,3 +1,5 @@
+import { ITimezone } from "react-timezone-select";
+
 import { DateRange } from "../types";
 
 const serializeDateRanges = (dateRanges: DateRange[]) : string => {
@@ -19,4 +21,8 @@ const deserializeDateRanges = (value: any) : DateRange[] => {
   return dateRanges;
 } 
 
-export { serializeDateRanges, deserializeDateRanges }
+const getTimezoneString = (timezone: ITimezone) : string => {
+  return typeof(timezone) === "string" ? timezone : timezone.value;
+}
+
+export { serializeDateRanges, deserializeDateRanges, getTimezoneString }

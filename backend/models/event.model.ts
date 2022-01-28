@@ -26,8 +26,22 @@ const EventSchema = new Schema<Event>({
 const EventModel = model<Event>('Event', EventSchema)
 
 EventSchema.methods.getEventMember = function (eventId: string, memberName: string) {
+  console.log("Access event member");
   return EventModel.findOne({ _id: eventId })
                    .select({ members: {$elemMatch: {name: memberName}}})
+}
+
+EventSchema.methods.createEventMember = function(eventId: string, memberName: string, timezone: string = "America/Edmonton") {
+  console.log("Create new event member");
+  const newMember = {
+    name: memberName,
+    dateRanges: [],
+    timezone: timezone
+  }
+  return EventModel.updateOne(
+    { _id: eventId },
+    { $push: { members: newMember }}
+  )
 }
 
 

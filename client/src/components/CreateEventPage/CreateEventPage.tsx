@@ -4,25 +4,21 @@ import Button from "@mui/material/Button";
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import TextField from '@mui/material/TextField';
 import { useNavigate } from "react-router-dom";
+import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 
-import { usePersistedValue } from "../../hooks";
+import { usePersistedValue, useTimezone } from "../../hooks";
 import { createEvent } from "../../api";
-import Page from "../common/Page/Page";
-import Header from "../common/Header/Header";
-import ContentBox from "../common/ContentBox/ContentBox";
+import { Page, Header, ContentBox } from "../common";
 import Calendar from "../Calendar/Calendar";
 import { DateRange, AbsTime } from "../../types/types";
-import { deserializeDateRanges, serializeDateRanges } from "../../utilities";
+import { deserializeDateRanges, serializeDateRanges, getTimezoneString } from "../../utilities";
 
 import './CreateEventPage.css';
 
-import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 
 const CreateEventPage: React.FC = () => {
   let navigate = useNavigate(); 
-  const [timezone, setTimezone] = useState<ITimezone>(
-    Intl.DateTimeFormat().resolvedOptions().timeZone
-  );
+  const [timezone, onTimezoneChange] = useTimezone();
   const [eventName, setEventName] = usePersistedValue<string>("", "eventName");
   const [dateRanges, setDateRanges] = usePersistedValue<DateRange[]>([], "dateRanges", {
     serialize: serializeDateRanges, deserialize: deserializeDateRanges 
@@ -42,7 +38,7 @@ const CreateEventPage: React.FC = () => {
       return;
     }
 
-    const eventId = await createEvent(eventName, dateRanges, typeof(timezone) === "string" ? timezone : timezone.value);
+    const eventId = await createEvent(eventName, dateRanges, getTimezoneString(timezone));
 
     if (eventId !== undefined)
       navigate(`/event/${eventId}`);
@@ -77,14 +73,14 @@ const CreateEventPage: React.FC = () => {
           <TimezoneSelect 
             className="timezone-select"
             value={timezone}
-            onChange={setTimezone}
+            onChange={onTimezoneChange}
             timezones={{...allTimezones}}
           /> 
         </Box>
         <div className="spacer"/>
         <div className='calendar-container'>
           <Calendar 
-            timezone={typeof(timezone) === "string" ? timezone : timezone.value}
+            timezone={getTimezoneString(timezone)}
             dateRanges={dateRanges}
             onDateRangeChange={onDateRangeChange}
           />

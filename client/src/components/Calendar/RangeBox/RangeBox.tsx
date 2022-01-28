@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { ResizeDirection } from "re-resizable";
 import { DraggableEvent } from 'react-draggable';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { Time, Size } from "../../../types/types";
+
+import { Time, Size, RangeBlockBox } from "../../../types/types";
 import { minToTime } from "../../../utilities/dates";
 import { 
   Rnd, 
@@ -13,19 +14,19 @@ import {
 import "./RangeBox.css";
 import { MINUTES_PER_DAY } from "../../../constants";
 
-export type RangeBlockBox = {
-  bRow: number, 
-  tRow: number,
-  col: number  
-}
-
 type RangeBoxProps = {
   id: number,
   box: RangeBlockBox,
   cellWidth: number,
   cellHeight: number,
-  onChange: (id: number, row: number, col: number, heightInCells: number) => void,
-  onDelete: (id: number) => void
+
+  onChange?: (id: number, row: number, col: number, heightInCells: number) => void,
+  onDelete?: (id: number) => void,
+
+  disableDragging?: boolean,
+  disableResizing?: boolean,
+  disableDeleting?: boolean,
+  disableTime?: boolean
 };
 
 const RangeBox: React.FC<RangeBoxProps> = ({
@@ -34,8 +35,13 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   cellWidth,
   cellHeight,
   
-  onChange,
-  onDelete
+  onChange = (id: number, row: number, col: number, heightInCells: number) => {},
+  onDelete = (id: number) => {},
+
+  disableDragging = false,
+  disableResizing = false,
+  disableDeleting = false,
+  disableTime = false
 }) => {
   const position: Position = {
     x: 0, 
@@ -74,6 +80,8 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   return (
     <Rnd
       key={id}
+      disableDragging={disableDragging ?? false}
+      disableResizing={disableResizing ?? false}
       dragAxis="y"
       bounds="parent"
       position={position}
@@ -92,21 +100,28 @@ const RangeBox: React.FC<RangeBoxProps> = ({
         bottom: true
       }}
     >
+      {!disableResizing && 
       <div className="drag-bar-container drag-bar-top">
         <div className="drag-bar" />
-      </div>
+      </div>}
+
+      {!disableTime && 
       <RBDateRange
         bottomRow={box.bRow}
         topRow={box.tRow}
         cellHeight={cellHeight}
-      />
+      />}
+
+      {!disableDeleting &&
       <div onClick={() => onDelete(id)}>
         <DeleteOutlineIcon className="delete-range" />
-      </div>
-     <div className="drag-bar-container drag-bar-bottom">
+      </div>}
+
+      {!disableResizing && 
+      <div className="drag-bar-container drag-bar-bottom">
         <div className="drag-bar" />
-      </div>
-   </Rnd>
+      </div>}
+  </Rnd>
   );
 }
 

@@ -44,3 +44,32 @@ export type Position = {
   row: number,
   col: number
 }
+
+export type RangeBlockBox = {
+  bRow: number,
+  tRow: number,
+  col: number
+}
+
+export type MemberRangeBlockBox = RangeBlockBox | {
+  name: string
+}
+
+export type MemberDateRange = DateRange | {
+  name: string
+}
+
+// Could refactor events to be
+/*
+export type Event = {
+ _id: string,
+  name: string,
+
+  // event timezone is in DateRange
+  dateRanges: DateRange[],             
+
+  // individual member timezone is in a MemberDateRange
+  memberDateRanges: MemberDateRange[] 
+}
+
+*/
