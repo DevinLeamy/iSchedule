@@ -2,18 +2,18 @@ import React from "react";
 import { Radio, Button } from '@mui/material';
 
 type CalendarHeaderProps = {
-  onNextWeek: () => void,
-  onPreviousWeek: () => void,
-  onClearCalendar: () => void,
+  onNext: () => void,
+  onPrevious: () => void,
+  onClearCalendar?: () => void,
 };
 
 let MONTH_C: string = "MONTH_C";
 let WEEK_C: string = "WEEK_C";
 
 const CalendarHeader : React.FC<CalendarHeaderProps> = ({
-  onNextWeek,
-  onPreviousWeek,
-  onClearCalendar
+  onNext,
+  onPrevious,
+  onClearCalendar = () => {}
 }) => {
   const [calendarType, setCalendarType] = React.useState<string>(WEEK_C);
 
@@ -25,7 +25,7 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
     <div className="calendar-header">
       <div 
         className="change-week-btn change-week-left"
-        onClick={onPreviousWeek}
+        onClick={onPrevious}
       >
         {"<"}
       </div>
@@ -51,7 +51,7 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
       </div>
       <div 
         className="change-week-btn change-week-right"
-        onClick={onNextWeek}
+        onClick={onNext}
       >
         {">"}
       </div>

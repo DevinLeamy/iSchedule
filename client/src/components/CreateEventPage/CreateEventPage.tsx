@@ -9,7 +9,7 @@ import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 import { usePersistedValue, useTimezone } from "../../hooks";
 import { createEvent } from "../../api";
 import { Page, Header, ContentBox } from "../common";
-import Calendar from "../Calendar/Calendar";
+import { Calendar } from "../Calendar/Calendar";
 import { DateRange, AbsTime } from "../../types/types";
 import { deserializeDateRanges, serializeDateRanges, getTimezoneString } from "../../utilities";
 

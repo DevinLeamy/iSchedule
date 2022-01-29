@@ -1,7 +1,7 @@
 import { ITimezone } from "react-timezone-select";
 
 import { DateRange, Time, RangeBlockBox, RangeBlock } from "../types";
-import { getAbsMinutesFromDate } from "../utilities";
+import { getAbsMinutesFromDate, dateInRange } from "../utilities";
 import { MINUTES_PER_CELL } from "../constants";
 
 const serializeDateRanges = (dateRanges: DateRange[]) : string => {
@@ -88,6 +88,13 @@ const getTimeFromRow = (row: number) : Time => {
   return { hour, minute, am };
 }
 
+const copy = (text: string) : void => { navigator.clipboard.writeText(text) }
+
+
+const getDateRangesInRange = (startDate: Date, endDate: Date, dateRanges: DateRange[]) : DateRange[] => {
+  return dateRanges
+    .filter(dateRange => dateInRange(dateRange.startDate, startDate, endDate))
+}
 
 export { 
   serializeDateRanges, 
@@ -96,5 +103,7 @@ export {
   getRangeBlocksFromDateRanges,
   getRangeBlockFromDateRange,
   deepEqual,
-  getTimeFromRow
+  getTimeFromRow,
+  copy,
+  getDateRangesInRange
 }

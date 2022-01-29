@@ -1,7 +1,8 @@
 .calendar-main {
   width: 100%;
   height: 100%;
-  background-color: var(--white);
+  /* background-color: var(--white); */
+  background-color: white;
   box-sizing: border-box;
   --calendar-border: 1px solid rgb(164, 196, 244); 
   --grid-border: 1px solid rgb(211, 211, 211);
@@ -49,6 +50,8 @@
 }
 
 .calendar-day {
+  position: relative;
+  z-index: 0;
   height: 100%;
   width: 100%;
   text-align: center;
@@ -162,24 +165,6 @@
 
   --calendar-dates-width: 50px;
 }
-
-.calendar-dates {
-  width: var(--calendar-dates-width); 
-}
-
-.calendar-date {
-  height: var(--dts-cell-height);
-  width: 100%;
-  line-height: var(--dts-cell-height);
-  transform: translateY(-7.5px);
-  text-align: center;
-
-  font-size: 11px;
-  /* color: var(--grey); */
-  color: grey;
-  font-family: 'poppins-medium' 
-}
-
 
 .rs-grid-container {
   display: flex;

@@ -1,17 +1,18 @@
 import React from "react";
-import { getSDate } from "../../utilities/dates";
+
+import { getSDate, getDateFromCalendarDate } from "../../utilities/dates";
+import { CalendarDate } from "../../types";
+import { List } from "../common";
 
 type CalendarDatesBarProps = {
-  startDate: Date,
-  totalDays: number
+  dates: CalendarDate[]
 };
 
 const CalendarDatesBar : React.FC<CalendarDatesBarProps> = ({
-  startDate,
-  totalDays
+  dates
 }) => {
-  const renderCalendarDay = (date: Date) : React.ReactNode => {
-    const sdate = getSDate(date)
+  const mapCalendarDate = (calendarDate: CalendarDate) : React.ReactNode => {
+    const sdate = getSDate(getDateFromCalendarDate(calendarDate))
 
     return (
       <div key={sdate.day} className="calendar-day">
@@ -22,16 +23,21 @@ const CalendarDatesBar : React.FC<CalendarDatesBarProps> = ({
     )
   }
 
+  const mapCalendarDateToKey = (calendarDate: CalendarDate) : string => {
+    return getDateFromCalendarDate(calendarDate).toString()
+  }
+
   return (
     <div className="calendar-days-main">
       <div className="calendar-dates-spacer" />
       <div className="calendar-days">
-        {[...Array(totalDays)].map((_, dayOffset) => {
-          let day = new Date(startDate.getTime())
-          day.setDate(day.getDate() + dayOffset)
-
-          return renderCalendarDay(day);
-        })}
+        {/* {dates.map(mapCalendarDate)} */}
+        <List
+          listKeyMap={mapCalendarDateToKey} 
+          listItemMap={mapCalendarDate}
+          items={dates}
+          horizontal={true}
+        />
       </div>
     </div>
   );

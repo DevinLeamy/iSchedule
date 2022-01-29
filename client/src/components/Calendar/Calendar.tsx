@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DateRange, AbsTime, RangeBlockBox } from "../../types/types";
+import { DateRange, AbsTime, RangeBlockBox, CalendarDate } from "../../types/types";
 import { 
   getDateInDays, 
   dateInRange, 
@@ -9,12 +9,15 @@ import {
   minToAbsTime,
   getAbsMinutesFromDate,
   serializeDate,
-  deserializeDate
-} from "../../utilities/dates";
+  deserializeDate,
+  getCalendarDate,
+  getDateRangesInRange
+} from "../../utilities";
 import { usePersistedValue } from "../../hooks";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDatesBar from "./CalendarDatesBar";
 import { CalendarRangeSelector } from "./CalendarRangeSelector/CalendarRangeSelector";
+import { DAYS_PER_WEEK } from "../../constants";
 
 import "./Calendar.css"
 
@@ -32,7 +35,7 @@ FEATURES TO ADD:
 - [x] Delete blocks
 - [ ] Squish blocks against top/bottom border
 - [ ] Drag blocks between columns
-- [ ] Better way to extend blocks 
+- [x] Better way to extend blocks 
 - [ ] Select all-day blocks
 
 TODO:
@@ -56,23 +59,16 @@ const Calendar: React.FC<CalendarProps> = ({
   }
 
   const getRangeBoxesFromDateRanges = (dateRanges: DateRange[]) : RangeBlockBox[] => {
-    return dateRanges
-      .map(dateRange => getRangeBoxFromDateRange(dateRange))
-      .filter(dateRange => dateRange !== undefined) as RangeBlockBox[];
+    let dateRangesInRange = getDateRangesInRange(weekStart, getWeekEnd(weekStart), dateRanges)
+    return dateRangesInRange.map(dateRange => getRangeBoxFromDateRange(dateRange))
   }
 
-  const getRangeBoxFromDateRange = (dateRange: DateRange) : RangeBlockBox | undefined => {
-    let startDate = getDateRangeStartDate(dateRange) 
-
-    if (weekContainsDate(startDate)) {
-      return {
-        bRow: Math.round(getAbsMinutesFromDate(dateRange.startDate) / CELL_HEIGHT),
-        tRow: Math.round(getAbsMinutesFromDate(dateRange.endDate) / CELL_HEIGHT),
-        col: daysBetween(startDate, weekStart) 
-      }
- 
+  const getRangeBoxFromDateRange = (dateRange: DateRange) : RangeBlockBox => {
+    return {
+      bRow: Math.round(getAbsMinutesFromDate(dateRange.startDate) / CELL_HEIGHT),
+      tRow: Math.round(getAbsMinutesFromDate(dateRange.endDate) / CELL_HEIGHT),
+      col: daysBetween(dateRange.startDate, weekStart) 
     }
-   return undefined;
   }
 
   const [weekStart, setWeekStart] = usePersistedValue<Date>(
@@ -112,28 +108,19 @@ const Calendar: React.FC<CalendarProps> = ({
     onDateRangeChange(updatedDateRanges);
   }
 
-  const gotoNextWeek = () : void => {
-    setWeekStart(getDateInDays(TOTAL_COLS, weekStart))
-  }
-
-  const gotoPreviousWeek = () : void => {
-    setWeekStart(getDateInDays(-TOTAL_COLS, weekStart))
-  } 
-
-  const clearCalendar = () : void => {
-    onDateRangeChange([])
-  }
+  const gotoNextWeek = () : void => { setWeekStart(getDateInDays(TOTAL_COLS, weekStart)) }
+  const gotoPreviousWeek = () : void => { setWeekStart(getDateInDays(-TOTAL_COLS, weekStart)) } 
+  const clearCalendar = () : void => { onDateRangeChange([]) }
 
   return (
     <div className="calendar-main">
       <CalendarHeader 
-        onNextWeek={gotoNextWeek}
-        onPreviousWeek={gotoPreviousWeek}
+        onNext={gotoNextWeek}
+        onPrevious={gotoPreviousWeek}
         onClearCalendar={clearCalendar}
       />
       <CalendarDatesBar 
-        startDate={weekStart} 
-        totalDays={TOTAL_COLS}
+        dates={getCalendarDates(weekStart, DAYS_PER_WEEK)}
       />
       <CalendarRangeSelector
         rangeBoxes={rangeBoxes}
@@ -143,6 +130,19 @@ const Calendar: React.FC<CalendarProps> = ({
       />
    </div>
   );
+}
+
+const getCalendarDates = (startDate: Date, totalDays: number) : CalendarDate[] => {
+  let calendarDates: CalendarDate[] = []
+
+  for (let i = 0; i < totalDays; ++i) {
+    let day = new Date(startDate.getTime())
+    day.setDate(day.getDate() + i);
+
+    calendarDates.push(getCalendarDate(day))
+  }
+
+  return calendarDates;
 }
 
 const getDateRangeStartDate = (dateRange: DateRange) : Date => {
@@ -157,8 +157,5 @@ const getWeekEnd = (weekStart: Date) : Date => {
   return getEndOfTheDay(getDateInDays(TOTAL_COLS - 1, weekStart));
 }
 
-
-
-
-export default Calendar;
+export { Calendar }
 

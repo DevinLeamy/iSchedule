@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, CSSProperties as CSS } from "react";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useParams } from "react-router-dom";
 import { TextField, TextFieldProps, Button, Box } from "@mui/material";
@@ -8,32 +8,16 @@ import { Event, Member, DateRange, RangeBlockBox, CalendarDate } from '../../typ
 import { getEventById, getEventMember } from "../../api";
 import { Page, Header, ContentBox } from "../../components/common";
 import { CalendarRangeSelector } from "../Calendar/CalendarRangeSelector/CalendarRangeSelector";
+import { Calendar } from "../Calendar/Calendar";
+import { EventCalendar } from "./EventCalendar/EventCalendar";
 import { useTimezone } from "../../hooks";
-import { getRangeBlocksFromDateRanges, deepEqual } from "../../utilities";
-import { DateRangeSelector } from "./DateRangeSelector/DateRangeSelector";
+import { getRangeBlocksFromDateRanges, deepEqual, copy } from "../../utilities";
 import { 
-  getDateInDays, 
-  dateInRange, 
-  daysBetween,
-  getAbsYMD,
-  getEndOfTheDay,
-  minToAbsTime,
-  getAbsMinutesFromDate,
-  serializeDate,
-  deserializeDate,
-  getCalendarDate
-} from "../../utilities/dates";
+  getCalendarDate,
+  getTimezoneString
+} from "../../utilities";
 
 import "./EventPage.css";
-
-//  {"startDate":"2022-01-30T09:45:00.000Z","endDate":"2022-01-30T12:15:00.000Z","_id":"61f2f2ac7a42f6ef5614423a"},
-//  {"startDate":"2022-01-31T08:30:00.000Z","endDate":"2022-01-31T12:00:00.000Z","_id":"61f2f2ac7a42f6ef5614423b"},
-//  {"startDate":"2022-02-01T07:00:00.000Z","endDate":"2022-02-01T11:45:00.000Z","_id":"61f2f2ac7a42f6ef5614423c"},
-//     {"startDate":"2022-01-13T07:45:00.000Z","endDate":"2022-01-13T10:15:00.000Z","_id":"61f2f2ac7a42f6ef5614423d"},
-//     {"startDate":"2022-01-16T07:45:00.000Z","endDate":"2022-01-16T11:30:00.000Z","_id":"61f2f2ac7a42f6ef5614423e"},
-//     {"startDate":"2022-01-17T11:15:00.000Z","endDate":"2022-01-17T12:45:00.000Z","_id":"61f2f2ac7a42f6ef5614423f"},
-//     {"startDate":"2022-02-07T07:15:00.000Z","endDate":"2022-02-07T09:00:00.000Z","_id":"61f2f2ac7a42f6ef56144240"},
-
 
 const fakeData = `{
   "_id":"61f2f2ac7a42f6ef56144235",
@@ -105,59 +89,42 @@ const EventPage: React.FC = () => {
 
   const eventLink = `http://localhost:3000/event/${_id}`;
 
-  const copyEventLink = () => {
-    navigator.clipboard.writeText(eventLink);
-  }
+//   const renderEventDate = (date: CalendarDate) : React.ReactNode => {
+//     if (event === undefined) return null;
 
-  // All of thehttps://github.com/DevinLeamy dates that an events fall on
-  const getEventCalendarDates = (dateRanges: DateRange[]) : CalendarDate[] => {
-    let dates: CalendarDate[] = []
+//     let eventDateRanges = event
+//       .dateRanges
+//       .filter(dateRange => deepEqual(getCalendarDate(dateRange.startDate), date));
+
+//     let eventRangeBlocks = getRangeBlocksFromDateRanges(eventDateRanges)
+
+//     let membersDateRanges = []
+//     for (let member of event.members)
+//       membersDateRanges.push(...member.dateRanges)
+//     let membersRangeBlocks = getRangeBlocksFromDateRanges(membersDateRanges);
+
+//     return (
+//       <DateRangeSelector
+//         date={date}
+//         eventRangeBlocks={eventRangeBlocks}
+//         membersRangeBlocks={membersRangeBlocks}
+//         memberRangeBlocks={[]}
+//         // cellHeight={10}
+//       />
+//     )
+//  }
+
+  // const renderEventDates = () => {
+  //   if (event === undefined) return <div className="event-dates-container" />;
+
+  //   let eventDates: CalendarDate[] = getEventCalendarDates(event.dateRanges)
     
-    for (let dateRange of dateRanges) {
-      let calendarDate = getCalendarDate(dateRange.startDate);
-
-      if (!dates.includes(calendarDate))
-        dates.push(calendarDate)
-    }
-    return dates;
-  }
-
-  const renderEventDate = (date: CalendarDate) : React.ReactNode => {
-    if (event === undefined) return null;
-
-    let eventDateRanges = event
-      .dateRanges
-      .filter(dateRange => deepEqual(getCalendarDate(dateRange.startDate), date));
-
-    let eventRangeBlocks = getRangeBlocksFromDateRanges(eventDateRanges)
-
-    let membersDateRanges = []
-    for (let member of event.members)
-      membersDateRanges.push(...member.dateRanges)
-    let membersRangeBlocks = getRangeBlocksFromDateRanges(membersDateRanges);
-
-    return (
-      <DateRangeSelector
-        date={date}
-        eventRangeBlocks={eventRangeBlocks}
-        membersRangeBlocks={membersRangeBlocks}
-        memberRangeBlocks={[]}
-        cellHeight={5}
-      />
-    )
- }
-
-  const renderEventDates = () => {
-    if (event === undefined) return <div className="event-dates-container" />;
-
-    let eventDates: CalendarDate[] = getEventCalendarDates(event.dateRanges)
-    
-    return (
-      <div className="event-dates-container">
-        {[...eventDates].map(eventDate => renderEventDate(eventDate))}
-      </div>
-    );
-  } 
+  //   return (
+  //     <div className="event-dates-container">
+  //       {[...eventDates].map(eventDate => renderEventDate(eventDate))}
+  //     </div>
+  //   );
+  // } 
 
   return (
     <Page>
@@ -175,14 +142,8 @@ const EventPage: React.FC = () => {
           <Button 
             className="copy-event-button"
             variant="contained"
-            style={{
-              fontWeight: "bolder",
-              fontSize: "16px",
-              textTransform: "none",
-              borderRadius: 0,
-              marginLeft: 10,
-            }}
-            onClick={() => copyEventLink()}
+            style={COPY_EVENT_BUTTON}
+            onClick={() => copy(eventLink)}
           >
             Copy
             <ContentCopyIcon 
@@ -201,18 +162,14 @@ const EventPage: React.FC = () => {
             className="em-input"
             placeholder="" 
             inputRef={memberNameRef}
+            style={{
+              backgroundColor: "white"
+            }}
           />
           <Button
             className="em-input-button"
             variant="contained"
-            style={{
-              fontWeight: "bolder",
-              width: "120px",
-              fontSize: "16px",
-              textTransform: "none",
-              borderRadius: 0,
-              marginLeft: 10,
-            }}
+            style={EM_INPUT_BUTTON}
             onClick={() => onConfirmMemberName()}
           >
             Confirm
@@ -227,10 +184,39 @@ const EventPage: React.FC = () => {
             timezones={{...allTimezones}}
           /> 
         </Box>
-        {renderEventDates()}
+        <div className="spacer" />
+        <div className="ep-calendar-container calendar-container">
+          <EventCalendar
+            eventDateRanges={event ? event.dateRanges : []}
+            membersDateRanges={[]}
+            memberDateRanges={[]}
+
+            // dateRanges={event ? event.dateRanges : []}
+            // timezone={getTimezoneString(timezone)}
+            // onDateRangeChange={(_: DateRange[]) => {}}
+          />
+        </div>
       </ContentBox>
     </Page>
   )
 }
+
+const COPY_EVENT_BUTTON : CSS = {
+  fontWeight: "bolder",
+  fontSize: "16px",
+  textTransform: "none",
+  borderRadius: 0,
+  marginLeft: 10,
+}
+
+const EM_INPUT_BUTTON : CSS = {
+  fontWeight: "bolder",
+  fontSize: "16px",
+  textTransform: "none",
+  borderRadius: 0,
+  marginLeft: 10,
+}
+
+
 
 export { EventPage };

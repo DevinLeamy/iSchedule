@@ -4,6 +4,7 @@ import classNames from "classnames";
 import RangeBox from "../RangeBox/RangeBox";
 import { getTimeFromRow } from "../../../utilities";
 import { Time, Position, RangeBlockBox } from "../../../types/types";
+import { TimesList } from "../../common";
 import { useMouseCapture } from "../../../hooks/useMouseCapture";
 
 type CalendarRangeSelectorProps = {
@@ -116,8 +117,6 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
             id={id}
             key={id}
             box={rangeBox}
-            // cellWidth={Math.round(rangeSelectorBounds().width / cols)}
-            // cellHeight={Math.round(rangeSelectorBounds().height / rows)}
             cellWidth={130}
             cellHeight={15}
             onChange={onRangeBoxChange}
@@ -167,25 +166,10 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
     );
   }
 
-  // const rangeSelectorBounds = () : DOMRect => {
-  //   if (rangeSelectorRef?.current)
-  //     return rangeSelectorRef.current.getBoundingClientRect();
-  //   return new DOMRect();
-  // }
-  
   const renderCalendarTimes = () : React.ReactNode => {
     return (
-      <div className="calendar-dates">
-        {[...Array(rows)].map((_, row) => {
-          if (row % 4 === 0 && row !== rows && row !== 0) {
-            return (
-              <div key={row * 999} className="calendar-date">
-                {getStringFromTime(getTimeFromRow(row))}
-              </div> 
-            )
-          } else return <div className="calendar-date" />; 
-        })}
-      </div>
+      <TimesList 
+      />
     )
   }
 
@@ -209,16 +193,6 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
 }
 
 
-const formatMinute = (minute: number) : string => {
-  return (minute < 10) ? `0${minute}` : `${minute}`
-}
 
-const getStringFromTime = (time: Time) : string => {
-  let zone = time.am ? 'AM' : 'PM'
-  if (time.minute === 0) 
-    return `${time.hour} ${zone}`
-
-  return `${time.hour}:${formatMinute(time.minute)} ${zone}`;
-}
 
 export { CalendarRangeSelector };

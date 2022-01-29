@@ -1,0 +1,86 @@
+.dr-selector-main {
+  width: 130px;
+  /* height: 400px;  */
+  height: fit-content;
+  /* background-color: orange; */
+  margin: 5px;
+
+  --cal-days-bar-sz: 50px;
+  --cal-times-bar-wd: 30px;
+}
+
+.dr-date-container {
+  height: var(--cal-days-bar-sz);
+  /* width: 100%; */
+  width: calc(100% - var(--cal-times-bar-wd));
+  margin-left: var(--cal-times-bar-wd);
+}
+
+.dr-bl-times-container {
+  width: 100%;
+  overflow-x: hidden;
+  height: calc(100% - var(--cal-days-bar-sz));
+  display: flex;
+}
+
+.dr-times-container {
+  width: var(--cal-times-bar-wd);
+  height: 100%; 
+}
+
+.dr-bl-times-container::-webkit-scrollbar {
+  display: none;
+}
+
+.dr-bl-container {
+  height: 100%;
+  width: calc(100% - var(--cal-times-bar-wd));
+  position: relative;
+}
+
+.dr-grid-cell {
+  width: 100%;
+  /* height: var(--dts-cell-height); */
+  box-sizing: border-box;
+  /* border-top: 1px dashed var(--grid-border-color); */
+}
+
+.dr-grid-cell:hover {
+  cursor: pointer;
+  background-color: var(--blue);
+  opacity: 0.4;
+}
+
+.dr-grid-cell-hour {
+  border-top: var(--grid-border);
+}
+
+.dr-grid-cell-selected {
+  background-color: #07245e; 
+  /* opacity: 0.4; */
+
+  /* border-top: var(--grid-border);  */
+}
+
+
+.dr-calendar-day {
+  height: var(--cal-days-bar-sz);
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.dr-cd-month-day {
+  font-size: 13px;
+}
+
+/* .dr-cd-day {
+  font-size: 20px;
+  font-family: var(--header-font);
+  color: var(--blue);
+} */
+
+.dr-cd-weekday {
+  font-size: 16px;
+}
