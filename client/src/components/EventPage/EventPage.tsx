@@ -89,43 +89,6 @@ const EventPage: React.FC = () => {
 
   const eventLink = `http://localhost:3000/event/${_id}`;
 
-//   const renderEventDate = (date: CalendarDate) : React.ReactNode => {
-//     if (event === undefined) return null;
-
-//     let eventDateRanges = event
-//       .dateRanges
-//       .filter(dateRange => deepEqual(getCalendarDate(dateRange.startDate), date));
-
-//     let eventRangeBlocks = getRangeBlocksFromDateRanges(eventDateRanges)
-
-//     let membersDateRanges = []
-//     for (let member of event.members)
-//       membersDateRanges.push(...member.dateRanges)
-//     let membersRangeBlocks = getRangeBlocksFromDateRanges(membersDateRanges);
-
-//     return (
-//       <DateRangeSelector
-//         date={date}
-//         eventRangeBlocks={eventRangeBlocks}
-//         membersRangeBlocks={membersRangeBlocks}
-//         memberRangeBlocks={[]}
-//         // cellHeight={10}
-//       />
-//     )
-//  }
-
-  // const renderEventDates = () => {
-  //   if (event === undefined) return <div className="event-dates-container" />;
-
-  //   let eventDates: CalendarDate[] = getEventCalendarDates(event.dateRanges)
-    
-  //   return (
-  //     <div className="event-dates-container">
-  //       {[...eventDates].map(eventDate => renderEventDate(eventDate))}
-  //     </div>
-  //   );
-  // } 
-
   return (
     <Page>
       <Header content="Set your availability" />
@@ -190,11 +153,12 @@ const EventPage: React.FC = () => {
             eventDateRanges={event ? event.dateRanges : []}
             membersDateRanges={[]}
             memberDateRanges={[]}
-
-            // dateRanges={event ? event.dateRanges : []}
-            // timezone={getTimezoneString(timezone)}
-            // onDateRangeChange={(_: DateRange[]) => {}}
+            timezone={getTimezoneString(timezone)}
           />
+        </div>
+        <div className="spacer" />
+        <div style={{backgroundColor: "white", border: '1px solid grey'}}>
+          Comments
         </div>
       </ContentBox>
     </Page>

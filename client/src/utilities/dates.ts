@@ -120,7 +120,7 @@ const getDateFromCalendarDate = (calendarDate: CalendarDate) : Date => {
 }
 
 const convertTimezone = (date: Date, currentTimezone: string, newTimezone: string) : Date => {
-  return date;
+  return new Date(date.toLocaleString("en-US", {timeZone: newTimezone}));
 }
 
 export { 

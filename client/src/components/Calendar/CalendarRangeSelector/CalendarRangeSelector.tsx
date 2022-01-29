@@ -4,19 +4,32 @@ import classNames from "classnames";
 import RangeBox from "../RangeBox/RangeBox";
 import { getTimeFromRow } from "../../../utilities";
 import { Time, Position, RangeBlockBox } from "../../../types/types";
-import { TimesList } from "../../common";
+import { TimesList, List } from "../../common";
 import { useMouseCapture } from "../../../hooks/useMouseCapture";
+import { CELLS_PER_DAY } from "../../../constants";
 
 type CalendarRangeSelectorProps = {
   rangeBoxes: RangeBlockBox[],
   onRangeBoxesChange: (rangeBoxes: RangeBlockBox[]) => void,
+  rangeBoxMap: (
+    rangeBox: RangeBlockBox, 
+    id: number,
+    onChange: (id: number, row: number, col: number, heightInCells: number) => void, 
+    onDelete: (id: number) => void
+  ) => React.ReactNode, 
   rows: number,
   cols: number
+}
+
+type GridCell = {
+  row: number,
+  col: number
 }
 
 const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
   rangeBoxes,
   onRangeBoxesChange,
+  rangeBoxMap,
   rows,
   cols
 }) => {
@@ -64,11 +77,8 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
           })
         } 
         
-        if (covered && prevCovered === -1)
-          prevCovered = row;
-        
-        if (!covered)
-          prevCovered = -1;
+        if (covered && prevCovered === -1) prevCovered = row;
+        if (!covered) prevCovered = -1;
       }
     }
 
@@ -109,33 +119,12 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
     onRangeBoxesChange(redrawRangeBoxes(updated));
   }
 
-  const renderRangeBoxesInCol = (col: number) : React.ReactNode => {
-    return rangeBoxes.map((rangeBox, id) => {
-      if (rangeBox.col === col)
-        return (
-          <RangeBox
-            id={id}
-            key={id}
-            box={rangeBox}
-            cellWidth={130}
-            cellHeight={15}
-            onChange={onRangeBoxChange}
-            onDelete={onRangeBoxDelete}
-          />
-        );
-      return <></>;
-   });
+  const getRangeBoxesInCol = (col: number) : { id: number, rangeBox: RangeBlockBox }[] => {
+    return rangeBoxes
+      .map((rangeBox, id) => { return {id, rangeBox} })
+      .filter(identifiedRb => identifiedRb.rangeBox.col === col)
   }
 
-  const renderGridRow = (col: number) : React.ReactNode => {
-    return (
-      <div className="rs-grid-row">
-        {[...Array(rows)].map((_, row) => renderGridCell(row, col))}
-        {renderRangeBoxesInCol(col)} 
-      </div>
-   );
-  }
-  
   const cellInSelectedRange = (row: number, col: number) : boolean => {
     if (startPosition === undefined || mousePosition === undefined) 
       return false;
@@ -150,43 +139,50 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
     return false;
   }
 
-  const renderGridCell = (row: number, col: number) : React.ReactNode => {
-    const onHourBound = row % 4 == 0;
+  const mapGridCol = (col: number) : React.ReactNode => {
+    return (
+      <div className="rs-grid-row">
+        <List
+          items={Array.from(Array(rows).keys()).map(row => { return {row, col} })}
+          listKeyMap={mapGridCellToKey}
+          listItemMap={mapGridCell}
+        />
+        {getRangeBoxesInCol(col).map(identifiedRb => 
+          rangeBoxMap(identifiedRb.rangeBox, identifiedRb.id, onRangeBoxChange, onRangeBoxDelete))} 
+      </div>
+   ); 
+  }
 
+  const mapGridCellToKey = (cell: GridCell) : number => cell.row * CELLS_PER_DAY + cell.col;
+
+  const mapGridCell = (cell: GridCell) : React.ReactNode => {
+    const onHourBound = cell.row % 4 == 0;
+
+    // create a mapToGridCell prop
     return (
       <div 
-        key={row * 999 } 
         className={classNames(
           "grid-cell",
           { "grid-cell-hour" : onHourBound },
-          { "grid-cell-selected" : cellInSelectedRange(row, col) } 
+          { "grid-cell-selected" : cellInSelectedRange(cell.row, cell.col) } 
         )}
-        onMouseDown={() => onMouseDown(row, col)}
+        onMouseDown={() => onMouseDown(cell.row, cell.col)}
       />
     );
   }
-
-  const renderCalendarTimes = () : React.ReactNode => {
-    return (
-      <TimesList 
-      />
-    )
-  }
-
 
   return (
     <div 
       className="rs-main"
       onMouseUp={() => onMouseUp()}
     >
-    {renderCalendarTimes()}
-     <div 
-        className="rs-grid-container"
-        ref={rangeSelectorRef}
-      >
-        {[...Array(cols)].map((_, col) => 
-          renderGridRow(col)
-        )}
+      <TimesList />
+      <div className="rs-grid-container" ref={rangeSelectorRef}>
+        <List
+          items={Array.from(Array(cols).keys())}
+          listItemMap={mapGridCol}
+          horizontal={true}
+        />
       </div>
     </div>
   );

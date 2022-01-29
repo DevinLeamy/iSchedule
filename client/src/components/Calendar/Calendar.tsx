@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { DateRange, AbsTime, RangeBlockBox, CalendarDate } from "../../types/types";
+import RangeBox from "../Calendar/RangeBox/RangeBox";
 import { 
   getDateInDays, 
   dateInRange, 
@@ -108,6 +109,24 @@ const Calendar: React.FC<CalendarProps> = ({
     onDateRangeChange(updatedDateRanges);
   }
 
+  const mapRangeBox = (
+    rangeBox: RangeBlockBox, 
+    id: number,
+    onChange: (id: number, row: number, col: number, heightInCells: number) => void, 
+    onDelete: (id: number) => void
+  ) : React.ReactNode => {
+    return (
+      <RangeBox
+        id={id}
+        box={{...rangeBox}}
+        cellWidth={130}
+        cellHeight={15}
+        onChange={onChange}
+        onDelete={onDelete}
+      />
+    );
+  }
+
   const gotoNextWeek = () : void => { setWeekStart(getDateInDays(TOTAL_COLS, weekStart)) }
   const gotoPreviousWeek = () : void => { setWeekStart(getDateInDays(-TOTAL_COLS, weekStart)) } 
   const clearCalendar = () : void => { onDateRangeChange([]) }
@@ -125,6 +144,7 @@ const Calendar: React.FC<CalendarProps> = ({
       <CalendarRangeSelector
         rangeBoxes={rangeBoxes}
         onRangeBoxesChange={updateDateRanges}
+        rangeBoxMap={mapRangeBox}
         rows={TOTAL_ROWS}
         cols={TOTAL_COLS}
       />

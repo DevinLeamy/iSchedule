@@ -18,21 +18,21 @@ import CalendarDatesBar from "../../Calendar/CalendarDatesBar";
 import { CalendarRangeSelector } from "../../Calendar/CalendarRangeSelector/CalendarRangeSelector";
 
 import "./EventCalendar.css"
-// import "../../Calendar/Calendar.css"
-// import "../../CreateEventPage/CreateEventPage.css"
 
 interface EventCalendarProps {
   eventDateRanges: DateRange[], // range boxes of the event
   membersDateRanges: MemberDateRange[], // range boxes of all of the members
   memberDateRanges: MemberDateRange[], // range boxes of the current, active, member
+  timezone: string,
   cellWidth?: number,
-  cellHeight?: number
+  cellHeight?: number,
 }
 
 const EventCalendar: React.FC<EventCalendarProps> = ({
   eventDateRanges,
   membersDateRanges,
   memberDateRanges,
+  timezone,
   cellWidth = 130,
   cellHeight = 15
 }) => {
@@ -70,6 +70,39 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     }
   }
 
+  const mapRangeBox = (
+    rangeBox: RangeBlockBox, 
+    id: number,
+    onChange: (id: number, row: number, col: number, heightInCells: number) => void, 
+    onDelete: (id: number) => void
+  ) : React.ReactNode => {
+    return (
+      <RangeBox
+        id={id}
+        box={rangeBox}
+        cellWidth={130}
+        cellHeight={15}
+        // onChange={onChange}
+        // onDelete={onDelete}
+        disableDeleting={true}
+        disableDragging={true}
+        disableResizing={true}
+      >
+        {/* <RangeBox
+          id={rangeBox.bRow}
+          box={rangeBox}
+          cellWidth={120}
+          cellHeight={15}
+          // onChange={onChange}
+          // onDelete={onDelete}
+          // disableDeleting={true}
+          // disableDragging={true}
+          // disableResizing={true}
+        /> */}
+      </RangeBox>
+    );
+  }
+
   const rangeBoxes = getRangeBoxesFromDateRanges(eventDateRanges)
   // const dateRangeCells: DateRangeCell[] = getDateRangeCells(eventRangeBlocks);
 
@@ -81,9 +114,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   //         box={rangeBlockToRangeBox(memberRangeBlock as RangeBlock)}
   //         cellWidth={cellWidth / 2}
   //         cellHeight={cellHeight}
-  //         disableDeleting={true}
-  //         disableDragging={true}
-  //         disableResizing={true}
+          // disableDeleting={true}
+          // disableDragging={true}
+          // disableResizing={true}
   //         disableTime={true}
   //       />
   //     )
@@ -106,60 +139,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
   //   })
   // }
 
-  // const mapGridCellToKey = (gridCell: DateRangeCell) : number => gridCell.row
 
-  // const mapGridCell = (gridCell: DateRangeCell) : React.ReactChild => {
-  //   let onHourBound = gridCell.row % 4 === 0;
-
-  //   return (
-  //     <div 
-  //       className={classNames(
-  //         "dr-grid-cell",
-  //         { "dr-grid-cell-hour" : onHourBound },
-  //         { "dr-grid-cell-selected" : gridCell.selected } 
-  //       )}
-  //       style={{height: cellHeight}}
-  //       onMouseDown={() => {}}
-  //     />
-  //   );
-  // }
-
-
-  // const renderGridCells = () : React.ReactNode => {
-  //   return (
-  //     <List
-  //       items={dateRangeCells}
-  //       listItemMap={mapGridCell}
-  //       listKeyMap={mapGridCellToKey}
-  //     />
-  //   )
-  // }
-
-  // const renderCalendarTimes = () : React.ReactNode => {
-  //   const [minRow, maxRow] = getRowRange(eventRangeBlocks);
-  //   return (
-  //     <TimesList
-  //       minMinutes={Math.max(0, minRow) * MINUTES_PER_CELL}
-  //       maxMinutes={Math.min(CELLS_PER_DAY, maxRow) * MINUTES_PER_CELL}
-  //       containerStyle={{width: 30}}
-  //       dateStyle={{height: cellHeight, fontSize: 10}}
-  //     />
-  //   )
-  // }
-
-  // const renderCalendarDay = (date: CalendarDate) : React.ReactNode => {
-  //   const sdate = getSDate(getDateFromCalendarDate(date))
-
-  //   return (
-  //     <div key={sdate.day} className="dr-calendar-day">
-  //       <div className="dr-cd-month-day">
-  //         {sdate.month.slice(0, 3)}{" "}{sdate.day}
-  //       </div>
-  //       {/* <div className="dr-cd-day">{sdate.day}</div> */}
-  //       <div className="dr-cd-weekday">{sdate.weekday}</div>
-  //     </div>
-  //   )
-  // }
   const gotoNextWeek = () : void => { 
     setStartDateIndex(Math.min(calendarDates.length - calendarColumns, startDateIndex + DAYS_PER_WEEK)) 
   }
@@ -179,82 +159,13 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       <CalendarRangeSelector
         rangeBoxes={rangeBoxes}
         onRangeBoxesChange={() => {}}
+        rangeBoxMap={mapRangeBox}
         rows={CELLS_PER_DAY}
         cols={calendarColumns}
       />
     </div>
-    // <div className="dr-selector-main">
-    //   <div className="dr-date-container">
-    //     {renderCalendarDay(date)}
-    //   </div>
-    //   <div className="dr-bl-times-container">
-    //     <div className="dr-times-container">
-    //       {renderCalendarTimes()}
-    //     </div>
-    //     <div className="dr-bl-container">
-    //       {/* {renderEventRangeBlocks()} */}
-    //       {renderMembersRangeBlocks()}
-    //       {renderMemberRangeBlocks()}
-    //       {renderGridCells()}
-    //     </div>
-    //  </div>
-    // </div>
   )
 }
-
-const rangeBlockToRangeBox = (rangeBlock: RangeBlock) : RangeBlockBox => {
-  return {
-    bRow: rangeBlock.bRow,
-    tRow: rangeBlock.tRow,
-    col: 0
-  }
-}
-
-const getRowRange = (rangeBlocks: RangeBlock[]) : [number, number] => {
-  const buffer = 0
-  const minimumDesiredRows = 0;
-  let minRow = 24 * 4 
-  let maxRow = 0 
-
-  for (let rangeBlock of rangeBlocks) {
-    minRow = Math.min(minRow, rangeBlock.bRow)
-    maxRow = Math.max(maxRow, rangeBlock.tRow)
-  }
-
-  minRow = Math.max(0, minRow - buffer);
-  maxRow = Math.min(CELLS_PER_DAY, maxRow + buffer);
-
-  let totalRows = maxRow - minRow + 1;
-  let missingRows = Math.max(0, minimumDesiredRows - totalRows);
-
-  let appendToBottom = Math.min(minRow, Math.round(missingRows / 2));
-  let appendToTop = missingRows - appendToBottom;
-
-  minRow -= appendToBottom;
-  maxRow += appendToTop;
-
-  return [minRow, maxRow]
-}
-
-// const getDateRangeCells = (rangeBlocks: RangeBlock[]) : DateRangeCell[] => {
-//   const [minRow, maxRow] = getRowRange(rangeBlocks);
-//   let dateRangeCells: DateRangeCell[] = [...Array(maxRow - minRow + 1)].map((_, i) => {
-//     return { row: i + minRow, selected: false }
-//   })
-
-//   for (let rangeBlock of rangeBlocks) {
-//     dateRangeCells = dateRangeCells.map(dateCell => {
-//       if (dateCell.row <= rangeBlock.tRow && dateCell.row >= rangeBlock.bRow) {
-//         dateCell.selected = true;
-//       }
-
-//       return dateCell;
-//     })
-//   }
-
-
-//   return dateRangeCells;
-// }
 
  // All of the dates that an events fall on
  const getEventCalendarDates = (dateRanges: DateRange[]) : CalendarDate[] => {
