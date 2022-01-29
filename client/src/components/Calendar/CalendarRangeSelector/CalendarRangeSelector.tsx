@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import classNames from "classnames";
 
 import RangeBox from "../RangeBox/RangeBox";
+import { getTimeFromRow } from "../../../utilities";
 import { Time, Position, RangeBlockBox } from "../../../types/types";
 import { useMouseCapture } from "../../../hooks/useMouseCapture";
 
@@ -171,13 +172,9 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
   //     return rangeSelectorRef.current.getBoundingClientRect();
   //   return new DOMRect();
   // }
-
-
-  return (
-    <div 
-      className="rs-main"
-      onMouseUp={() => onMouseUp()}
-    >
+  
+  const renderCalendarTimes = () : React.ReactNode => {
+    return (
       <div className="calendar-dates">
         {[...Array(rows)].map((_, row) => {
           if (row % 4 === 0 && row !== rows && row !== 0) {
@@ -189,7 +186,17 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
           } else return <div className="calendar-date" />; 
         })}
       </div>
-      <div 
+    )
+  }
+
+
+  return (
+    <div 
+      className="rs-main"
+      onMouseUp={() => onMouseUp()}
+    >
+    {renderCalendarTimes()}
+     <div 
         className="rs-grid-container"
         ref={rangeSelectorRef}
       >
@@ -201,26 +208,6 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
   );
 }
 
-const computeHourFrom24Hour = (totalHours: number) : number => {
-  if (totalHours === 0)
-    return 12
-  if (totalHours > 12) 
-    return totalHours - 12
-  return totalHours
-}
-
-const getTimeFromRow = (row: number) : Time => {
-  let minutes: number = row * 15;
-  if (minutes === 24 * 60)
-    --minutes;
-
-  let totalHours = Math.floor(minutes / 60)
-  let hour = computeHourFrom24Hour(totalHours);
-  let minute = minutes % 60
-  let am = totalHours < 12
-
-  return { hour, minute, am };
-}
 
 const formatMinute = (minute: number) : string => {
   return (minute < 10) ? `0${minute}` : `${minute}`

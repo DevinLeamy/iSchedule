@@ -1,5 +1,5 @@
 import { MILLISECONDS_PER_DAY } from "../constants"
-import { AbsTime, Time, DateRange } from "../types/types"
+import { AbsTime, Time, DateRange, CalendarDate } from "../types/types"
 
 const MONTHS = [
   { name: "January",   monthIndex: 0,  days: 31 }, 
@@ -107,6 +107,22 @@ const getAbsMinutesFromDate = (date: Date) : number => {
   return localHours * 60 + localMinutes; 
 }
 
+const getCalendarDate = (date: Date) : CalendarDate => {
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    day: date.getDate()
+  }
+}
+
+const getDateFromCalendarDate = (calendarDate: CalendarDate) : Date => {
+  return new Date(calendarDate.year, calendarDate.month, calendarDate.day);
+}
+
+const convertTimezone = (date: Date, currentTimezone: string, newTimezone: string) : Date => {
+  return date;
+}
+
 export { 
   getSDate, 
   getDateInDays, 
@@ -119,5 +135,7 @@ export {
   deserializeDate,
   getAbsYMD,
   getEndOfTheDay,
-  getAbsMinutesFromDate
+  getAbsMinutesFromDate,
+  getCalendarDate,
+  getDateFromCalendarDate
 }

@@ -51,13 +51,29 @@ export type RangeBlockBox = {
   col: number
 }
 
+export type RangeBlock = {
+  bRow: number,
+  tRow: number
+}
+
+export type CalendarDate = {
+  year: number,
+  month: number,
+  day: number
+}
+
 export type MemberRangeBlockBox = RangeBlockBox | {
+  name: string
+}
+
+export type MemberRangeBlock = RangeBlock | {
   name: string
 }
 
 export type MemberDateRange = DateRange | {
   name: string
 }
+
 
 // Could refactor events to be
 /*

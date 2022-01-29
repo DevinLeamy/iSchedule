@@ -12,7 +12,7 @@ import {
   Position
 } from "react-rnd"
 import "./RangeBox.css";
-import { MINUTES_PER_DAY } from "../../../constants";
+import { MINUTES_PER_CELL, MINUTES_PER_DAY } from "../../../constants";
 
 type RangeBoxProps = {
   id: number,
@@ -80,8 +80,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   return (
     <Rnd
       key={id}
-      disableDragging={disableDragging ?? false}
-      disableResizing={disableResizing ?? false}
+      disableDragging={disableDragging}
       dragAxis="y"
       bounds="parent"
       position={position}
@@ -96,8 +95,8 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       enableResizing={{
         left: false,
         right: false,
-        top: true,
-        bottom: true
+        top: !disableResizing,
+        bottom: !disableResizing 
       }}
     >
       {!disableResizing && 
@@ -109,7 +108,6 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       <RBDateRange
         bottomRow={box.bRow}
         topRow={box.tRow}
-        cellHeight={cellHeight}
       />}
 
       {!disableDeleting &&
@@ -127,17 +125,15 @@ const RangeBox: React.FC<RangeBoxProps> = ({
 
 type RBDateRangeProps = {
   bottomRow: number,
-  topRow: number,
-  cellHeight: number
+  topRow: number
 }
 
 const RBDateRange: React.FC<RBDateRangeProps> = ({
   bottomRow,
-  topRow,
-  cellHeight
+  topRow
 }) => {
-  const startTime = getTimeFromRow(bottomRow, cellHeight);
-  const endTime = getTimeFromRow(topRow + 1, cellHeight);
+  const startTime = getTimeFromRow(bottomRow);
+  const endTime = getTimeFromRow(topRow + 1);
 
   const getCellDisplayText = () : string => {
     const startS = getStringFromTime(startTime)
@@ -157,8 +153,8 @@ const RBDateRange: React.FC<RBDateRangeProps> = ({
   );
 }
 
-const getTimeFromRow = (row: number, cellHeight: number) : Time => {
-  let minutes: number = row * cellHeight;
+const getTimeFromRow = (row: number) : Time => {
+  let minutes: number = row * MINUTES_PER_CELL;
   if (minutes === MINUTES_PER_DAY)
     --minutes;
   

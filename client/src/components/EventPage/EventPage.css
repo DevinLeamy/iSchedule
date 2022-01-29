@@ -55,8 +55,8 @@
 
 .event-dates-container {
   margin-top: 30px;
-  padding: 10px 0px;
   display: flex;
+  flex-wrap: wrap;
 
   /* COPY of .calendar-main */
   width: 100%;
