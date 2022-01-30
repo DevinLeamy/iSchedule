@@ -23,7 +23,7 @@ export type Size = {
 export type Member = {
   name: string,
   timezone: string,
-  dateRanges: DateRange[]
+  dateRanges: MemberDateRange[]
 }
 
 export type Event = {
@@ -62,15 +62,15 @@ export type CalendarDate = {
   day: number
 }
 
-export type MemberRangeBlockBox = RangeBlockBox | {
+export type MemberRangeBlockBox = RangeBlockBox & {
   name: string
 }
 
-export type MemberRangeBlock = RangeBlock | {
+export type MemberRangeBlock = RangeBlock & {
   name: string
 }
 
-export type MemberDateRange = DateRange | {
+export type MemberDateRange = DateRange & {
   name: string
 }
 

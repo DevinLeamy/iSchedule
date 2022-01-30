@@ -1,22 +1,49 @@
-// import React, { CSSProperties as CSS } from "react";
-// import 
+import React, { CSSProperties as CSS, useState, useEffect, useRef, MutableRefObject as MRef } from "react";
+import classNames from "classnames";
 
-// import "./GridCell.css";
+import { Position } from "../../../types";
 
-// interface GridCellProps {
-//   width?: number,
-//   height?: number,
-//   onClick?: Function,
-//   onMouseDown?: Function,
-//   style?: CSS
-// }
+import "./GridCell.css";
 
-// const GridCell: React.FC<GridCellProps> = ({
-//   width = 130,
-//   height = 15,
-//   style = {}
-// }) => {
-//   return 
-// }
+export interface GridCellProps {
+  location: Position, 
+  selected?: boolean,
+  hoverStyle?: CSS,
+  style?: CSS,
+  onMouseDown?: (position: Position) => void
+}
 
-export {}
+const GridCell: React.FC<GridCellProps> = ({
+  location, 
+  selected = false,
+  hoverStyle = {},
+  style = {},
+  onMouseDown = () => {}
+}) => {
+
+  const [hovering, setHovering] = useState<boolean>(false);
+  const cellRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (cellRef?.current) {
+      cellRef.current.addEventListener("mouseenter", () => setHovering(true))
+      cellRef.current.addEventListener("mouseleave", () => setHovering(false))
+    }
+  }, [])
+  const onHourBound = location.row % 4 == 0;
+
+  return (
+    <div 
+      ref={cellRef}
+      className={classNames(
+        "grid-cell",
+        { "grid-cell-hour" : onHourBound },
+        { "grid-cell-selected" : selected } 
+      )}
+      style={hovering ? {...style, ...hoverStyle}: style}
+      onMouseDown={() => onMouseDown(location)}
+    />
+  );
+}
+
+export { GridCell }

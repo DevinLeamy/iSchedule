@@ -26,7 +26,8 @@ type RangeBoxProps = {
   disableDragging?: boolean,
   disableResizing?: boolean,
   disableDeleting?: boolean,
-  disableTime?: boolean
+  disableTime?: boolean,
+  children?: React.ReactNode
 };
 
 const RangeBox: React.FC<RangeBoxProps> = ({
@@ -41,7 +42,8 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   disableDragging = false,
   disableResizing = false,
   disableDeleting = false,
-  disableTime = false
+  disableTime = false,
+  children
 }) => {
   const position: Position = {
     x: 0, 
@@ -119,6 +121,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       <div className="drag-bar-container drag-bar-bottom">
         <div className="drag-bar" />
       </div>}
+      {children}
   </Rnd>
   );
 }

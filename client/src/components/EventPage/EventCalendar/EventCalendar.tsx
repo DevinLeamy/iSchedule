@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useContext } from "react";
 import classNames from "classnames";
 
 import { Time, RangeBlock, DateRange, MemberRangeBlock, CalendarDate, RangeBlockBox, MemberDateRange } from "../../../types";
@@ -12,33 +12,27 @@ import {
   deepEqual 
 } from "../../../utilities";
 import { TimesList, GridCellsList, List } from "../../common";
+import { EventContext } from "../../contexts";
+import { EventRangeSelector } from "../EventRangeSelector/EventRangeSelector";
 import { CELLS_PER_DAY, DAYS_PER_WEEK, MINUTES_PER_CELL } from "../../../constants";
 import CalendarHeader from "../../Calendar/CalendarHeader";
 import CalendarDatesBar from "../../Calendar/CalendarDatesBar";
-import { CalendarRangeSelector } from "../../Calendar/CalendarRangeSelector/CalendarRangeSelector";
 
 import "./EventCalendar.css"
 
 interface EventCalendarProps {
-  eventDateRanges: DateRange[], // range boxes of the event
-  membersDateRanges: MemberDateRange[], // range boxes of all of the members
-  memberDateRanges: MemberDateRange[], // range boxes of the current, active, member
-  timezone: string,
-  cellWidth?: number,
-  cellHeight?: number,
 }
 
 const EventCalendar: React.FC<EventCalendarProps> = ({
-  eventDateRanges,
-  membersDateRanges,
-  memberDateRanges,
-  timezone,
-  cellWidth = 130,
-  cellHeight = 15
 }) => {
+  const { eventDateRanges } = useContext(EventContext);
+  
   const calendarDates = getEventCalendarDates(eventDateRanges);
   const calendarColumns = Math.min(DAYS_PER_WEEK, calendarDates.length)
   const [startDateIndex, setStartDateIndex] = useState<number>(0);
+
+  if (calendarDates.length === 0)
+    return <h1>Loading...</h1>;
 
   const getRangeBoxesFromDateRanges = (dateRanges: DateRange[]) : RangeBlockBox[] => {
     let startDate = getDateFromCalendarDate(calendarDates[startDateIndex])
@@ -68,39 +62,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       tRow: Math.round(getAbsMinutesFromDate(dateRange.endDate) / MINUTES_PER_CELL),
       col: calendarDateIndex - startDateIndex 
     }
-  }
-
-  const mapRangeBox = (
-    rangeBox: RangeBlockBox, 
-    id: number,
-    onChange: (id: number, row: number, col: number, heightInCells: number) => void, 
-    onDelete: (id: number) => void
-  ) : React.ReactNode => {
-    return (
-      <RangeBox
-        id={id}
-        box={rangeBox}
-        cellWidth={130}
-        cellHeight={15}
-        // onChange={onChange}
-        // onDelete={onDelete}
-        disableDeleting={true}
-        disableDragging={true}
-        disableResizing={true}
-      >
-        {/* <RangeBox
-          id={rangeBox.bRow}
-          box={rangeBox}
-          cellWidth={120}
-          cellHeight={15}
-          // onChange={onChange}
-          // onDelete={onDelete}
-          // disableDeleting={true}
-          // disableDragging={true}
-          // disableResizing={true}
-        /> */}
-      </RangeBox>
-    );
   }
 
   const rangeBoxes = getRangeBoxesFromDateRanges(eventDateRanges)
@@ -156,10 +117,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       <CalendarDatesBar 
         dates={calendarDates.slice(startDateIndex, startDateIndex + calendarColumns)}
       />
-      <CalendarRangeSelector
+      <EventRangeSelector
         rangeBoxes={rangeBoxes}
         onRangeBoxesChange={() => {}}
-        rangeBoxMap={mapRangeBox}
         rows={CELLS_PER_DAY}
         cols={calendarColumns}
       />

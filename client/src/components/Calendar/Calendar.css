@@ -191,12 +191,6 @@
   /* border-top: 1px dashed var(--grid-border-color); */
 }
 
-.grid-cell:hover {
-  cursor: pointer;
-  background-color: var(--blue);
-  opacity: 0.4;
-}
-
 .grid-cell-hour {
   border-top: var(--grid-border);
 }

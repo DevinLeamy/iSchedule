@@ -5,3 +5,4 @@ export * from "./Header/Header";
 export * from "./List/List";
 export * from "./TimesList/TimesList";
 export * from "./GridCellsList/GridCellsList";
+export * from "./GridCell/GridCell";

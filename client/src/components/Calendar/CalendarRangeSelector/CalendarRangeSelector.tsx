@@ -1,10 +1,7 @@
 import React, { useRef, useState } from "react";
-import classNames from "classnames";
 
-import RangeBox from "../RangeBox/RangeBox";
-import { getTimeFromRow } from "../../../utilities";
 import { Time, Position, RangeBlockBox } from "../../../types/types";
-import { TimesList, List } from "../../common";
+import { TimesList, List, GridCell } from "../../common";
 import { useMouseCapture } from "../../../hooks/useMouseCapture";
 import { CELLS_PER_DAY } from "../../../constants";
 
@@ -19,11 +16,6 @@ type CalendarRangeSelectorProps = {
   ) => React.ReactNode, 
   rows: number,
   cols: number
-}
-
-type GridCell = {
-  row: number,
-  col: number
 }
 
 const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
@@ -102,8 +94,8 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
     setStartPosition(undefined);
   }
 
-  const onMouseDown = (row: number, col: number) => {
-    setStartPosition({ row, col });
+  const onMouseDown = (position: Position) => {
+    setStartPosition(position);
   }
 
   const createRangeBox = (row: number, col: number, length: number = 3) => {
@@ -144,8 +136,8 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
       <div className="rs-grid-row">
         <List
           items={Array.from(Array(rows).keys()).map(row => { return {row, col} })}
-          listKeyMap={mapGridCellToKey}
-          listItemMap={mapGridCell}
+          listKeyMap={mapPositionToKey}
+          listItemMap={mapPosition}
         />
         {getRangeBoxesInCol(col).map(identifiedRb => 
           rangeBoxMap(identifiedRb.rangeBox, identifiedRb.id, onRangeBoxChange, onRangeBoxDelete))} 
@@ -153,20 +145,19 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
    ); 
   }
 
-  const mapGridCellToKey = (cell: GridCell) : number => cell.row * CELLS_PER_DAY + cell.col;
+  const mapPositionToKey = (cell: Position) : number => cell.row * CELLS_PER_DAY + cell.col;
 
-  const mapGridCell = (cell: GridCell) : React.ReactNode => {
-    const onHourBound = cell.row % 4 == 0;
-
-    // create a mapToGridCell prop
+  const mapPosition = (cell: Position) : React.ReactNode => {
     return (
-      <div 
-        className={classNames(
-          "grid-cell",
-          { "grid-cell-hour" : onHourBound },
-          { "grid-cell-selected" : cellInSelectedRange(cell.row, cell.col) } 
-        )}
-        onMouseDown={() => onMouseDown(cell.row, cell.col)}
+      <GridCell
+        location={{row: cell.row, col: cell.col}}
+        selected={cellInSelectedRange(cell.row, cell.col) }
+        onMouseDown={onMouseDown}
+        hoverStyle={{
+          cursor: "pointer",
+          backgroundColor: "var(--blue)",
+          opacity: 0.4
+        }}
       />
     );
   }
