@@ -1,7 +1,6 @@
 export type DateRange = {
   startDate: Date,
   endDate: Date,
-  timezone: string
 };
 
 export type AbsTime = {
@@ -26,12 +25,18 @@ export type Member = {
   dateRanges: MemberDateRange[]
 }
 
+export type TimeSlot = {
+  _id: string,
+  bottomRow: number,
+  topRow: number,
+  date: CalendarDate,
+  availability: Array<Array<string>>
+}
+
 export type Event = {
   _id: string,
   name: string,
-  dateRanges: DateRange[],
-  timezone: string,
-  members: Member[]
+  timeSlots: TimeSlot[] // UTC
 }
 
 export interface ResponseT {
@@ -46,6 +51,7 @@ export type Position = {
 }
 
 export type RangeBlockBox = {
+  _id?: string,
   bRow: number,
   tRow: number,
   col: number
@@ -73,7 +79,6 @@ export type MemberRangeBlock = RangeBlock & {
 export type MemberDateRange = DateRange & {
   name: string
 }
-
 
 // Could refactor events to be
 /*

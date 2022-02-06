@@ -2,7 +2,7 @@ import { ITimezone } from "react-timezone-select";
 
 import { DateRange, Time, RangeBlockBox, RangeBlock } from "../types";
 import { getAbsMinutesFromDate, dateInRange } from "../utilities";
-import { MINUTES_PER_CELL } from "../constants";
+import { MINUTES_PER_CELL, MILLISECONDS_PER_HOUR } from "../constants";
 
 const serializeDateRanges = (dateRanges: DateRange[]) : string => {
   return JSON.stringify(dateRanges);
@@ -16,12 +16,15 @@ const deserializeDateRanges = (value: any) : DateRange[] => {
     dateRanges.push({
       startDate: new Date(dateRangeString.startDate),
       endDate: new Date(dateRangeString.endDate),
-      timezone: dateRangeString.timezone
     })
   }
 
   return dateRanges;
 } 
+
+const clone = (dataToClone: any) : any => {
+  return JSON.parse(JSON.stringify(dataToClone))
+}
 
 const getTimezoneString = (timezone: ITimezone) : string => {
   return typeof(timezone) === "string" ? timezone : timezone.value;
@@ -96,6 +99,31 @@ const getDateRangesInRange = (startDate: Date, endDate: Date, dateRanges: DateRa
     .filter(dateRange => dateInRange(dateRange.startDate, startDate, endDate))
 }
 
+const applyOffsetToDate = (date: Date, offset: number) : Date => {
+  return new Date(date.getTime() + offset * MILLISECONDS_PER_HOUR);
+}
+
+// NOTE: In hours
+const getTimezoneOffset = (timezone: string) : number => {
+  const date = new Date();
+  const tz = date.toLocaleString("en", {timeZone: timezone, timeStyle: "long"}).split(" ").slice(-1)[0];
+  const dateString = date.toString();
+  const offsetInMilli = Date.parse(`${dateString} UTC`) - Date.parse(`${dateString} ${tz}`);
+  
+  // return UTC offset in millis
+  return offsetInMilli / MILLISECONDS_PER_HOUR;
+}
+
+const convertToUTC = (localDate: Date, timezone: string) : Date => {
+  const offset = getTimezoneOffset(timezone);
+  return applyOffsetToDate(localDate, -1 * offset);
+}
+
+const convertToTimezone = (utcDate: Date, timezone: string) : Date => {
+  const offset = getTimezoneOffset(timezone);
+  return applyOffsetToDate(utcDate, offset);
+}
+
 export { 
   serializeDateRanges, 
   deserializeDateRanges, 
@@ -105,5 +133,8 @@ export {
   deepEqual,
   getTimeFromRow,
   copy,
-  getDateRangesInRange
+  getDateRangesInRange,
+  convertToUTC,
+  convertToTimezone,
+  clone
 }

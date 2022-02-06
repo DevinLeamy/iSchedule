@@ -15,13 +15,13 @@ import "./RangeBox.css";
 import { MINUTES_PER_CELL, MINUTES_PER_DAY } from "../../../constants";
 
 type RangeBoxProps = {
-  id: number,
+  id: string,
   box: RangeBlockBox,
   cellWidth: number,
   cellHeight: number,
 
-  onChange?: (id: number, row: number, col: number, heightInCells: number) => void,
-  onDelete?: (id: number) => void,
+  onChange?: (id: string, row: number, col: number, heightInCells: number) => void,
+  onDelete?: (id: string) => void,
 
   disableDragging?: boolean,
   disableResizing?: boolean,
@@ -36,8 +36,8 @@ const RangeBox: React.FC<RangeBoxProps> = ({
   cellWidth,
   cellHeight,
   
-  onChange = (id: number, row: number, col: number, heightInCells: number) => {},
-  onDelete = (id: number) => {},
+  onChange = (id: string, row: number, col: number, heightInCells: number) => {},
+  onDelete = (id: string) => {},
 
   disableDragging = false,
   disableResizing = false,

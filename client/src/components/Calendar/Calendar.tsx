@@ -1,32 +1,20 @@
-import React, { useState } from "react";
-import { DateRange, AbsTime, RangeBlockBox, CalendarDate } from "../../types/types";
-import RangeBox from "../Calendar/RangeBox/RangeBox";
+import React, { useState, useContext } from "react";
+import { CalendarDate } from "../../types/types";
 import { 
   getDateInDays, 
-  dateInRange, 
-  daysBetween,
   getAbsYMD,
-  getEndOfTheDay,
-  minToAbsTime,
-  getAbsMinutesFromDate,
   serializeDate,
   deserializeDate,
   getCalendarDate,
-  getDateRangesInRange
 } from "../../utilities";
 import { usePersistedValue } from "../../hooks";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDatesBar from "./CalendarDatesBar";
 import { CalendarRangeSelector } from "./CalendarRangeSelector/CalendarRangeSelector";
-import { DAYS_PER_WEEK } from "../../constants";
+import { DAYS_PER_WEEK, CELL_HEIGHT } from "../../constants";
 
 import "./Calendar.css"
-
-type CalendarProps = {
-  dateRanges: DateRange[],
-  timezone: string, 
-  onDateRangeChange: (newRanges: DateRange[]) => void
-};
+import { CreateEventContext } from "../contexts";
 
 /*
 FEATURES TO ADD:
@@ -46,90 +34,103 @@ TODO:
 */
 
 const TOTAL_ROWS: number = 24 * 4;
-const TOTAL_COLS: number = 7;
-const CELL_HEIGHT: number = 15;
-const CELL_MINUTES: number = 15;
+
+type CalendarProps = {
+};
 
 const Calendar: React.FC<CalendarProps> = ({
-  timezone,
-  dateRanges,
-  onDateRangeChange
 }) => {
-  const weekContainsDate = (date: Date) : boolean => {
-    return dateInRange(date, weekStart, getWeekEnd(weekStart));
-  }
+  const { setTimeSlots } = useContext(CreateEventContext);
+  // const weekContainsDate = (date: Date) : boolean => {
+  //   return dateInRange(date, weekStart, getWeekEnd(weekStart));
+  // }
 
-  const getRangeBoxesFromDateRanges = (dateRanges: DateRange[]) : RangeBlockBox[] => {
-    let dateRangesInRange = getDateRangesInRange(weekStart, getWeekEnd(weekStart), dateRanges)
-    return dateRangesInRange.map(dateRange => getRangeBoxFromDateRange(dateRange))
-  }
+  // const getRangeBoxesFromDateRanges = (dateRanges: DateRange[]) : RangeBlockBox[] => {
+  //   let dateRangesInRange = getDateRangesInRange(weekStart, getWeekEnd(weekStart), dateRanges)
+  //   return dateRangesInRange.map(dateRange => getRangeBoxFromDateRange(dateRange))
+  // }
 
-  const getRangeBoxFromDateRange = (dateRange: DateRange) : RangeBlockBox => {
-    return {
-      bRow: Math.round(getAbsMinutesFromDate(dateRange.startDate) / CELL_HEIGHT),
-      tRow: Math.round(getAbsMinutesFromDate(dateRange.endDate) / CELL_HEIGHT),
-      col: daysBetween(dateRange.startDate, weekStart) 
-    }
-  }
+  // const getRangeBoxFromDateRange = (dateRange: DateRange) : RangeBlockBox => {
+  //   return {
+  //     bRow: Math.round(getAbsMinutesFromDate(dateRange.startDate) / CELL_HEIGHT),
+  //     tRow: Math.round(getAbsMinutesFromDate(dateRange.endDate) / CELL_HEIGHT),
+  //     col: daysBetween(dateRange.startDate, weekStart) 
+  //   }
+  // }
 
   const [weekStart, setWeekStart] = usePersistedValue<Date>(
     getAbsYMD(new Date()),
     "weekStart",
     { serialize: serializeDate, deserialize: deserializeDate }
   );
-  const rangeBoxes = getRangeBoxesFromDateRanges(dateRanges)
 
-  const updateDateRanges = (updatedRangeBoxes: RangeBlockBox[]) : void => {
-    const updatedDateRanges: DateRange[] = [] 
+  const getCalendarDates = (weekStart: Date) : CalendarDate[] => {
+    let calendarDates = []
+
+    for (let i = 0; i < DAYS_PER_WEEK; ++i) {
+      let calendarDate = getCalendarDate(getDateInDays(0, weekStart))
+      calendarDates.push(calendarDate)
+    }
+
+    return calendarDates
+  }
+
+  const calendarDates = getCalendarDates(weekStart);
+
+  
+  // const rangeBoxes = getRangeBoxesFromDateRanges(dateRanges)
+
+  // const updateDateRanges = (updatedRangeBoxes: RangeBlockBox[]) : void => {
+  //   const updatedDateRanges: DateRange[] = [] 
     
-    // Keep dates that lie outside of the current week, discard the rest.
-    for (let dateRange of dateRanges) {
-      const startDate = getDateRangeStartDate(dateRange)
+  //   // Keep dates that lie outside of the current week, discard the rest.
+  //   for (let dateRange of dateRanges) {
+  //     const startDate = getDateRangeStartDate(dateRange)
 
-      if (!weekContainsDate(startDate)) 
-        updatedDateRanges.push({...dateRange})
-    }
+  //     if (!weekContainsDate(startDate)) 
+  //       updatedDateRanges.push({...dateRange})
+  //   }
 
-    for (let rangeBox of updatedRangeBoxes) {
-      let startRow = rangeBox.bRow;
-      let endRow = rangeBox.tRow;
+  //   for (let rangeBox of updatedRangeBoxes) {
+  //     let startRow = rangeBox.bRow;
+  //     let endRow = rangeBox.tRow;
 
-      let dayOffset = rangeBox.col;
-      let date = getDateInDays(dayOffset, weekStart);
+  //     let dayOffset = rangeBox.col;
+  //     let date = getDateInDays(dayOffset, weekStart);
 
-      let startTime: AbsTime = minToAbsTime(startRow * CELL_MINUTES)
-      let startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), startTime.hour, startTime.minute)
+  //     let startTime: AbsTime = minToAbsTime(startRow * CELL_MINUTES)
+  //     let startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), startTime.hour, startTime.minute)
 
-      let endTime: AbsTime = minToAbsTime(endRow * CELL_MINUTES)
-      let endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), endTime.hour, endTime.minute)
+  //     let endTime: AbsTime = minToAbsTime(endRow * CELL_MINUTES)
+  //     let endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), endTime.hour, endTime.minute)
 
-      updatedDateRanges.push({ startDate, endDate, timezone })
-    }
+  //     updatedDateRanges.push({ startDate, endDate, timezone })
+  //   }
 
-    onDateRangeChange(updatedDateRanges);
-  }
+  //   onDateRangeChange(updatedDateRanges);
+  // }
 
-  const mapRangeBox = (
-    rangeBox: RangeBlockBox, 
-    id: number,
-    onChange: (id: number, row: number, col: number, heightInCells: number) => void, 
-    onDelete: (id: number) => void
-  ) : React.ReactNode => {
-    return (
-      <RangeBox
-        id={id}
-        box={{...rangeBox}}
-        cellWidth={130}
-        cellHeight={15}
-        onChange={onChange}
-        onDelete={onDelete}
-      />
-    );
-  }
+  // const mapRangeBox = (
+  //   rangeBox: RangeBlockBox, 
+  //   id: number,
+  //   onChange: (id: number, row: number, col: number, heightInCells: number) => void, 
+  //   onDelete: (id: number) => void
+  // ) : React.ReactNode => {
+  //   return (
+  //     <RangeBox
+  //       id={id}
+  //       box={{...rangeBox}}
+  //       cellWidth={130}
+  //       cellHeight={15}
+  //       onChange={onChange}
+  //       onDelete={onDelete}
+  //     />
+  //   );
+  // }
 
-  const gotoNextWeek = () : void => { setWeekStart(getDateInDays(TOTAL_COLS, weekStart)) }
-  const gotoPreviousWeek = () : void => { setWeekStart(getDateInDays(-TOTAL_COLS, weekStart)) } 
-  const clearCalendar = () : void => { onDateRangeChange([]) }
+  const gotoNextWeek = () : void => { setWeekStart(getDateInDays(DAYS_PER_WEEK, weekStart)) }
+  const gotoPreviousWeek = () : void => { setWeekStart(getDateInDays(-DAYS_PER_WEEK, weekStart)) } 
+  const clearCalendar = () : void => { setTimeSlots([]) }
 
   return (
     <div className="calendar-main">
@@ -139,43 +140,44 @@ const Calendar: React.FC<CalendarProps> = ({
         onClearCalendar={clearCalendar}
       />
       <CalendarDatesBar 
-        dates={getCalendarDates(weekStart, DAYS_PER_WEEK)}
+        dates={getCalendarDates(weekStart)}
       />
       <CalendarRangeSelector
-        rangeBoxes={rangeBoxes}
-        onRangeBoxesChange={updateDateRanges}
-        rangeBoxMap={mapRangeBox}
+        calendarDates={calendarDates}
+        // rangeBoxes={rangeBoxes}
+        // onRangeBoxesChange={updateDateRanges}
+        // rangeBoxMap={mapRangeBox}
         rows={TOTAL_ROWS}
-        cols={TOTAL_COLS}
+        cols={DAYS_PER_WEEK}
       />
    </div>
   );
 }
 
-const getCalendarDates = (startDate: Date, totalDays: number) : CalendarDate[] => {
-  let calendarDates: CalendarDate[] = []
+// const getCalendarDates = (startDate: Date, totalDays: number) : CalendarDate[] => {
+//   let calendarDates: CalendarDate[] = []
 
-  for (let i = 0; i < totalDays; ++i) {
-    let day = new Date(startDate.getTime())
-    day.setDate(day.getDate() + i);
+//   for (let i = 0; i < totalDays; ++i) {
+//     let day = new Date(startDate.getTime())
+//     day.setDate(day.getDate() + i);
 
-    calendarDates.push(getCalendarDate(day))
-  }
+//     calendarDates.push(getCalendarDate(day))
+//   }
 
-  return calendarDates;
-}
+//   return calendarDates;
+// }
 
-const getDateRangeStartDate = (dateRange: DateRange) : Date => {
-  return dateRange.startDate; 
-}
+// const getDateRangeStartDate = (dateRange: DateRange) : Date => {
+//   return dateRange.startDate; 
+// }
 
-const getDateRangeEndDate = (dateRange: DateRange) : Date => {
-  return dateRange.endDate;
-}
+// const getDateRangeEndDate = (dateRange: DateRange) : Date => {
+//   return dateRange.endDate;
+// }
 
-const getWeekEnd = (weekStart: Date) : Date => {
-  return getEndOfTheDay(getDateInDays(TOTAL_COLS - 1, weekStart));
-}
+// const getWeekEnd = (weekStart: Date) : Date => {
+//   return getEndOfTheDay(getDateInDays(TOTAL_COLS - 1, weekStart));
+// }
 
 export { Calendar }
 

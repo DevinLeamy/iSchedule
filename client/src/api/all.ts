@@ -26,7 +26,7 @@ const getEventById = async (_id: string) : Promise<Event | undefined> => {
     return {
       startDate: new Date(stringDateRange.startDate),
       endDate: new Date(stringDateRange.endDate),
-      timezone: stringDateRange.timezone
+      // timezone: stringDateRange.timezone
     }
   }
 

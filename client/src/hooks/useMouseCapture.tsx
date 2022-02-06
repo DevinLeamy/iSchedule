@@ -27,7 +27,6 @@ export const useMouseCapture = (divRef: MRef<HTMLDivElement | null>, rows: numbe
   useEffect(() => {
     if (divRef?.current) {
       divRef.current.addEventListener('mousemove', handleMouseMove);
-      // const boundingBox = divRef.current.getBoundingClientRect();
     }
 
     return () => {

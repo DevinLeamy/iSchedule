@@ -25,37 +25,16 @@ const EventPage: React.FC = () => {
   const { _id } = useParams();
 
   const [timezone, onTimezoneChange] = useTimezone();
+
+  console.log(timezone);
+
   const memberNameRef = useRef<TextFieldProps>();
-  const [eventMember, setEventMember] = useState<Member | undefined>({
-    name: "dereck",
-    dateRanges: [],
-    timezone: "America/Edmonton"
-  });
-
-  // console.log("Event ID:", _id)
-  // console.log("Event: ", event)
-
-
-  // useEffect(() => {
-  //   if (_id === undefined)
-  //     return;
-
-    // const getEvent = async () : Promise<void> => {
-    //   const fetchedEvent: Event | undefined = await getEventById(_id);
-
-    //   if (fetchedEvent !== undefined)
-    //     setEvent(fetchedEvent)
-    // }
-
-    // getEvent();
-  // }, [_id])
+  const [member, setMember] = useState<string>("Derek")
 
   const onConfirmMemberName = async () => {
     if (memberNameRef?.current?.value && _id !== undefined) {
       const name: string = memberNameRef.current.value as string;
-
-      const member = await getEventMember(name, _id);
-      setEventMember(member);
+      setMember(name);
     }
   }
 
@@ -64,13 +43,13 @@ const EventPage: React.FC = () => {
   return (
     <EventContextProvider
       eventId={_id} 
-      memberName={eventMember?.name as string}
-      memberTimezone={getTimezoneString(timezone)}
+      member={member}
+      localTimezone={getTimezoneString(timezone)}
     >
       <Page>
         <Header content="Set your availability" />
         <Header content={`Event: sdf`} />
-        <Header content={`You are: ${eventMember?.name}`} />
+        <Header content={`You are: ${member}`} />
         <ContentBox>
           <div>Share the event</div>
           <div className="copy-event-container">
@@ -126,12 +105,7 @@ const EventPage: React.FC = () => {
           </Box>
           <div className="spacer" />
           <div className="ep-calendar-container calendar-container">
-            <EventCalendar
-              // eventDateRanges={event ? event.dateRanges : []}
-              // membersDateRanges={[]}
-              // memberDateRanges={[]}
-              // timezone={getTimezoneString(timezone)}
-            />
+            <EventCalendar />
           </div>
           <div className="spacer" />
           <div style={{backgroundColor: "white", border: '1px solid grey'}}>

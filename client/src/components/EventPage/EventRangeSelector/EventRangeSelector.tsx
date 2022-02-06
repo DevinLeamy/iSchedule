@@ -1,58 +1,73 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useContext } from "react";
 
-import { Time, Position, RangeBlockBox } from "../../../types/types";
+import { Time, Position, RangeBlockBox, CalendarDate, TimeSlot } from "../../../types/types";
 import { TimesList, List, GridCell } from "../../common";
 import { CELLS_PER_DAY } from "../../../constants";
 import RangeBox from "../../Calendar/RangeBox/RangeBox";
 import { EventTimeSelector } from "../EventTimeSelector/EventTimeSelector";
+import { EventContext } from "../../contexts";
+import { deepEqual } from "../../../utilities";
 
 type EventRangeSelectorProps = {
-  rangeBoxes: RangeBlockBox[],
-  onRangeBoxesChange?: (rangeBoxes: RangeBlockBox[]) => void,
+  calendarDates: CalendarDate[],
   rows: number,
   cols: number
 }
 
 const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
-  rangeBoxes,
-  onRangeBoxesChange = {},
+  calendarDates,
   rows,
   cols
 }) => {
+  const { event } = useContext(EventContext);
+
+  if (event === undefined)
+    return null;
+
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
 
-  const getRangeBoxesInCol = (col: number) : { id: number, rangeBox: RangeBlockBox }[] => {
-    return rangeBoxes
-      .map((rangeBox, id) => { return {id, rangeBox} })
-      .filter(identifiedRb => identifiedRb.rangeBox.col === col)
+  const getTimeSlotsInDay = (date: CalendarDate) : TimeSlot[] => {
+    return event.timeSlots.filter(timeSlot => deepEqual(date, timeSlot.date))
   }
 
-  const mapRangeBox = (rangeBox: RangeBlockBox, id: number) : React.ReactNode => {
+  const mapTimeSlot = (timeSlot: TimeSlot) : React.ReactNode => {
     return (
       <RangeBox
-        id={id}
-        box={rangeBox}
+        id={timeSlot._id}
+        box={{
+          tRow: timeSlot.topRow,
+          bRow: timeSlot.bottomRow,
+          col: getCalendarDateIndexOfDate(timeSlot.date)
+        }}
         cellWidth={130}
         cellHeight={15}
         disableDeleting={true}
         disableDragging={true}
         disableResizing={true}
       >
-        <EventTimeSelector box={rangeBox} />
+        <EventTimeSelector timeSlot={timeSlot} />
       </RangeBox>
     );
   }
 
-  const mapGridCol = (col: number) : React.ReactNode => {
+  const getCalendarDateIndexOfDate = (date: CalendarDate) : number => {
+    for (let i = 0; i < calendarDates.length; ++i) {
+      if (deepEqual(calendarDates[i], date))
+        return i;
+    }
+
+    return -1;
+  }
+
+  const mapCalendarDate = (date: CalendarDate) : React.ReactNode => {
     return (
       <div className="rs-grid-row">
         <List
-          items={Array.from(Array(rows).keys()).map(row => { return {row, col} })}
+          items={Array.from(Array(rows).keys()).map(row => { return {row, col: getCalendarDateIndexOfDate(date)} })}
           listKeyMap={mapPositionToKey}
           listItemMap={mapPosition}
         />
-        {getRangeBoxesInCol(col).map(identifiedRb => 
-          mapRangeBox(identifiedRb.rangeBox, identifiedRb.id))} 
+        {getTimeSlotsInDay(date).map(mapTimeSlot)} 
       </div>
    ); 
   }
@@ -77,8 +92,8 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
       <TimesList />
       <div className="rs-grid-container" ref={rangeSelectorRef}>
         <List
-          items={Array.from(Array(cols).keys())}
-          listItemMap={mapGridCol}
+          items={calendarDates}
+          listItemMap={mapCalendarDate}
           horizontal={true}
         />
       </div>
