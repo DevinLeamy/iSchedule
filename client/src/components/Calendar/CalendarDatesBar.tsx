@@ -31,7 +31,6 @@ const CalendarDatesBar : React.FC<CalendarDatesBarProps> = ({
     <div className="calendar-days-main">
       <div className="calendar-dates-spacer" />
       <div className="calendar-days">
-        {/* {dates.map(mapCalendarDate)} */}
         <List
           listKeyMap={mapCalendarDateToKey} 
           listItemMap={mapCalendarDate}

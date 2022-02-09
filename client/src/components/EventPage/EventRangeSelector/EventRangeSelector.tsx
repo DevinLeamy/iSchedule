@@ -1,6 +1,6 @@
-import React, { useRef, useState, useContext } from "react";
+import React, { useRef, useContext } from "react";
 
-import { Time, Position, RangeBlockBox, CalendarDate, TimeSlot } from "../../../types/types";
+import { Position, CalendarDate, TimeSlot } from "../../../types/types";
 import { TimesList, List, GridCell } from "../../common";
 import { CELLS_PER_DAY } from "../../../constants";
 import RangeBox from "../../Calendar/RangeBox/RangeBox";
@@ -20,11 +20,10 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
   cols
 }) => {
   const { event } = useContext(EventContext);
+  const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
 
   if (event === undefined)
     return null;
-
-  const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
 
   const getTimeSlotsInDay = (date: CalendarDate) : TimeSlot[] => {
     return event.timeSlots.filter(timeSlot => deepEqual(date, timeSlot.date))
@@ -33,12 +32,7 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
   const mapTimeSlot = (timeSlot: TimeSlot) : React.ReactNode => {
     return (
       <RangeBox
-        id={timeSlot._id}
-        box={{
-          tRow: timeSlot.topRow,
-          bRow: timeSlot.bottomRow,
-          col: getCalendarDateIndexOfDate(timeSlot.date)
-        }}
+        timeSlot={timeSlot}
         cellWidth={130}
         cellHeight={15}
         disableDeleting={true}

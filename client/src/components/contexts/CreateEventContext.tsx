@@ -1,9 +1,11 @@
 import React, { useContext, useState, Dispatch } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Event, TimeSlot } from "../../types";
+import { Event, TimeSlot, CalendarDate } from "../../types";
 import { useTimezone, usePersistedValue } from "../../hooks";
 import { ITimezone } from "react-timezone-select/dist";
+import { CELLS_PER_DAY } from "../../constants";
+import { clone, deepEqual } from "../../utilities";
 
 interface EventContextI {
   setTimeSlots: Dispatch<TimeSlot[]>,
@@ -17,7 +19,10 @@ interface EventContextI {
   eventName: string,
   timeSlots: TimeSlot[],
 
-  onCreateEvent: () => Promise<void>
+  onCreateEvent: () => void,
+  onCreateTimeSlot: (bottomRow: number, heightInCells: number, date: CalendarDate) => void,
+  onDeleteTimeSlot: (timeSlot: TimeSlot) => void,
+  onUpdateTimeSlot: (timeSlot: TimeSlot) => void
 }
 
 const CreateEventContext = React.createContext({} as EventContextI);
@@ -34,7 +39,7 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
   const [eventName, setEventName] = usePersistedValue<string>("", "eventName");
   const [timeSlots, setTimeSlots] = usePersistedValue<TimeSlot[]>([], "timeSlots")
 
- const onCreateEvent = async () : Promise<void> => {
+ const onCreateEvent = () : void => {
     if (eventName === "" || timeSlots.length === 0) {
       alert("event data is incomplete");
       return;
@@ -46,6 +51,99 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
     if (eventId !== undefined)
       navigate(`/event/${eventId}`);
   }
+
+  const onCreateTimeSlot = (bottomRow: number, heightInCells: number, date: CalendarDate) => {
+    heightInCells = Math.max(heightInCells, 3)
+    console.log("HE", heightInCells)
+
+    let newTimeSlot: TimeSlot = {
+      _id: String(Math.random()),
+      bottomRow: bottomRow,
+      topRow: bottomRow + heightInCells - 1,
+      date: date,
+      availability: new Array(CELLS_PER_DAY).fill([])
+    }
+
+    const updatedTimeSlots = [...timeSlots, newTimeSlot]
+
+    const timeSlotsOnDate = updatedTimeSlots.filter(t => deepEqual(t.date, date))
+    const timeSlotsNotOnDate = updatedTimeSlots.filter(t => !deepEqual(t.date, date))
+    setTimeSlots([...timeSlotsNotOnDate, ...mergeTimeSlotsOnDate(timeSlotsOnDate)])
+  }
+
+  const onDeleteTimeSlot = (timeSlot: TimeSlot) => {
+    setTimeSlots(timeSlots.filter(t => t._id !== timeSlot._id))
+  }
+
+  const onUpdateTimeSlot = (timeSlot: TimeSlot) => {
+    const updatedTimeSlots = timeSlots.map(t => t._id === timeSlot._id ? timeSlot : t)
+
+    const timeSlotsOnDate = updatedTimeSlots.filter(t => deepEqual(t.date, timeSlot.date))
+    const timeSlotsNotOnDate = updatedTimeSlots.filter(t => !deepEqual(t.date, timeSlot.date))
+    setTimeSlots([...timeSlotsNotOnDate, ...mergeTimeSlotsOnDate(timeSlotsOnDate)])
+  }
+
+  const mergeTimeSlotsOnDate = (timeSlots: TimeSlot[]) : TimeSlot[] => {
+    timeSlots.sort((t1, t2) => t1.bottomRow - t2.bottomRow)
+
+    const slotAvailabilities: Array<Array<string>> = new Array(CELLS_PER_DAY).fill(0).map(i => [])
+    const occupied: Array<Array<string>> = new Array(CELLS_PER_DAY).fill(0).map(i => [])
+
+    // NOTE: all time slot dates match
+    const date: CalendarDate = timeSlots[0].date
+
+    for (let timeSlot of timeSlots) {
+      for (let i = timeSlot.bottomRow; i <= timeSlot.topRow; ++i) {
+        slotAvailabilities[i].push(...timeSlot.availability[i]);
+        occupied[i].push(timeSlot._id);
+      }
+    }
+
+    let newTimeSlots: TimeSlot[] = []
+
+    for (let i = 0; i < CELLS_PER_DAY; ++i) {
+      let occupants: Array<string> = slotAvailabilities[i]
+
+      if (occupied[i].length > 0) {
+        if (newTimeSlots.length === 0 || newTimeSlots[newTimeSlots.length - 1].topRow !== i - 1) {
+          newTimeSlots.push({
+            _id: occupied[i][0],
+            bottomRow: i,
+            topRow: i,
+            date: clone(date),
+            availability: new Array(CELLS_PER_DAY).fill([])
+          })
+        }
+        let lastI = newTimeSlots.length - 1
+
+        newTimeSlots[lastI].topRow = i; 
+
+        for (let member of occupants) {
+          if (newTimeSlots[lastI].availability[i].indexOf(member) === -1)
+            newTimeSlots[lastI].availability[i].push(member)
+        }
+      }
+    }
+
+    return newTimeSlots;
+  }
+
+  // const mergeTimeSlots = (timeSlots: TimeSlot[]) : TimeSlot[] => {
+  //   let uniqueDates: CalendarDate[] = timeSlots.reduce((accumulator: CalendarDate[], current: TimeSlot) => {
+  //     if (!accumulator.includes(current.date)) {
+  //       accumulator.push(current.date)
+  //     }
+  //     return accumulator;
+  //   }, [])
+
+  //   let mergedTimeSlots: TimeSlot[] = []
+  //   for (let date of uniqueDates) {
+  //     let timeSlotsOnDate = timeSlots.filter(t => deepEqual(t.date, date))
+  //     mergedTimeSlots.push(...mergeTimeSlotsOnDate(timeSlotsOnDate))
+  //   }
+
+  //   return mergedTimeSlots;
+  // }
 
   return (
     <CreateEventContext.Provider
@@ -62,7 +160,10 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
         cellWidth: 130,
         cellHeight: 15,
 
-        onCreateEvent
+        onCreateEvent,
+        onCreateTimeSlot,
+        onDeleteTimeSlot,
+        onUpdateTimeSlot
       }}
     >
       {children}

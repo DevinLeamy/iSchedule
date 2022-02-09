@@ -3,7 +3,7 @@ import { ResizeDirection } from "re-resizable";
 import { DraggableEvent } from 'react-draggable';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
-import { Time, Size, RangeBlockBox } from "../../../types/types";
+import { Time, Size, RangeBlockBox, TimeSlot } from "../../../types/types";
 import { minToTime } from "../../../utilities/dates";
 import { 
   Rnd, 
@@ -13,15 +13,15 @@ import {
 } from "react-rnd"
 import "./RangeBox.css";
 import { MINUTES_PER_CELL, MINUTES_PER_DAY } from "../../../constants";
+import { clone } from "../../../utilities";
 
 type RangeBoxProps = {
-  id: string,
-  box: RangeBlockBox,
+  timeSlot: TimeSlot,
   cellWidth: number,
   cellHeight: number,
 
-  onChange?: (id: string, row: number, col: number, heightInCells: number) => void,
-  onDelete?: (id: string) => void,
+  onChange?: (updatedTimeSlot: TimeSlot) => void,
+  onDelete?: (timeSlot: TimeSlot) => void,
 
   disableDragging?: boolean,
   disableResizing?: boolean,
@@ -31,13 +31,12 @@ type RangeBoxProps = {
 };
 
 const RangeBox: React.FC<RangeBoxProps> = ({
-  id,
-  box,
+  timeSlot,
   cellWidth,
   cellHeight,
   
-  onChange = (id: string, row: number, col: number, heightInCells: number) => {},
-  onDelete = (id: string) => {},
+  onChange = (updatedTimeSlot: TimeSlot) => {},
+  onDelete = (timeSlot: TimeSlot) => {},
 
   disableDragging = false,
   disableResizing = false,
@@ -47,12 +46,12 @@ const RangeBox: React.FC<RangeBoxProps> = ({
 }) => {
   const position: Position = {
     x: 0, 
-    y: rowsToPixels(box.bRow, cellHeight)
+    y: rowsToPixels(timeSlot.bottomRow, cellHeight)
   };
 
   const size: Size = {
     width: cellWidth - 10,
-    height: rowsToPixels(box.tRow - box.bRow + 1, cellHeight)
+    height: rowsToPixels(timeSlot.topRow - timeSlot.bottomRow + 1, cellHeight)
   };
 
   const handleResize = (
@@ -67,21 +66,28 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     const height = elementRef.getBoundingClientRect().height;
     const heightInCells = pixelsToRows(height, cellHeight)
 
-    onChange(id, row, box.col, heightInCells);
+    let updatedTimeSlot = clone(timeSlot)
+    updatedTimeSlot.bottomRow = row
+    updatedTimeSlot.topRow = row + heightInCells - 1
+
+    onChange(updatedTimeSlot);
   }
 
   const handleDrag = (event: DraggableEvent, data: DraggableData) => {
     const row = pixelsToRows(data.y, cellHeight); 
-    const col = box.col // + pixelsToCols(data.x, cellWidth);
 
     const heightInCells = pixelsToRows(size.height, cellHeight);
 
-    onChange(id, row, col, heightInCells);
+    let updatedTimeSlot = clone(timeSlot)
+    updatedTimeSlot.bottomRow = row;
+    updatedTimeSlot.topRow = row + heightInCells - 1
+
+    onChange(updatedTimeSlot)
   }
 
   return (
     <Rnd
-      key={id}
+      key={timeSlot._id}
       disableDragging={disableDragging}
       dragAxis="y"
       bounds="parent"
@@ -108,12 +114,12 @@ const RangeBox: React.FC<RangeBoxProps> = ({
 
       {!disableTime && 
       <RBDateRange
-        bottomRow={box.bRow}
-        topRow={box.tRow}
+        bottomRow={timeSlot.bottomRow}
+        topRow={timeSlot.topRow}
       />}
 
       {!disableDeleting &&
-      <div onClick={() => onDelete(id)}>
+      <div onClick={() => onDelete(timeSlot)}>
         <DeleteOutlineIcon className="delete-range" />
       </div>}
 

@@ -67,9 +67,7 @@ const CreateEventPage: React.FC = () => {
         </Box>
         <div className="spacer"/>
         <div className='calendar-container'>
-          <Calendar 
-            timezone={getTimezoneString(timezone)}
-          />
+          <Calendar />
         </div>
         <Button 
           variant='outlined' 
