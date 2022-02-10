@@ -20,6 +20,8 @@
 }
 
 .rb-date-range {
+  position: relative;
+  z-index: 3;
   font-size: 11px;
   width: 100%;
   text-align: left;

@@ -17,13 +17,31 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
 }) => {
   const { member, onTimeSlotUpdate } = useContext(EventContext);
 
-  if (member === undefined)
-    return null;
-
   const rowState: Array<Array<string>> = clone(timeSlot.availability)
-  const maxAvailability = rowState.reduce((prevMax, rowStateRow) => Math.max(prevMax, rowStateRow.length), 0) 
+
+  const getMaxAvailability = (rowState: Array<Array<string>>) : number => {
+    if (member === undefined) 
+      return rowState.reduce((max, row) => Math.max(max, row.length), 0);
+
+    let containsActiveMember: boolean = false; 
+    let maxAvailability = 0
+
+    for (let row of rowState) {
+      maxAvailability = Math.max(maxAvailability, row.length)
+      containsActiveMember ||= row.indexOf(member) !== -1
+    }
+
+    if (!containsActiveMember)
+      ++maxAvailability;
+    return maxAvailability;
+  }
+
+  const maxAvailability = getMaxAvailability(rowState)
+
 
   const updateRow = (index: number) : void => {
+    if (member === undefined) return;
+
     let clonedAVB: Array<Array<string>> = clone(timeSlot.availability)
 
     if (clonedAVB[index].some(m => m === member)) {
@@ -39,24 +57,25 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   }
 
   const mapRowState = (rowStateRow: Array<string>, index?: number) : React.ReactNode => {
-    const brightness = 255 * (rowStateRow.length / maxAvailability)
+    const brightness = 94 + rowStateRow.length * 15 
+    const row = (index as number) + timeSlot.bottomRow;
 
     return (
       <div 
         className="row-state-row"
-        style={{backgroundColor: `rgb(255, 255, ${brightness})`}} 
-        onClick={() => updateRow(index as number)}
-      />
+        style={{backgroundColor: `rgb(${brightness}, ${brightness}, ${brightness})`}} 
+        onClick={() => updateRow(row)}
+      >
+        {rowStateRow.length}
+      </div>
     )
   }
-
-  console.log(rowState)
 
   return (
     <div className="ets-main">
       <List
         listItemMap={mapRowState}
-        items={rowState}
+        items={rowState.slice(timeSlot.bottomRow, timeSlot.topRow + 1)}
       />
     </div>
   )

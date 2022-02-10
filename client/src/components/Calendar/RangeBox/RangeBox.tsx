@@ -85,9 +85,10 @@ const RangeBox: React.FC<RangeBoxProps> = ({
     onChange(updatedTimeSlot)
   }
 
+
+
   return (
     <Rnd
-      key={timeSlot._id}
       disableDragging={disableDragging}
       dragAxis="y"
       bounds="parent"
@@ -128,7 +129,7 @@ const RangeBox: React.FC<RangeBoxProps> = ({
         <div className="drag-bar" />
       </div>}
       {children}
-  </Rnd>
+    </Rnd>
   );
 }
 

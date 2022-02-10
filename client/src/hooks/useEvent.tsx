@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getEventById } from "../api";
+import { db, serializeTimeSlot, deserializeTimeSlot } from "../firebase";
 import { Event, TimeSlot } from "../types";
 import { clone } from "../utilities";
 
@@ -15,19 +15,41 @@ const useEvent = (localTimezone: string, eventId?: string) : [
   const [event, setEvent] = useState<Event | undefined>(undefined)
 
   useEffect(() => {
-    if (event === undefined) {
-      getEventById(eventId ?? "")
-        .then(event => setEvent(event))
-    }
+    // subscribe to updates
+    const unsubscribe = db.collection("events").doc(eventId)
+      .onSnapshot(doc => {
+        const serializedEvent: any = doc.data()
+        setEvent({
+          _id: serializedEvent._id,
+          name: serializedEvent.name,
+          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot),
+        })
+      })
+
+    // initialize event state
+    db.collection("events").doc(eventId).get()
+      .then(doc => doc.data())
+      .then((serializedEvent: any) => setEvent({
+        _id: serializedEvent._id,
+        name: serializedEvent.name,
+        timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot),
+      }))
+    
+    return () => unsubscribe();
   }, [])
 
   const onTimeSlotUpdate = (updatedTimeSlot: TimeSlot) : void => {
-    let clonedEvent: Event = clone(event);
-    clonedEvent.timeSlots = clonedEvent.timeSlots.map(timeSlot => {
-      return (timeSlot._id === updatedTimeSlot._id) ? updatedTimeSlot : timeSlot
+    if (event === undefined) return;
+
+    const updatedTimeSlots = event.timeSlots.map(t => 
+      (t._id === updatedTimeSlot._id) ? updatedTimeSlot : t 
+    ) 
+
+    db.collection("events").doc(eventId).update({
+      timeSlots: updatedTimeSlots.map(serializeTimeSlot)
     })
 
-    setEvent(clonedEvent)
+    setEvent({...event, timeSlots: updatedTimeSlots})
   }
 
 

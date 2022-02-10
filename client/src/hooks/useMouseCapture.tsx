@@ -1,4 +1,4 @@
-import { useEffect, useState, MutableRefObject as MRef } from "react";
+import { useEffect, useState, useRef, MutableRefObject as MRef } from "react";
 
 export type Position = {
   row: number,
@@ -6,7 +6,7 @@ export type Position = {
 }
 
 export const useMouseCapture = (divRef: MRef<HTMLDivElement | null>, rows: number, cols: number) : Position | undefined => {
-  const [mousePosition, setMousePosition] = useState<Position>();
+  const mousePosition = useRef<Position>({row: 0, col: 0}) 
 
   const handleMouseMove = (event: any) => {
     if (!divRef?.current) return;
@@ -19,9 +19,8 @@ export const useMouseCapture = (divRef: MRef<HTMLDivElement | null>, rows: numbe
     let row = Math.floor((y / bounds.height) * rows);
     let col = Math.floor((x / bounds.width) * cols);
 
-    let position: Position = { row, col };
-
-    setMousePosition(position);
+    mousePosition.current.row = row;
+    mousePosition.current.col = col;
   }
 
   useEffect(() => {
@@ -37,5 +36,5 @@ export const useMouseCapture = (divRef: MRef<HTMLDivElement | null>, rows: numbe
   }, []);
 
 
-  return mousePosition;
+  return mousePosition.current;
 }

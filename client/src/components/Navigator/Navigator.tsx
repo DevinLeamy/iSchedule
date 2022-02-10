@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { CreateEventPage } from "../CreateEventPage/CreateEventPage";
 import { EventPage } from "../EventPage/EventPage";
-import { CreateEventContextProvider } from "../contexts";
+import { CreateEventContextProvider, EventContextProvider } from "../contexts";
 
 const Navigator: React.FC = () => {
   return (
@@ -13,7 +13,11 @@ const Navigator: React.FC = () => {
           <CreateEventPage />
         </CreateEventContextProvider>
       }/>
-      <Route path="/event/:_id" element={<EventPage />} />
+      <Route path="/event/:_id" element={
+        <EventContextProvider>
+          <EventPage />
+        </EventContextProvider>
+      }/>
     </Routes>
   );
 }

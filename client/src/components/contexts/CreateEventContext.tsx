@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import { Event, TimeSlot, CalendarDate } from "../../types";
 import { useTimezone, usePersistedValue } from "../../hooks";
+import { db, serializeTimeSlot, generateDocId } from "../../firebase"
 import { ITimezone } from "react-timezone-select/dist";
 import { CELLS_PER_DAY } from "../../constants";
 import { clone, deepEqual } from "../../utilities";
+
 
 interface EventContextI {
   setTimeSlots: Dispatch<TimeSlot[]>,
@@ -39,22 +41,36 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
   const [eventName, setEventName] = usePersistedValue<string>("", "eventName");
   const [timeSlots, setTimeSlots] = usePersistedValue<TimeSlot[]>([], "timeSlots")
 
- const onCreateEvent = () : void => {
+  const eventsRef = db.collection('events')
+
+ const onCreateEvent = async () : Promise<void> => {
     if (eventName === "" || timeSlots.length === 0) {
       alert("event data is incomplete");
       return;
     }
 
     // TODO: Convert timeslots to UTC
-    const eventId = "cat" // await createEvent(eventName, dateRanges, getTimezoneString(timezone));
 
-    if (eventId !== undefined)
-      navigate(`/event/${eventId}`);
+    const uid = generateDocId("events") 
+
+    await eventsRef.doc(uid).set({
+      _id: uid,
+      name: eventName,
+      timeSlots: timeSlots.map(serializeTimeSlot)
+    })
+
+    // reset data
+    setEventName("")
+    setTimeSlots([])
+
+    navigate(`/event/${uid}`);
   }
+
+  // TODO: There is a bug where if you resize up and merge
+  //       with another block, the lower block will disappear.
 
   const onCreateTimeSlot = (bottomRow: number, heightInCells: number, date: CalendarDate) => {
     heightInCells = Math.max(heightInCells, 3)
-    console.log("HE", heightInCells)
 
     let newTimeSlot: TimeSlot = {
       _id: String(Math.random()),
@@ -127,23 +143,6 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
 
     return newTimeSlots;
   }
-
-  // const mergeTimeSlots = (timeSlots: TimeSlot[]) : TimeSlot[] => {
-  //   let uniqueDates: CalendarDate[] = timeSlots.reduce((accumulator: CalendarDate[], current: TimeSlot) => {
-  //     if (!accumulator.includes(current.date)) {
-  //       accumulator.push(current.date)
-  //     }
-  //     return accumulator;
-  //   }, [])
-
-  //   let mergedTimeSlots: TimeSlot[] = []
-  //   for (let date of uniqueDates) {
-  //     let timeSlotsOnDate = timeSlots.filter(t => deepEqual(t.date, date))
-  //     mergedTimeSlots.push(...mergeTimeSlotsOnDate(timeSlotsOnDate))
-  //   }
-
-  //   return mergedTimeSlots;
-  // }
 
   return (
     <CreateEventContext.Provider

@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 
 import { Time, Position, RangeBlockBox, CalendarDate, TimeSlot } from "../../../types/types";
 import { TimesList, List, GridCell } from "../../common";
@@ -21,7 +21,11 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
 }) => {
   const { timeSlots, onCreateTimeSlot, onDeleteTimeSlot, onUpdateTimeSlot } = useContext(CreateEventContext);
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
+
+  // Make useMouseCapture update state ONLY if a start position is selection
+  // Perhaps replace it?
   const mousePosition = useMouseCapture(rangeSelectorRef, rows, cols);
+
   const [startPosition, setStartPosition] = useState<Position>();
 
   const onMouseUp = () => {
@@ -41,6 +45,7 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
   const mapTimeSlot = (timeSlot: TimeSlot) : React.ReactNode => {
     return (
       <RangeBox
+        key={timeSlot._id}
         timeSlot={timeSlot}
         cellWidth={130}
         cellHeight={15}
