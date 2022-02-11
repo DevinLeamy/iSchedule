@@ -1,13 +1,13 @@
 .content-pane {
   /* margin: 20px auto; */
   margin: auto;
-  /* padding-bottom: 50px; */
+  padding-bottom: 200px;
   /* margin: auto; */
   /* width: 100%; */
   width: 1000px;
-  height: 100%;
+  min-height: 100vh;
+  height: fit-content; 
   /* height: 100%; */
-  /* height: fit-content; */
   border-radius: 5px;
   box-shadow: 0 0 2px 2px #d0d0d0;
   background-color: var(--white);
