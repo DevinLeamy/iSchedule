@@ -5,14 +5,38 @@
   flex-direction: column;
   justify-content: center;
   padding: 5px;
+  border-bottom: 1px solid rgb(216, 216, 216);
+  height: 50px;
+  position: relative;
 }
 
 .navbar-left {
   float: left;
+  font-family: 'typographica';
+  font-size: 30px;
+  color: var(--blue) !important;
+  line-height: 50px;
+}
+
+.center-container {
+  position: absolute;
+  width: 60%;
+  margin-left: 20%;
+  display: flex;
+  justify-content: center;
 }
 
 .navbar-right {
   float: right;
   display: flex;
   gap: 10px;
+}
+
+.navbar-element {
+  width: 100px;
+  text-align: center;
+  font-size: 20px;
+  color: var(--blue) !important;
+  font-family: var(--header-font);
+  line-height: 50px;
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { CreateEventPage } from "../CreateEventPage/CreateEventPage";
+import { AboutPage } from "../AboutPage/AboutPage"
 import { EventPage } from "../EventPage/EventPage";
 import { CreateEventContextProvider, EventContextProvider } from "../contexts";
 
@@ -18,6 +19,7 @@ const Navigator: React.FC = () => {
           <EventPage />
         </EventContextProvider>
       }/>
+      <Route path="/about" element={<AboutPage />} />
     </Routes>
   );
 }

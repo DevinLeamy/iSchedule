@@ -33,14 +33,13 @@ const CreateEventPage: React.FC = () => {
   }
 
   return (
-    <Page>
+    <Page header={"Instantly Schedule Events!"}>
       <ContentBox>
-        <Header content="Instantly schedule an event"/>
         <div className='h-center-contents'>
           <TextField 
-            label="" 
-            variant="standard" 
-            placeholder="Your event name"
+            // label="Event Name" 
+            variant="outlined" 
+            placeholder="My Event Name"
             value={eventName}
             style={{minWidth: "60%"}}
             inputProps={{style: {
@@ -54,8 +53,11 @@ const CreateEventPage: React.FC = () => {
           />
         </div>
         <div className="spacer"/>
-        
+    
         <div className="spacer"/>
+        <div className='calendar-container'>
+          <Calendar />
+        </div>
         <Box>
           Select your timezone
           <TimezoneSelect 
@@ -65,10 +67,6 @@ const CreateEventPage: React.FC = () => {
             timezones={{...allTimezones}}
           /> 
         </Box>
-        <div className="spacer"/>
-        <div className='calendar-container'>
-          <Calendar />
-        </div>
         <Button 
           variant='outlined' 
           className="next-page-btn-container h-center-contents"

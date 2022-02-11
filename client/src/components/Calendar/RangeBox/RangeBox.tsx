@@ -96,10 +96,12 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       size={size}
       dragGrid={[cellWidth, 15]}
       resizeGrid={[15, 15]}
-      onResize={handleResize}
       onResizeStop={handleResize}
       onDragStop={handleDrag}
-      onDrag={handleDrag}
+      // NOTE: enabling these slows things down but makes the 
+      //       blocks update every frame
+      // onResize={handleResize}
+      // onDrag={handleDrag}
       className="range-box-main"
       enableResizing={{
         left: false,

@@ -1,12 +1,22 @@
 import React from 'react';
-import './Page.css'
+
+
 import { ContentPane } from "../../../components/common";
 
+import './Page.css'
 
-const Page: React.FC = ({children}) => {
+interface PageProps {
+  header?: string,
+  children: React.ReactNode
+}
+
+const Page: React.FC<PageProps> = ({
+  header="",
+  children
+}) => {
   return (
     <div className="full-page">
-      <ContentPane>
+      <ContentPane header={header}>
         {children}
       </ContentPane>
     </div>

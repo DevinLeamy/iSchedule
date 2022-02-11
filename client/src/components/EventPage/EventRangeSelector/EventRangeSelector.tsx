@@ -72,9 +72,6 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
     return (
       <GridCell
         location={{row: cell.row, col: cell.col}}
-        style={{
-          backgroundColor: "var(--white)"
-        }}
       />
     );
   }

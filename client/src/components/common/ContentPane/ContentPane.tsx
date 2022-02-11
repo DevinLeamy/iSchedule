@@ -1,12 +1,21 @@
 import React from 'react'
-import Navbar from '../../../components/Navbar/Navbar';
+
+import Navbar from "../../Navbar/Navbar"
+
 import './ContentPane.css'
 
-const ContentPane: React.FC = ({children}) => {
+interface ContentPaneProps {
+  header?: string,
+  children: React.ReactNode
+}
 
+const ContentPane: React.FC<ContentPaneProps> = ({
+  header="",
+  children
+}) => {
   return (
     <div className="content-pane">
-      <Navbar />
+      <Navbar header={header}/>
       {children}
     </div>
  );

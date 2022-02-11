@@ -1,17 +1,29 @@
 import React from 'react';
+import { Link } from "react-router-dom"
+
+import { Header } from "../common";
+
 import './Navbar.css'
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  header?: string
+}
 
+const Navbar: React.FC<NavbarProps> = ({
+  header=""
+}) => {
   return (
     <div className="navbar-main">
       <div className="navbar-content">
-        <div className="navbar-left">
-          Find a time.
+        <Link to="/" className="navbar-left">
+          W2M 2.0
+        </Link>
+        <div className="center-container">
+          <Header content={header} />
         </div>
         <div className="navbar-right">
-          <div className="navbar-element">About</div>
-          <div className="navbar-element">About</div>
+          <Link to="/about" className="navbar-element">About</Link>
+          {/* <Link to="/contact" className="navbar-element">Contact</Link> */}
         </div>
       </div>
    </div>

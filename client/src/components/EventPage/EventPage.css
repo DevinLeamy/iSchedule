@@ -11,7 +11,8 @@
 .event-link-container {
   display: flex;
   height: 100%;
-  width: calc(100% - var(--copy-button-width));
+  /* width: calc(100% - var(--copy-button-width)); */
+  width: 100%;
   line-height: var(--copy-link-height);
   border-radius: 5px;
   border: 1px solid rgb(193, 193, 193);
@@ -24,12 +25,23 @@
   width: 100%;
 }
 
-.event-link-icon {
-  padding-right: 10px;
+.event-link-container:hover {
+  background-color: rgb(238, 238, 238);
+  cursor: pointer;
 }
 
-.copy-event-button {
-  width: var(--copy-button-width);
+.name-cover {
+  width: 100%;
+  height: 90px;
+  position: absolute;
+  z-index: 2;
+}
+
+.event-link-icon {
+  padding-right: 10px;
+  height: 50px;
+  font-size: 30px;
+  line-height: var(--copy-link-height);
 }
 
 .em-input-container {

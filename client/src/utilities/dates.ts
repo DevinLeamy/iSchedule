@@ -115,6 +115,15 @@ const getCalendarDate = (date: Date) : CalendarDate => {
   }
 }
 
+/*
+You were filling in this function for use on the EventCalendar page
+(Sort with Date() and then convert back to calendarDates)
+*/
+
+const sortCalendarDates = (calendarDates: CalendarDate[]) : CalendarDate[] => {
+  return calendarDates
+}
+
 const getDateFromCalendarDate = (calendarDate: CalendarDate) : Date => {
   return new Date(calendarDate.year, calendarDate.month, calendarDate.day);
 }

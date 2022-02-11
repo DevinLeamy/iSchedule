@@ -1,7 +1,10 @@
 .header-main {
-  font-size: var(--l2-fs);
+  font-size: var(--l3-fs);
   font-family: var(--header-font);
-  color: var(--black);
+  /* color: var(--grey); */
+  color: grey;
   margin: auto;
   text-align: center;
+  height: 50px;
+  line-height: 50px;
 }
