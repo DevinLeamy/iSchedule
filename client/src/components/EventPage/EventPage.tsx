@@ -83,7 +83,8 @@ const EventPage: React.FC = () => {
             </div>
           </Tooltip>
         </div>
-        <div>Enter your name</div>
+        {/* TODO: have seperate components display based on whether a name has been confirmed or not */}
+        <div>*Enter your name</div>
         <div className="em-input-container">
           <TextField
             className="em-input"

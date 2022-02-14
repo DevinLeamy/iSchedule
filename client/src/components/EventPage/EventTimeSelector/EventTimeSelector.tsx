@@ -19,9 +19,9 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   const selectMode = useRef<boolean>(false)
   const mouseDown = useRef<boolean>(false)
 
-  const { member, onTimeSlotUpdate } = useContext(EventContext);
+  const { member, respondents, onTimeSlotUpdate } = useContext(EventContext);
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
-  const rowState: Array<Array<string>> = clone(timeSlot.availability)
+  const [rowState, setRowState] = useState<Array<Array<string>>>(timeSlot.availability)
 
   const getEventRow = (event: any) : number => {
     if (!rangeSelectorRef?.current) return 0; 
@@ -57,6 +57,10 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   const onMouseUp = (event: any) => {
     mouseDown.current = false
     lastUpdatedRow.current = -1;
+
+    // NOTE: make update to database
+    timeSlot.availability = clone(rowState)
+    onTimeSlotUpdate(timeSlot)
   }
 
   const onMouseMove = (event: any) => {
@@ -66,31 +70,20 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
     }
   }
 
-  const getMaxAvailability = (rowState: Array<Array<string>>) : number => {
-    // Calculate the number of unique members
-    if (member === undefined) 
-      return rowState.reduce((max, row) => Math.max(max, row.length), 0);
-
-    let containsActiveMember: boolean = false; 
-    let maxAvailability = 0
-
-    for (let row of rowState) {
-      maxAvailability = Math.max(maxAvailability, row.length)
-      containsActiveMember ||= row.includes(member)
-    }
-
-    if (!containsActiveMember)
-      ++maxAvailability;
-    return maxAvailability;
+  const getMaxAvailability = () : number => {
+    if (member === undefined || respondents.includes(member)) 
+      return respondents.length 
+    
+    return respondents.length + 1
   }
 
-  const maxAvailability = getMaxAvailability(rowState)
+  const maxAvailability = getMaxAvailability()
 
 
   const updateRow = (index: number) : void => {
     if (member === undefined || lastUpdatedRow.current === index) return;
 
-    let clonedAVB: Array<Array<string>> = clone(timeSlot.availability)
+    let clonedAVB: Array<Array<string>> = clone(rowState)
 
     // remove the member, to avoid duplicates
     clonedAVB[index] = clonedAVB[index].filter(m => m !== member)
@@ -100,11 +93,12 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
       clonedAVB[index].push(member)
     } 
 
-    timeSlot.availability = clonedAVB;
+    // timeSlot.availability = clonedAVB;
+    setRowState(clonedAVB)
 
     lastUpdatedRow.current = index;
 
-    onTimeSlotUpdate(timeSlot)
+    // onTimeSlotUpdate(timeSlot)
   }
 
   const mapRowState = (rowStateRow: Array<string>, index?: number) : React.ReactNode => {
@@ -114,17 +108,19 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
     const maxWidth = rangeSelectorRef?.current?.getBoundingClientRect()?.width ?? 1
 
     const available = rowStateRow.length
-    const width = (maxAvailability === 0 || available === 0) ? 1 : (available / maxAvailability) * maxWidth
+    const width = (maxAvailability === 0 || available === 0) ? 20 : (available / maxAvailability) * maxWidth
 
     return (
       <div 
         className="row-state-row"
         style={{
-          backgroundColor: included ? "var(--white)" : "var(--blue)",
+          backgroundColor: included ? "#EEEEEE" : "var(--blue)",
+          color: included ? "var(--black)" : "var(--white)",
           width: width
         }} 
-      />
-      // </div>
+      >
+        {rowStateRow.length}
+      </div>
     )
   }
 

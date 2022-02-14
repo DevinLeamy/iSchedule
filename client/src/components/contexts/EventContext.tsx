@@ -18,7 +18,9 @@ interface EventContextI {
   onTimeSlotUpdate: (timeSlot: TimeSlot) => void,
 
   cellHeight: number,
-  cellWidth: number
+  cellWidth: number,
+
+  respondents: Array<string>
 }
 
 const EventContext = React.createContext({} as EventContextI);
@@ -35,6 +37,17 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
   const [member, setMember] = usePersistedValue<string | undefined>(undefined, "memberName");
   const [event, onTimeSlotUpdate] = useEvent(getTimezoneString(timezone), _id);
 
+  const getAllRespondents  = () : Array<string> => {
+    if (event === undefined) return new Array();
+
+    let respondents = new Array<string>();
+
+    for (let timeSlot of event.timeSlots)
+      respondents.push(...timeSlot.availability.flat())
+    
+    return respondents.filter((r, i, a) => a.indexOf(r) === i)
+  }
+
   return (
     <EventContext.Provider
       value={{
@@ -47,7 +60,9 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
 
         onTimeSlotUpdate,
         cellWidth: 130,
-        cellHeight: 15
+        cellHeight: 15,
+
+        respondents: getAllRespondents()
       }}
     >
       {children}

@@ -31,16 +31,24 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
 
   const mapTimeSlot = (timeSlot: TimeSlot) : React.ReactNode => {
     return (
-      <RangeBox
-        timeSlot={timeSlot}
-        // cellWidth={130}
-        // cellHeight={15}
-        disableDeleting={true}
-        disableDragging={true}
-        disableResizing={true}
-      >
+      // <RangeBox
+      //   timeSlot={timeSlot}
+      //   // cellWidth={130}
+      //   // cellHeight={15}
+      //   disableDeleting={true}
+      //   disableDragging={true}
+      //   disableResizing={true}
+      // >
+      <div style={{
+        position: "absolute",
+        left: 0,
+        top: timeSlot.bottomRow * 15,
+        // backgroundColor: "orange",
+        width: "100%",
+      }}>
         <EventTimeSelector timeSlot={timeSlot} />
-      </RangeBox>
+      </div>
+      // </RangeBox>
     );
   }
 
