@@ -121,6 +121,13 @@ You were filling in this function for use on the EventCalendar page
 */
 
 const sortCalendarDates = (calendarDates: CalendarDate[]) : CalendarDate[] => {
+  calendarDates.sort((d1: any, d2: any) => {
+    d1 = getDateFromCalendarDate(d1)
+    d2 = getDateFromCalendarDate(d2)
+
+    return d1.getTime() - d2.getTime()
+  })
+
   return calendarDates
 }
 
@@ -146,5 +153,6 @@ export {
   getEndOfTheDay,
   getAbsMinutesFromDate,
   getCalendarDate,
-  getDateFromCalendarDate
+  getDateFromCalendarDate,
+  sortCalendarDates
 }

@@ -87,8 +87,8 @@ const EventPage: React.FC = () => {
         <div className="em-input-container">
           <TextField
             className="em-input"
-            placeholder=""
             inputRef={memberNameRef}
+            defaultValue={member ?? ""}
             style={{
               backgroundColor: "white",
             }}

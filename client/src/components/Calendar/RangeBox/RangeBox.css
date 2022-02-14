@@ -20,12 +20,15 @@
 }
 
 .rb-date-range {
-  position: relative;
-  z-index: 3;
+  transform: translateY(-15px);
+
+  position: absolute;
+  z-index: 4;
   font-size: 11px;
-  width: 100%;
+  /* width: 100%; */
   text-align: left;
-  color: var(--off-white);
+  /* color: var(--off-white); */
+  color: var(--black);
   font-family: 'poppins-medium' 
 }
 

@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 
 import { CalendarDate, Event } from "../../../types";
-import { deepEqual, } from "../../../utilities";
+import { deepEqual, sortCalendarDates } from "../../../utilities";
 import { EventContext } from "../../contexts";
 import { EventRangeSelector } from "../EventRangeSelector/EventRangeSelector";
 import { CELLS_PER_DAY, DAYS_PER_WEEK } from "../../../constants";
@@ -60,7 +60,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
     dates = dates.filter(d => !deepEqual(timeslot.date, d))
     dates.push(timeslot.date)
   }
-  return dates;
+
+  return sortCalendarDates(dates)
 }
 
 export { EventCalendar };

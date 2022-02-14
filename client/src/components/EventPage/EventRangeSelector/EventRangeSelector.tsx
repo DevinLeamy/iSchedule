@@ -33,8 +33,8 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
     return (
       <RangeBox
         timeSlot={timeSlot}
-        cellWidth={130}
-        cellHeight={15}
+        // cellWidth={130}
+        // cellHeight={15}
         disableDeleting={true}
         disableDragging={true}
         disableResizing={true}

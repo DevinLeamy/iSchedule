@@ -17,8 +17,8 @@ import { clone } from "../../../utilities";
 
 type RangeBoxProps = {
   timeSlot: TimeSlot,
-  cellWidth: number,
-  cellHeight: number,
+  cellWidth?: number,
+  cellHeight?: number,
 
   onChange?: (updatedTimeSlot: TimeSlot) => void,
   onDelete?: (timeSlot: TimeSlot) => void,
@@ -32,8 +32,8 @@ type RangeBoxProps = {
 
 const RangeBox: React.FC<RangeBoxProps> = ({
   timeSlot,
-  cellWidth,
-  cellHeight,
+  cellWidth=130,
+  cellHeight=15,
   
   onChange = (updatedTimeSlot: TimeSlot) => {},
   onDelete = (timeSlot: TimeSlot) => {},

@@ -2,7 +2,7 @@ import React, { useContext, useState, Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
 import { Event, TimeSlot } from "../../types";
-import { useEvent, useTimezone } from "../../hooks";
+import { useEvent, useTimezone, usePersistedValue } from "../../hooks";
 import { getTimezoneString } from "../../utilities"
 import { ITimezone } from "react-timezone-select/dist";
 
@@ -32,7 +32,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
 }) => {
   const { _id } = useParams();
   const [timezone, onTimezoneChange] = useTimezone();
-  const [member, setMember] = useState<string>();
+  const [member, setMember] = usePersistedValue<string | undefined>(undefined, "memberName");
   const [event, onTimeSlotUpdate] = useEvent(getTimezoneString(timezone), _id);
 
   return (

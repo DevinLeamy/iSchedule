@@ -2,16 +2,30 @@
   position: absolute;
   top: 0px;
   width: 100%;
+  left: 0px;
   height: 100%;
 }
 
 .row-state-row {
-  width: 100%;
-  height: 15px;
-  border-top: 1px dashed grey;
-  border-top: 1px dashed grey;
-  line-height: 15px;
+  /* width: 100%; */
+  height: 13px;
+  /* margin: auto; */
+
+  /* border-top: 1px dashed grey;
+  border-top: 1px dashed grey; */
+  /* line-height: 13px; */
   text-align: right;
-  padding-right: 5px;
-  font-family: monospace
+  /* padding-right: 5px; */
+  margin-top: 1px;
+  margin-bottom: 2px;
+  font-family: monospace;
+  border-radius: 5px;
+}
+
+.row-state-row:hover {
+  background-color: white;
+}
+
+.range-box:hover {
+  background-color: #07245e !important;
 }
