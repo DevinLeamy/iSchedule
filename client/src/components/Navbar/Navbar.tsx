@@ -9,6 +9,8 @@ interface NavbarProps {
   header?: string
 }
 
+const logo = require('../../assets/images/logo.png')
+
 const Navbar: React.FC<NavbarProps> = ({
   header=""
 }) => {
@@ -16,7 +18,8 @@ const Navbar: React.FC<NavbarProps> = ({
     <div className="navbar-main">
       <div className="navbar-content">
         <Link to="/" className="navbar-left">
-          W2M 2.0
+          <img src={logo} className="nav-logo" />
+           iSchedule
         </Link>
         <div className="center-container">
           <Header content={header} />
