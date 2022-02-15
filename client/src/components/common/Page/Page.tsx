@@ -18,6 +18,10 @@ const Page: React.FC<PageProps> = ({
     <div className="full-page">
       <ContentPane header={header}>
         {children}
+        {/* <div style={{flex: 1}} />
+        <div className="footer">
+          iSchedule inc. 
+        </div> */}
       </ContentPane>
     </div>
   );

@@ -63,21 +63,22 @@ const EventRespondents: React.FC = ({
   return (
     <div className="res-container"> 
       {renderFilled(
-        // (selectedRespondents.length === respondents.length),
         false,
         "SELECT ALL",
         (e: any) => selectAll()
       )}
-      {renderFilled(
-        (member !== undefined && selectedRespondents.includes(member)),
-        "ME",
-        (e: any) => {
-          if (member !== undefined) {
-            toggleRespondent(member)
+      {member !== undefined && (
+        renderFilled(
+          (member !== undefined && selectedRespondents.includes(member)),
+          member,
+          (e: any) => {
+            if (member !== undefined) {
+              toggleRespondent(member)
+            }
           }
-        }
+        )
       )}
-      {respondents.filter(r => r !== member).map(mapRespondent)}
+     {respondents.filter(r => r !== member).map(mapRespondent)}
     </div>
   )
 }

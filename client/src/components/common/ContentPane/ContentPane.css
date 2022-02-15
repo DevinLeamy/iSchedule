@@ -12,4 +12,5 @@
   box-shadow: 0 0 2px 2px #d0d0d0;
   background-color: var(--white);
   box-sizing: border-box;
+  position: relative;
 }

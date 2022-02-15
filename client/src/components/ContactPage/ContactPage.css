@@ -1,0 +1,42 @@
+.form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 50px;
+  border-radius: 5px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-family: var(--header-font);
+}
+
+.email-container {
+  width: 100%;
+  font-size: 14px;
+  height: 40px; 
+  line-height: 40px;
+}
+
+.email-input {
+  width: 100%;
+  font-size: 16px;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.message-text {
+  height: 400px;
+  resize: none;
+  font-size: 16px;
+  outline: none;
+  border: 1px solid lightgray; 
+  padding: 5px;
+}
+
+.message-text:focus {
+  outline: none;
+}
+
+.submit-button {
+  background-color: var(--c5) !important;
+  /* font-weight: bold !important; */
+}

@@ -76,7 +76,7 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
     let newTimeSlot: TimeSlot = {
       _id: String(Math.random()),
       bottomRow: bottomRow,
-      topRow: bottomRow + heightInCells - 1,
+      topRow: bottomRow + heightInCells,
       date: date,
       availability: new Array(CELLS_PER_DAY).fill([])
     }

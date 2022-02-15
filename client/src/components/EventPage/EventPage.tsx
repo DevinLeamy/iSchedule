@@ -53,6 +53,7 @@ const EventPage: React.FC = () => {
             inputProps={{style: {
               textAlign: "center", 
               fontSize: 30,
+              fontWeight: "bolder"
             }}}
           />
         </div>
@@ -85,14 +86,22 @@ const EventPage: React.FC = () => {
           </Tooltip>
         </div>
         {/* TODO: have seperate components display based on whether a name has been confirmed or not */}
-        <div>*Enter your name</div>
+        <div>
+          {member === undefined ? 
+          "Identify yourself"  :
+          "Signed in as"} 
+        </div>
         <div className="em-input-container">
           <TextField
             className="em-input"
+            placeholder="Your name"
             inputRef={memberNameRef}
+            variant="outlined"
             defaultValue={member ?? ""}
-            style={{
+            inputProps={{
               backgroundColor: "white",
+              textAlign: "center",
+              fontSize: 30 
             }}
           />
           <Button
@@ -101,7 +110,7 @@ const EventPage: React.FC = () => {
             style={EM_INPUT_BUTTON}
             onClick={() => onConfirmMemberName()}
           >
-            Confirm
+            {member === undefined ? "Confirm" : "Update"}
           </Button>
         </div>
   

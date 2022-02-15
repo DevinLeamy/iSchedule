@@ -53,8 +53,6 @@ const CreateEventPage: React.FC = () => {
           />
         </div>
         <div className="spacer"/>
-    
-        <div className="spacer"/>
         <div className='calendar-container'>
           <Calendar />
         </div>

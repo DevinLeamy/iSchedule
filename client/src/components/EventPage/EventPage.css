@@ -62,7 +62,7 @@
   width: 120px;
   font-size: 16px;
   text-transform: none;
-  border-radius: 0;
+  border-radius: 5px !important;
   margin-left: 10;
 }
 
