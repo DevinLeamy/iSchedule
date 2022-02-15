@@ -19,7 +19,7 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   const selectMode = useRef<boolean>(false)
   const mouseDown = useRef<boolean>(false)
 
-  const { member, respondents, onTimeSlotUpdate } = useContext(EventContext);
+  const { member, respondents, selectedRespondents, setSelectedRespondents, onTimeSlotUpdate } = useContext(EventContext);
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
   const [rowState, setRowState] = useState<Array<Array<string>>>(timeSlot.availability)
 
@@ -68,6 +68,13 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
     if (mouseDown.current) {
       updateRow(row)
     }
+
+    // setSelectedRespondents([...rowState[row]])
+  }
+
+  const updatedSelectedRespondents = (event: any) => {
+    // const row = getEventRow(event)
+    // setSelectedRespondents([...rowState[row]]) 
   }
 
   const getMaxAvailability = () : number => {
@@ -102,9 +109,14 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   }
 
   const mapRowState = (rowStateRow: Array<string>, index?: number) : React.ReactNode => {
-    const brightness = 94 + rowStateRow.length * 15 
-    const row = (index as number) + timeSlot.bottomRow;
-    const included = (member === undefined || !rowState[row].includes(member))
+    let memberIncluded = rowStateRow.includes(member === undefined ? "" : member)
+
+    let included = selectedRespondents.length > 0 
+
+    for (let respondent of selectedRespondents)
+      included &&= rowStateRow.includes(respondent)
+
+    // const included = (member === undefined || !rowState[row].includes(member))
     const maxWidth = rangeSelectorRef?.current?.getBoundingClientRect()?.width ?? 1
 
     const available = rowStateRow.length
@@ -114,12 +126,19 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
       <div 
         className="row-state-row"
         style={{
-          backgroundColor: included ? "#EEEEEE" : "var(--blue)",
-          color: included ? "var(--black)" : "var(--white)",
+          backgroundColor: !included ? "#EEEEEE" : "var(--blue)",
+          color: !included ? "var(--black)" : "var(--white)",
+          border: "2px solid " + (!memberIncluded ? (included ? "var(--black)" : "#EEEEEE") : "var(--blue)"), 
           width: width
         }} 
       >
-        {rowStateRow.length}
+        {/* {rowStateRow.length} */}
+        {/* <div 
+          className="member-tag"
+          style={{
+            backgroundColor: !memberIncluded ? "#EEEEEE" : "var(--blue)"
+          }}
+        /> */}
       </div>
     )
   }
@@ -131,7 +150,7 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
-      onMouseLeave={onMouseUp}
+      onMouseLeave={(e) => { onMouseUp(e); updatedSelectedRespondents(e) }}
     >
       <List
         listItemMap={mapRowState}

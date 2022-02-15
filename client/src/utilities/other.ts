@@ -1,8 +1,10 @@
 import { ITimezone } from "react-timezone-select";
+import { getTimezone } from "countries-and-timezones"
 
-import { DateRange, Time, RangeBlockBox, RangeBlock } from "../types";
+import { DateRange, Time, RangeBlockBox, RangeBlock, TimeSlot, CalendarDate } from "../types";
 import { getAbsMinutesFromDate, dateInRange } from "../utilities";
-import { MINUTES_PER_CELL, MILLISECONDS_PER_HOUR } from "../constants";
+import { MINUTES_PER_CELL, MILLISECONDS_PER_HOUR, CELLS_PER_DAY } from "../constants";
+import { getCalendarDate, getDateFromCalendarDate, getDateInDays } from "./dates";
 
 const serializeDateRanges = (dateRanges: DateRange[]) : string => {
   return JSON.stringify(dateRanges);
@@ -105,13 +107,10 @@ const applyOffsetToDate = (date: Date, offset: number) : Date => {
 
 // NOTE: In hours
 const getTimezoneOffset = (timezone: string) : number => {
-  const date = new Date();
-  const tz = date.toLocaleString("en", {timeZone: timezone, timeStyle: "long"}).split(" ").slice(-1)[0];
-  const dateString = date.toString();
-  const offsetInMilli = Date.parse(`${dateString} UTC`) - Date.parse(`${dateString} ${tz}`);
-  
-  // return UTC offset in millis
-  return offsetInMilli / MILLISECONDS_PER_HOUR;
+  const data = getTimezone(timezone)
+  if (data === null) return 0
+
+  return Math.round(data.utcOffset / 60)
 }
 
 const convertToUTC = (localDate: Date, timezone: string) : Date => {
@@ -122,6 +121,145 @@ const convertToUTC = (localDate: Date, timezone: string) : Date => {
 const convertToTimezone = (utcDate: Date, timezone: string) : Date => {
   const offset = getTimezoneOffset(timezone);
   return applyOffsetToDate(utcDate, offset);
+}
+
+export const convertTimeSlotsToTimezone = (utcTimeSlots: TimeSlot[], timezone: string) : TimeSlot[] => {
+  return utcTimeSlots.map(timeSlot => convertTimeSlotToTimezone(timeSlot, timezone)).flat()
+}
+
+export const convertTimeSlotsToUTC = (localTimeSlots: TimeSlot[], timezone: string) : TimeSlot[] => {
+  return localTimeSlots.map(timeSlot => convertTimeSlotToUTC(timeSlot, timezone)).flat()
+}
+
+// UTC -> Timezone
+export const convertTimeSlotToTimezone = (utcTimeSlot: TimeSlot, timezone: string) : TimeSlot[] => {
+  const offset = getTimezoneOffset(timezone);
+  const rowShifts = offset * 4; 
+
+  if (rowShifts < 0) {
+    return moveTimeSlotBackward(utcTimeSlot, rowShifts)
+  }
+  return moveTimeSlotForward(utcTimeSlot, rowShifts)
+}
+
+// Timezone -> UTC
+export const convertTimeSlotToUTC = (localTimeSlot: TimeSlot, timezone: string) : TimeSlot[] => {
+  const offset = getTimezoneOffset(timezone) * -1;
+  console.log(offset)
+  const rowShifts = offset * 4; 
+
+  if (rowShifts < 0) {
+    return moveTimeSlotBackward(localTimeSlot, rowShifts)
+  } 
+  return moveTimeSlotForward(localTimeSlot, rowShifts)
+}
+
+const moveTimeSlotBackward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => {
+  let moveDayBackward = (timeSlot.topRow - rows) < 0
+  let timeSlotRows = (timeSlot.topRow - timeSlot.bottomRow + 1)
+
+  let updatedBottomRow = (timeSlot.bottomRow - rows + CELLS_PER_DAY) % CELLS_PER_DAY;
+  let updatedTopRow = (timeSlot.topRow - rows + CELLS_PER_DAY) % CELLS_PER_DAY;
+
+  let result: TimeSlot[] = []
+
+  let updatedAvailability = new Array(CELLS_PER_DAY).fill([])
+    for (let row = 0; row < CELLS_PER_DAY; ++row) {
+      let updatedRow = (row - rows + CELLS_PER_DAY) % CELLS_PER_DAY
+      updatedAvailability[updatedRow].push(...timeSlot.availability[row])
+    }
+
+  if (updatedTopRow - updatedBottomRow + 1 !== timeSlotRows) {
+    // split time slot
+    result.push({
+      _id: timeSlot._id,
+      bottomRow: updatedBottomRow,
+      topRow: CELLS_PER_DAY - 1,
+      date: timeSlot.date, 
+      availability: getAvailability(updatedBottomRow, CELLS_PER_DAY - 1, updatedAvailability) 
+    })
+
+    // IDS match!
+    result.push({
+      _id: timeSlot._id, // + "-Z",
+      bottomRow: 0,
+      topRow: updatedTopRow, 
+      date: getCalendarDateYesterday(timeSlot.date), 
+      availability: getAvailability(0, updatedTopRow, updatedAvailability) 
+    })
+  } else {
+    result.push({
+      _id: timeSlot._id,
+      bottomRow: updatedBottomRow,
+      topRow: updatedTopRow,
+      date: moveDayBackward ? getCalendarDateYesterday(timeSlot.date) : timeSlot.date,
+      availability: updatedAvailability 
+    })
+  }
+
+  return result; 
+}
+
+const moveTimeSlotForward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => {
+  let moveDayForward = (timeSlot.topRow + rows) >= CELLS_PER_DAY
+  let timeSlotRows = (timeSlot.topRow - timeSlot.bottomRow + 1)
+
+  let updatedBottomRow = (timeSlot.bottomRow + rows) % CELLS_PER_DAY;
+  let updatedTopRow = (timeSlot.topRow + rows) % CELLS_PER_DAY;
+
+  let result: TimeSlot[] = []
+
+  let updatedAvailability = new Array(CELLS_PER_DAY).fill([])
+    for (let row = 0; row < CELLS_PER_DAY; ++row) {
+      let updatedRow = (row + rows) % CELLS_PER_DAY
+      updatedAvailability[updatedRow].push(...timeSlot.availability[row])
+    }
+
+  if (updatedTopRow - updatedBottomRow + 1 !== timeSlotRows) {
+    // split time slot
+    result.push({
+      _id: timeSlot._id,
+      bottomRow: updatedBottomRow,
+      topRow: CELLS_PER_DAY - 1,
+      date: timeSlot.date, 
+      availability: getAvailability(updatedBottomRow, CELLS_PER_DAY - 1, updatedAvailability) 
+    })
+
+    // IDS match!
+    result.push({
+      _id: timeSlot._id, //+ "-Z",
+      bottomRow: 0,
+      topRow: updatedTopRow, 
+      date: getCalendarDateTomorrow(timeSlot.date), 
+      availability: getAvailability(0, updatedTopRow, updatedAvailability) 
+    })
+  } else {
+    result.push({
+      _id: timeSlot._id,
+      bottomRow: updatedBottomRow,
+      topRow: updatedTopRow,
+      date: moveDayForward ? getCalendarDateTomorrow(timeSlot.date) : timeSlot.date,
+      availability: updatedAvailability 
+    })
+  }
+
+  return result;
+}
+
+const getCalendarDateTomorrow = (calendarDate: CalendarDate) : CalendarDate => {
+  return getCalendarDate(getDateInDays(1, getDateFromCalendarDate(calendarDate)))
+}
+
+const getCalendarDateYesterday = (calendarDate: CalendarDate) : CalendarDate => {
+  return getCalendarDate(getDateInDays(-1, getDateFromCalendarDate(calendarDate)))
+}
+
+const getAvailability = (bottomRow: number, topRow: number, availability: Array<Array<string>>) : Array<Array<string>> => {
+  let updatedAvailability = new Array(CELLS_PER_DAY).fill([]) 
+  for (let row = bottomRow; row <= topRow; ++row)
+    updatedAvailability.push(...availability[row])
+  
+  return updatedAvailability
 }
 
 export { 

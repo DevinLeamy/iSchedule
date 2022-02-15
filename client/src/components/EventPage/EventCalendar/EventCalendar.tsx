@@ -39,6 +39,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({
       <CalendarHeader 
         onNext={gotoNextWeek}
         onPrevious={gotoPreviousWeek}
+        leftDisabled={!(startDateIndex !== 0)}
+        rightDisabled={!(startDateIndex + calendarColumns !== calendarDates.length)}
       />
       <CalendarDatesBar 
         dates={calendarDates.slice(startDateIndex, startDateIndex + calendarColumns)}

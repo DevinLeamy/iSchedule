@@ -15,5 +15,5 @@ IDEAS:
   or below 
 - When you hover over a 15minute time slot, it enboldends the names of the respondents
   available at that time.
-
+- Disable left-right buttons when the end has been reached
 */

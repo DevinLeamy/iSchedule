@@ -3,10 +3,10 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useParams } from "react-router-dom";
 import { TextField, Tooltip, TextFieldProps, Button, Box } from "@mui/material";
 import Fade from '@mui/material/Fade';
-import Zoom from '@mui/material/Zoom';
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 
 import { EventContext } from "../contexts";
+import { EventRespondents } from "./EventRespondents/EventRespondents";
 import { Page, Header, ContentBox } from "../../components/common";
 import { EventCalendar } from "./EventCalendar/EventCalendar";
 import { copy } from "../../utilities";
@@ -17,12 +17,12 @@ const EventPage: React.FC = () => {
   const { _id } = useParams();
   const memberNameRef = useRef<TextFieldProps>();
   const [copied, setCopied] = useState<boolean>(false);
-  const { timezone, onTimezoneChange, member, setMember, event } = useContext(EventContext)
+  const { timezone, onTimezoneChange, member, onSetMember, event } = useContext(EventContext)
 
   const onConfirmMemberName = async () => {
     if (memberNameRef?.current?.value && _id !== undefined) {
       const name: string = memberNameRef.current.value as string;
-      setMember(name);
+      onSetMember(name);
     }
   };
 
@@ -69,8 +69,9 @@ const EventPage: React.FC = () => {
             <div 
               className="event-link-container"
               onMouseEnter={() => setCopied(false)}
+              onClick={() => {setCopied(true); copy(eventLink)}}
             >
-              <div className="event-link" onClick={() => {setCopied(true); copy(eventLink)}}>{eventLink}</div>
+              <div className="event-link">{eventLink}</div>
               <ContentCopyIcon
                 className="event-link-icon"
                 style={{
@@ -109,6 +110,10 @@ const EventPage: React.FC = () => {
           <EventCalendar />
         </div>
         {/* <div className="spacer" /> */}
+        <Box>
+          Respondents
+          <EventRespondents />
+        </Box>
         <Box>
           Select your timezone
           <TimezoneSelect

@@ -214,3 +214,12 @@
 .c-type-label {
   line-height: var(--c-type-container-sz);
 }
+
+.disabled {
+  background-color: var(--off-white); 
+  cursor: pointer;
+}
+
+.disabled:hover {
+  cursor: default;
+}

@@ -6,7 +6,7 @@ import { useTimezone, usePersistedValue } from "../../hooks";
 import { db, serializeTimeSlot, generateDocId } from "../../firebase"
 import { ITimezone } from "react-timezone-select/dist";
 import { CELLS_PER_DAY } from "../../constants";
-import { clone, deepEqual } from "../../utilities";
+import { clone, deepEqual, getTimezoneString, convertTimeSlotsToUTC } from "../../utilities";
 
 
 interface EventContextI {
@@ -52,11 +52,12 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
     // TODO: Convert timeslots to UTC
 
     const uid = generateDocId("events") 
+    const utcTimeSlots = convertTimeSlotsToUTC(timeSlots, getTimezoneString(timezone))
 
     await eventsRef.doc(uid).set({
       _id: uid,
       name: eventName,
-      timeSlots: timeSlots.map(serializeTimeSlot)
+      timeSlots: utcTimeSlots.map(serializeTimeSlot)
     })
 
     // reset data

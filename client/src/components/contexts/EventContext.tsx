@@ -3,14 +3,14 @@ import { useParams } from "react-router-dom";
 
 import { Event, TimeSlot } from "../../types";
 import { useEvent, useTimezone, usePersistedValue } from "../../hooks";
-import { getTimezoneString } from "../../utilities"
+import { convertTimeSlotsToTimezone, getTimezoneString } from "../../utilities"
 import { ITimezone } from "react-timezone-select/dist";
 
 interface EventContextI {
   event: Event | undefined
 
   member: string | undefined,
-  setMember: Dispatch<string>,
+  onSetMember: (updatedMember: string) => void,
 
   timezone: ITimezone,
   onTimezoneChange: Dispatch<ITimezone> 
@@ -20,7 +20,10 @@ interface EventContextI {
   cellHeight: number,
   cellWidth: number,
 
-  respondents: Array<string>
+  respondents: Array<string>,
+
+  selectedRespondents: Array<string>
+  setSelectedRespondents: Dispatch<Array<string>>
 }
 
 const EventContext = React.createContext({} as EventContextI);
@@ -35,7 +38,17 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
   const { _id } = useParams();
   const [timezone, onTimezoneChange] = useTimezone();
   const [member, setMember] = usePersistedValue<string | undefined>(undefined, "memberName");
-  const [event, onTimeSlotUpdate] = useEvent(getTimezoneString(timezone), _id);
+  const [utcEvent, onTimeSlotUpdate] = useEvent(getTimezoneString(timezone), _id);
+
+  let event: Event | undefined  = undefined;
+
+  if (utcEvent !== undefined) {
+    event = {
+      _id: utcEvent._id,
+      name: utcEvent.name,
+      timeSlots: convertTimeSlotsToTimezone(utcEvent.timeSlots, getTimezoneString(timezone))
+    }
+  }
 
   const getAllRespondents  = () : Array<string> => {
     if (event === undefined) return new Array();
@@ -45,24 +58,41 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
     for (let timeSlot of event.timeSlots)
       respondents.push(...timeSlot.availability.flat())
     
+    if (member !== undefined && !respondents.includes(member)) {
+      respondents.push(member)
+    }
+    
     return respondents.filter((r, i, a) => a.indexOf(r) === i)
   }
 
+  const [selectedRespondents, setSelectedRespondents] = useState<Array<string>>(
+    member ? [member] : []
+  )
+
+  const onSetMember = (updatedMember: string) : void => {
+    setSelectedRespondents([updatedMember])
+    setMember(updatedMember)
+  }
+  
   return (
     <EventContext.Provider
       value={{
         event,
 
         member,
-        setMember,
+        onSetMember,
 
         timezone, onTimezoneChange,
 
-        onTimeSlotUpdate,
+        onTimeSlotUpdate, 
+
         cellWidth: 130,
         cellHeight: 15,
 
-        respondents: getAllRespondents()
+        respondents: [...getAllRespondents()].sort(),
+        
+        selectedRespondents: [...selectedRespondents].sort(),
+        setSelectedRespondents
       }}
     >
       {children}

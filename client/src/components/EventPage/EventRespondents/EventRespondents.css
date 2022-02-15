@@ -1,0 +1,37 @@
+.res-container {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.res {
+  margin-right: 5px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  color: var(--black);
+}
+
+.hoverable:hover {
+  cursor: pointer;
+}
+
+.outline-selected {
+  border: 3px solid var(--blue);
+}
+
+.outline-unselected {
+  border: 3px solid var(--light-grey)
+}
+
+.filled-selected {
+  border: 3px solid var(--blue);
+  background-color: var(--blue);
+  color: var(--white);
+}
+
+.filled-unselected {
+  border: 3px solid var(--light-grey);
+  background-color: var(--light-grey);
+  color: var(--black);
+}

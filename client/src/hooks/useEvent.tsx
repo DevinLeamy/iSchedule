@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { db, serializeTimeSlot, deserializeTimeSlot } from "../firebase";
 import { Event, TimeSlot } from "../types";
-import { clone } from "../utilities";
+import { clone, convertTimeSlotsToUTC } from "../utilities";
 
 /*
 TODO: Added database updates and timezone conversions
@@ -22,59 +22,42 @@ const useEvent = (localTimezone: string, eventId?: string) : [
         setEvent({
           _id: serializedEvent._id,
           name: serializedEvent.name,
-          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot),
+          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot)
         })
       })
 
     // initialize event state
     db.collection("events").doc(eventId).get()
       .then(doc => doc.data())
-      .then((serializedEvent: any) => setEvent({
-        _id: serializedEvent._id,
-        name: serializedEvent.name,
-        timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot),
-      }))
+      .then((serializedEvent: any) => {
+        setEvent({
+          _id: serializedEvent._id,
+          name: serializedEvent.name,
+          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot) 
+        })
+      })
     
     return () => unsubscribe();
   }, [])
 
+  // local timezone time slot
   const onTimeSlotUpdate = (updatedTimeSlot: TimeSlot) : void => {
     if (event === undefined) return;
+
+    let utcTimeSlot = convertTimeSlotsToUTC([updatedTimeSlot], localTimezone)
 
     const updatedTimeSlots = event.timeSlots.map(t => 
       (t._id === updatedTimeSlot._id) ? updatedTimeSlot : t 
     ) 
 
     db.collection("events").doc(eventId).update({
-      timeSlots: updatedTimeSlots.map(serializeTimeSlot)
+      timeSlots: convertTimeSlotsToUTC(updatedTimeSlots.map(serializeTimeSlot), localTimezone)
     })
 
     setEvent({...event, timeSlots: updatedTimeSlots})
   }
 
-
-  // if (event === undefined)
-  //   return ["Loading...", [], [], (memberDateRanges: MemberDateRange[], memberName: string) => {}]
-
-  // const membersDateRanges = getMemberDateRanges(event) 
-
-  // const onMemberDateRangeChange = (memberDateRanges: MemberDateRange[], memberName: string) : void => {
-  //   // NOTE: remove member
-  //   let updatedDateRanges = membersDateRanges.filter(memberDR => memberDR.name !== memberName) 
-
-  //   updatedDateRanges.push(...memberDateRanges);
-  // }
-
-  // const convertDateRangeToLocalTime = (utcDateRange: MemberDateRange) : MemberDateRange
-
-  // const convertDateRangesToLocalTime = (utcDateRanges: MemberDateRange[]) : void => {
-  //   // Need to check if this splits the time block between two days
-
-  // }
-
-
-  
-  // return [event.name, event.dateRanges, membersDateRanges, onMemberDateRangeChange];
+  // UTC event
   return [event, onTimeSlotUpdate];
 }
 
