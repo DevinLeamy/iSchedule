@@ -19,6 +19,7 @@
     "classnames": "^2.3.1",
     "countries-and-timezones": "^3.3.0",
     "firebase": "8.2.3",
+    "firebase-tools": "^10.2.0",
     "intl": "^1.2.5",
     "kalend": "^0.6.5",
     "patch-package": "^6.4.7",
