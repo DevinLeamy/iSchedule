@@ -2,7 +2,7 @@ import React, { useRef, useContext } from "react";
 
 import { Position, CalendarDate, TimeSlot } from "../../../types/types";
 import { TimesList, List, GridCell } from "../../common";
-import { CELLS_PER_DAY } from "../../../constants";
+import { CELLS_PER_DAY, CELL_HEIGHT } from "../../../constants";
 import RangeBox from "../../Calendar/RangeBox/RangeBox";
 import { EventTimeSelector } from "../EventTimeSelector/EventTimeSelector";
 import { EventContext } from "../../contexts";
@@ -40,12 +40,11 @@ const EventRangeSelector: React.FC<EventRangeSelectorProps> = ({
       <div style={{
         position: "absolute",
         left: 0,
-        top: timeSlot.bottomRow * 15,
+        top: timeSlot.bottomRow * CELL_HEIGHT,
         width: "100%",
       }}>
         <EventTimeSelector timeSlot={timeSlot} />
       </div>
-      // </RangeBox>
     );
   }
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CELLS_PER_DAY } from "../constants";
 
 import { db, serializeTimeSlot, deserializeTimeSlot } from "../firebase";
 import { Event, TimeSlot } from "../types";
@@ -8,9 +9,9 @@ import { clone, convertTimeSlotsToUTC } from "../utilities";
 TODO: Added database updates and timezone conversions
 */
 
-const useEvent = (localTimezone: string, eventId?: string) : [
+const useEvent = (eventId?: string) : [
   Event | undefined,
-  (timeSlot: TimeSlot) => void
+  (timeSlot: TimeSlot, timezone: string) => void
 ] => {
   const [event, setEvent] = useState<Event | undefined>(undefined)
 
@@ -41,24 +42,26 @@ const useEvent = (localTimezone: string, eventId?: string) : [
   }, [])
 
   // local timezone time slot
-  const onTimeSlotUpdate = (updatedTimeSlot: TimeSlot) : void => {
+  const onTimeSlotUpdate = (updatedTimeSlot: TimeSlot, timezone: string) : void => {
+    // TODO: might need to update and merge all time slots
     if (event === undefined) return;
 
-    let utcTimeSlot = convertTimeSlotsToUTC([updatedTimeSlot], localTimezone)
+    let utcTimeSlot = convertTimeSlotsToUTC([updatedTimeSlot], timezone)
 
     const updatedTimeSlots = event.timeSlots.map(t => 
-      (t._id === updatedTimeSlot._id) ? updatedTimeSlot : t 
-    ) 
+      (t._id === updatedTimeSlot._id) ? utcTimeSlot : [t]
+    ).flat()
 
     db.collection("events").doc(eventId).update({
-      timeSlots: convertTimeSlotsToUTC(updatedTimeSlots.map(serializeTimeSlot), localTimezone)
+      timeSlots: updatedTimeSlots.map(serializeTimeSlot)
     })
 
     setEvent({...event, timeSlots: updatedTimeSlots})
   }
 
-  // UTC event
-  return [event, onTimeSlotUpdate];
+
+// UTC event
+ return [event, onTimeSlotUpdate];
 }
 
 export { useEvent };

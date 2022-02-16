@@ -5,7 +5,7 @@ import { Event, TimeSlot, CalendarDate } from "../../types";
 import { useTimezone, usePersistedValue } from "../../hooks";
 import { db, serializeTimeSlot, generateDocId } from "../../firebase"
 import { ITimezone } from "react-timezone-select/dist";
-import { CELLS_PER_DAY } from "../../constants";
+import { CELLS_PER_DAY, CELL_HEIGHT } from "../../constants";
 import { clone, deepEqual, getTimezoneString, convertTimeSlotsToUTC } from "../../utilities";
 
 
@@ -67,9 +67,6 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
     navigate(`/event/${uid}`);
   }
 
-  // TODO: There is a bug where if you resize up and merge
-  //       with another block, the lower block will disappear.
-
   const onCreateTimeSlot = (bottomRow: number, heightInCells: number, date: CalendarDate) => {
     heightInCells = Math.max(heightInCells, 3)
 
@@ -78,7 +75,7 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
       bottomRow: bottomRow,
       topRow: bottomRow + heightInCells,
       date: date,
-      availability: new Array(CELLS_PER_DAY).fill([])
+      availability: new Array(CELLS_PER_DAY).fill(0).map(i => new Array())
     }
 
     const updatedTimeSlots = [...timeSlots, newTimeSlot]
@@ -128,7 +125,7 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
             bottomRow: i,
             topRow: i,
             date: clone(date),
-            availability: new Array(CELLS_PER_DAY).fill([])
+            availability: new Array(CELLS_PER_DAY).fill(0).map(i => new Array())
           })
         }
         let lastI = newTimeSlots.length - 1
@@ -158,7 +155,7 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
         setTimeSlots,
 
         cellWidth: 130,
-        cellHeight: 15,
+        cellHeight: CELL_HEIGHT,
 
         onCreateEvent,
         onCreateTimeSlot,

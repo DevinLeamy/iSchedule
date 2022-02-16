@@ -3,10 +3,11 @@ import React, { useContext, useRef, useEffect, useState } from "react";
 import { MemberRangeBlockBox, TimeSlot, Position, DateRange, MemberDateRange, RangeBlockBox } from "../../../types";
 import { List } from "../../common";
 import { EventContext } from "../../contexts";
-import { getAbsMinutesFromDate, clone } from "../../../utilities";
+import { getAbsMinutesFromDate, clone, getTimezoneString } from "../../../utilities";
 import { CELL_HEIGHT } from "../../../constants";
 
 import "./EventTimeSelector.css";
+import { ITimezone } from "react-timezone-select";
 
 interface EventTimeSelectorProps {
   timeSlot: TimeSlot, // represents the space occupied by the box
@@ -19,9 +20,16 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   const selectMode = useRef<boolean>(false)
   const mouseDown = useRef<boolean>(false)
 
-  const { member, respondents, selectedRespondents, setSelectedRespondents, onTimeSlotUpdate } = useContext(EventContext);
+  const { member, timezone, respondents, selectedRespondents, setSelectedRespondents, onTimeSlotUpdate } = useContext(EventContext);
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
+
   const [rowState, setRowState] = useState<Array<Array<string>>>(timeSlot.availability)
+  const [currentTimezone, setCurrentTimezone]  = useState<ITimezone>(timezone)
+
+  if (getTimezoneString(currentTimezone) !== getTimezoneString(timezone)) {
+    setRowState(timeSlot.availability)
+    setCurrentTimezone(timezone)
+  }
 
   const getEventRow = (event: any) : number => {
     if (!rangeSelectorRef?.current) return 0; 

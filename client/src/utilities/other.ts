@@ -137,21 +137,20 @@ export const convertTimeSlotToTimezone = (utcTimeSlot: TimeSlot, timezone: strin
   const rowShifts = offset * 4; 
 
   if (rowShifts < 0) {
-    return moveTimeSlotBackward(utcTimeSlot, rowShifts)
+    return moveTimeSlotBackward(utcTimeSlot, Math.abs(rowShifts))
   }
-  return moveTimeSlotForward(utcTimeSlot, rowShifts)
+  return moveTimeSlotForward(utcTimeSlot, Math.abs(rowShifts))
 }
 
 // Timezone -> UTC
 export const convertTimeSlotToUTC = (localTimeSlot: TimeSlot, timezone: string) : TimeSlot[] => {
   const offset = getTimezoneOffset(timezone) * -1;
-  console.log(offset)
   const rowShifts = offset * 4; 
 
   if (rowShifts < 0) {
-    return moveTimeSlotBackward(localTimeSlot, rowShifts)
+    return moveTimeSlotBackward(localTimeSlot, Math.abs(rowShifts))
   } 
-  return moveTimeSlotForward(localTimeSlot, rowShifts)
+  return moveTimeSlotForward(localTimeSlot, Math.abs(rowShifts))
 }
 
 const moveTimeSlotBackward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => {
@@ -163,7 +162,7 @@ const moveTimeSlotBackward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => 
 
   let result: TimeSlot[] = []
 
-  let updatedAvailability = new Array(CELLS_PER_DAY).fill([])
+  let updatedAvailability = new Array(CELLS_PER_DAY).fill(0).map(i => new Array())
     for (let row = 0; row < CELLS_PER_DAY; ++row) {
       let updatedRow = (row - rows + CELLS_PER_DAY) % CELLS_PER_DAY
       updatedAvailability[updatedRow].push(...timeSlot.availability[row])
@@ -181,7 +180,7 @@ const moveTimeSlotBackward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => 
 
     // IDS match!
     result.push({
-      _id: timeSlot._id, // + "-Z",
+      _id: timeSlot._id + "-Z",
       bottomRow: 0,
       topRow: updatedTopRow, 
       date: getCalendarDateYesterday(timeSlot.date), 
@@ -209,11 +208,11 @@ const moveTimeSlotForward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => {
 
   let result: TimeSlot[] = []
 
-  let updatedAvailability = new Array(CELLS_PER_DAY).fill([])
-    for (let row = 0; row < CELLS_PER_DAY; ++row) {
-      let updatedRow = (row + rows) % CELLS_PER_DAY
-      updatedAvailability[updatedRow].push(...timeSlot.availability[row])
-    }
+  let updatedAvailability: Array<Array<string>> = new Array(CELLS_PER_DAY).fill(0).map(i => new Array())
+  for (let row = 0; row < CELLS_PER_DAY; ++row) {
+    let updatedRow = (row + rows) % CELLS_PER_DAY
+    updatedAvailability[updatedRow].push(...timeSlot.availability[row])
+  }
 
   if (updatedTopRow - updatedBottomRow + 1 !== timeSlotRows) {
     // split time slot
@@ -227,7 +226,7 @@ const moveTimeSlotForward = (timeSlot: TimeSlot, rows: number) : TimeSlot[] => {
 
     // IDS match!
     result.push({
-      _id: timeSlot._id, //+ "-Z",
+      _id: timeSlot._id + "-Z",
       bottomRow: 0,
       topRow: updatedTopRow, 
       date: getCalendarDateTomorrow(timeSlot.date), 
@@ -255,9 +254,9 @@ const getCalendarDateYesterday = (calendarDate: CalendarDate) : CalendarDate => 
 }
 
 const getAvailability = (bottomRow: number, topRow: number, availability: Array<Array<string>>) : Array<Array<string>> => {
-  let updatedAvailability = new Array(CELLS_PER_DAY).fill([]) 
+  let updatedAvailability = new Array(CELLS_PER_DAY).fill(0).map(i => new Array())
   for (let row = bottomRow; row <= topRow; ++row)
-    updatedAvailability.push(...availability[row])
+    updatedAvailability[row].push(...availability[row])
   
   return updatedAvailability
 }

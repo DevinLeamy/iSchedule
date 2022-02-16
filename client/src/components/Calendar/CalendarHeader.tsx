@@ -52,7 +52,7 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
         Clear
       </Button>
 
-      <div className="c-type-toggle-container">
+      {/* <div className="c-type-toggle-container">
         <span className="c-type-label">Week</span>
         <Radio
           checked={calendarType === WEEK_C}
@@ -65,7 +65,7 @@ const CalendarHeader : React.FC<CalendarHeaderProps> = ({
           onChange={handleChange}
           value={MONTH_C}
         />
-      </div>
+      </div> */}
       {!rightDisabled && (
         <div 
           className={classNames(

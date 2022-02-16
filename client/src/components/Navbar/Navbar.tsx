@@ -28,7 +28,6 @@ const Navbar: React.FC<NavbarProps> = ({
           <Link to="/about" className="navbar-element">About</Link>
           <Link to="/contact" className="navbar-element">Contact</Link>
           <Link to="/" className="navbar-element">Schedule</Link>
-          {/* <Link to="/contact" className="navbar-element">Contact</Link> */}
         </div>
       </div>
    </div>

@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 
 import { Event, TimeSlot } from "../../types";
 import { useEvent, useTimezone, usePersistedValue } from "../../hooks";
-import { convertTimeSlotsToTimezone, getTimezoneString } from "../../utilities"
+import { clone, convertTimeSlotsToTimezone, getTimezoneString } from "../../utilities"
 import { ITimezone } from "react-timezone-select/dist";
+import { CELLS_PER_DAY, CELL_HEIGHT } from "../../constants";
 
 interface EventContextI {
   event: Event | undefined
@@ -38,7 +39,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
   const { _id } = useParams();
   const [timezone, onTimezoneChange] = useTimezone();
   const [member, setMember] = usePersistedValue<string | undefined>(undefined, "memberName");
-  const [utcEvent, onTimeSlotUpdate] = useEvent(getTimezoneString(timezone), _id);
+  const [utcEvent, onTimeSlotUpdate] = useEvent(_id);
 
   let event: Event | undefined  = undefined;
 
@@ -46,7 +47,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
     event = {
       _id: utcEvent._id,
       name: utcEvent.name,
-      timeSlots: convertTimeSlotsToTimezone(utcEvent.timeSlots, getTimezoneString(timezone))
+      timeSlots: convertTimeSlotsToTimezone(clone(utcEvent.timeSlots), getTimezoneString(timezone))
     }
   }
 
@@ -84,10 +85,10 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
 
         timezone, onTimezoneChange,
 
-        onTimeSlotUpdate, 
+        onTimeSlotUpdate: (timeSlot: TimeSlot) => onTimeSlotUpdate(timeSlot, getTimezoneString(timezone)), 
 
         cellWidth: 130,
-        cellHeight: 15,
+        cellHeight: CELL_HEIGHT,
 
         respondents: [...getAllRespondents()].sort(),
         
