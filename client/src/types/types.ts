@@ -33,10 +33,19 @@ export type TimeSlot = {
   availability: Array<Array<string>>
 }
 
+export type DateTime = CalendarDate & Time;
+
+export type Message = {
+  datetime: Date,
+  message: string,
+  sender: string
+}
+
 export type Event = {
   _id: string,
   name: string,
-  timeSlots: TimeSlot[] // UTC
+  timeSlots: TimeSlot[], // UTC
+  messages: Message[]
 }
 
 export interface ResponseT {

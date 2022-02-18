@@ -12,7 +12,7 @@ import {
   Position
 } from "react-rnd"
 import "./RangeBox.css";
-import { MINUTES_PER_CELL, MINUTES_PER_DAY } from "../../../constants";
+import { CELL_HEIGHT, MINUTES_PER_CELL, MINUTES_PER_DAY } from "../../../constants";
 import { clone } from "../../../utilities";
 
 type RangeBoxProps = {
@@ -33,7 +33,7 @@ type RangeBoxProps = {
 const RangeBox: React.FC<RangeBoxProps> = ({
   timeSlot,
   cellWidth=130,
-  cellHeight=15,
+  cellHeight=CELL_HEIGHT,
   
   onChange = (updatedTimeSlot: TimeSlot) => {},
   onDelete = (timeSlot: TimeSlot) => {},
@@ -94,8 +94,8 @@ const RangeBox: React.FC<RangeBoxProps> = ({
       bounds="parent"
       position={position}
       size={size}
-      dragGrid={[cellWidth, 15]}
-      resizeGrid={[15, 15]}
+      dragGrid={[cellWidth, CELL_HEIGHT]}
+      resizeGrid={[CELL_HEIGHT, CELL_HEIGHT]}
       onResizeStop={handleResize}
       onDragStop={handleDrag}
       // NOTE: enabling these slows things down but makes the 

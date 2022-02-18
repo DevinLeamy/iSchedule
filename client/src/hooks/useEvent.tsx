@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { CELLS_PER_DAY } from "../constants";
 
-import { db, serializeTimeSlot, deserializeTimeSlot } from "../firebase";
-import { Event, TimeSlot } from "../types";
-import { clone, convertTimeSlotsToUTC } from "../utilities";
+import { db, serializeTimeSlot, deserializeTimeSlot, serializeMessage, deserializeMessage } from "../firebase";
+import { Event, Message, TimeSlot } from "../types";
+import { clone, convertMessageToUTC, convertTimeSlotsToUTC } from "../utilities";
 
-/*
-TODO: Added database updates and timezone conversions
-*/
+/* TODO: Added database updates and timezone conversions */
 
 const useEvent = (eventId?: string) : [
   Event | undefined,
-  (timeSlot: TimeSlot, timezone: string) => void
+  (timeSlot: TimeSlot, timezone: string) => void,
+  (message: Message, timezone: string) => void
 ] => {
   const [event, setEvent] = useState<Event | undefined>(undefined)
 
@@ -23,7 +22,8 @@ const useEvent = (eventId?: string) : [
         setEvent({
           _id: serializedEvent._id,
           name: serializedEvent.name,
-          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot)
+          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot),
+          messages: serializedEvent.messages.map(deserializeMessage) 
         })
       })
 
@@ -34,7 +34,8 @@ const useEvent = (eventId?: string) : [
         setEvent({
           _id: serializedEvent._id,
           name: serializedEvent.name,
-          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot) 
+          timeSlots: serializedEvent.timeSlots.map(deserializeTimeSlot),
+          messages: serializedEvent.messages.map(deserializeMessage)
         })
       })
     
@@ -59,9 +60,19 @@ const useEvent = (eventId?: string) : [
     setEvent({...event, timeSlots: updatedTimeSlots})
   }
 
+  const onNewMessage = (message: Message, timezone: string) : void => {
+    if (event === undefined) return;
+
+    let utcMessage = convertMessageToUTC(message, timezone)
+
+    db.collection("events").doc(eventId).update({
+      messages: [...event.messages, utcMessage].map(serializeMessage)
+    })
+  }
+
 
 // UTC event
- return [event, onTimeSlotUpdate];
+ return [event, onTimeSlotUpdate, onNewMessage];
 }
 
 export { useEvent };

@@ -21,12 +21,8 @@ const CreateEventPage: React.FC = () => {
   let { 
     timezone, setTimezone,
     eventName, setEventName,
-    // timeSlots, setTimeSlots,
     onCreateEvent
   } = useContext(CreateEventContext);
-  // const onDateRangeChange = (dateRanges: DateRange[]) : void => {
-  //   setDateRanges(dateRanges);
-  // }
 
   const onEventNameChange = (event: React.ChangeEvent<HTMLInputElement>) : void => {
     setEventName(event.currentTarget.value);

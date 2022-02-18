@@ -8,7 +8,7 @@
 
 .row-state-row {
   /* width: 100%; */
-  height: 13px;
+  height: calc(var(--dts-cell-height) - 2px);
   /* margin: auto; */
   box-sizing: border-box;
 
@@ -24,7 +24,7 @@
   margin-top: 1px;
   margin-bottom: 2px;
   font-family: monospace;
-  border-radius: 5px;
+  /* border-radius: 3px; */
   /* Disable highlight */
   user-select: none;
   -moz-user-select: none;

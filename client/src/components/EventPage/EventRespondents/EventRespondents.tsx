@@ -33,8 +33,8 @@ const EventRespondents: React.FC = ({
           'res',
           'hoverable',
           {
-            'outline-selected': selected,
-            'outline-unselected': !selected
+            'filled-selected': selected,
+            'filled-unselected': !selected
           }
         )}
         onClick={(e) => toggleRespondent(respondent)}

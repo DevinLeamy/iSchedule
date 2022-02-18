@@ -1,6 +1,5 @@
 .calendar-dates {
   --calendar-dates-width: 50px;
-  --dts-cell-height: 15px;
   width: var(--calendar-dates-width); 
   position: relative;
 }

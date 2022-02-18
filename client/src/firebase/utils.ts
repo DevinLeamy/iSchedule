@@ -1,5 +1,5 @@
 import { db } from "./config";
-import { TimeSlot } from "../types"
+import { Message, TimeSlot } from "../types"
 
 export const generateDocId = (collection: string) : string => {
   return db.collection(collection).doc().id;
@@ -22,5 +22,21 @@ export const serializeTimeSlot = (timeSlot: TimeSlot) : any => {
     topRow: timeSlot.topRow,
     date: timeSlot.date,
     availability: JSON.stringify(timeSlot.availability)
+  }
+}
+
+export const serializeMessage = (message: Message) : any => {
+  return {
+    datetime: message.datetime.toUTCString(),
+    message: message.message,
+    sender: message.sender,
+  }
+}
+
+export const deserializeMessage = (serializedMessage: any) : Message => {
+  return {
+    datetime: new Date(serializedMessage.datetime),
+    message: serializedMessage.message,
+    sender: serializedMessage.sender
   }
 }

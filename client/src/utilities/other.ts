@@ -1,7 +1,7 @@
 import { ITimezone } from "react-timezone-select";
 import { getTimezone } from "countries-and-timezones"
 
-import { DateRange, Time, RangeBlockBox, RangeBlock, TimeSlot, CalendarDate } from "../types";
+import { DateRange, Time, RangeBlockBox, RangeBlock, TimeSlot, CalendarDate, Message } from "../types";
 import { getAbsMinutesFromDate, dateInRange } from "../utilities";
 import { MINUTES_PER_CELL, MILLISECONDS_PER_HOUR, CELLS_PER_DAY } from "../constants";
 import { getCalendarDate, getDateFromCalendarDate, getDateInDays } from "./dates";
@@ -122,6 +122,32 @@ const convertToTimezone = (utcDate: Date, timezone: string) : Date => {
   const offset = getTimezoneOffset(timezone);
   return applyOffsetToDate(utcDate, offset);
 }
+
+export const convertMessagesToTimezone = (utcMessages: Message[], timezone: string) : Message[] => {
+  return utcMessages.map(message => convertMessageToTimezone(message, timezone))
+}
+
+export const convertMessagesToUTC = (localMessages: Message[], timezone: string) : Message[] => {
+  return localMessages.map(message => convertMessageToUTC(message, timezone)) 
+}
+
+export const convertMessageToTimezone = (utcMessage: Message, timezone: string) : Message => {
+  return {
+    // TODO: this is a hacky solution, conversion should take place during deserialization
+    datetime: convertToTimezone(new Date(utcMessage.datetime), timezone),
+    message: utcMessage.message,
+    sender: utcMessage.sender
+  }
+}
+
+export const convertMessageToUTC = (localMessage: Message, timezone: string) : Message => {
+  return {
+    datetime: convertToUTC(localMessage.datetime, timezone),
+    message: localMessage.message,
+    sender: localMessage.sender
+  }
+}
+
 
 export const convertTimeSlotsToTimezone = (utcTimeSlots: TimeSlot[], timezone: string) : TimeSlot[] => {
   return utcTimeSlots.map(timeSlot => convertTimeSlotToTimezone(timeSlot, timezone)).flat()

@@ -84,5 +84,8 @@
   border: var(--calendar-border);
 
   --cal-top-bar-sz: 50px;
-  --dts-cell-height: 15px;
+}
+
+.respondents-container {
+  margin-bottom: 5px;
 }

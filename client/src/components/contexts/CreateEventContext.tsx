@@ -57,7 +57,8 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
     await eventsRef.doc(uid).set({
       _id: uid,
       name: eventName,
-      timeSlots: utcTimeSlots.map(serializeTimeSlot)
+      timeSlots: utcTimeSlots.map(serializeTimeSlot),
+      messages: []
     })
 
     // reset data

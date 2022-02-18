@@ -1,9 +1,9 @@
 import React, { useContext, useState, Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
-import { Event, TimeSlot } from "../../types";
+import { Event, Message, TimeSlot } from "../../types";
 import { useEvent, useTimezone, usePersistedValue } from "../../hooks";
-import { clone, convertTimeSlotsToTimezone, getTimezoneString } from "../../utilities"
+import { clone, convertMessagesToTimezone, convertTimeSlotsToTimezone, getTimezoneString } from "../../utilities"
 import { ITimezone } from "react-timezone-select/dist";
 import { CELLS_PER_DAY, CELL_HEIGHT } from "../../constants";
 
@@ -17,6 +17,7 @@ interface EventContextI {
   onTimezoneChange: Dispatch<ITimezone> 
 
   onTimeSlotUpdate: (timeSlot: TimeSlot) => void,
+  onNewMessage: (message: Message) => void,
 
   cellHeight: number,
   cellWidth: number,
@@ -39,7 +40,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
   const { _id } = useParams();
   const [timezone, onTimezoneChange] = useTimezone();
   const [member, setMember] = usePersistedValue<string | undefined>(undefined, "memberName");
-  const [utcEvent, onTimeSlotUpdate] = useEvent(_id);
+  const [utcEvent, onTimeSlotUpdate, onNewMessage] = useEvent(_id);
 
   let event: Event | undefined  = undefined;
 
@@ -47,7 +48,8 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
     event = {
       _id: utcEvent._id,
       name: utcEvent.name,
-      timeSlots: convertTimeSlotsToTimezone(clone(utcEvent.timeSlots), getTimezoneString(timezone))
+      timeSlots: convertTimeSlotsToTimezone(clone(utcEvent.timeSlots), getTimezoneString(timezone)),
+      messages: convertMessagesToTimezone(clone(utcEvent.messages), getTimezoneString(timezone))
     }
   }
 
@@ -86,6 +88,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
         timezone, onTimezoneChange,
 
         onTimeSlotUpdate: (timeSlot: TimeSlot) => onTimeSlotUpdate(timeSlot, getTimezoneString(timezone)), 
+        onNewMessage: (message: Message) => onNewMessage(message, getTimezoneString(timezone)),
 
         cellWidth: 130,
         cellHeight: CELL_HEIGHT,

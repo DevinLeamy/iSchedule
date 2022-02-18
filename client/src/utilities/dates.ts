@@ -1,5 +1,5 @@
 import { MILLISECONDS_PER_DAY } from "../constants"
-import { AbsTime, Time, DateRange, CalendarDate } from "../types/types"
+import { AbsTime, Time, DateRange, CalendarDate, DateTime } from "../types/types"
 
 const MONTHS = [
   { name: "January",   monthIndex: 0,  days: 31 }, 

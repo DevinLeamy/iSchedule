@@ -7,4 +7,4 @@ export const MINUTES_PER_CELL = 15;
 export const CELLS_PER_DAY = 24 * 4;
 export const DAYS_PER_WEEK = 7;
 
-export const CELL_HEIGHT = 15;
+export const CELL_HEIGHT = 13;

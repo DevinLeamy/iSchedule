@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { Time, Position, RangeBlockBox, CalendarDate, TimeSlot } from "../../../types/types";
 import { TimesList, List, GridCell } from "../../common";
 import { useMouseCapture } from "../../../hooks/useMouseCapture";
-import { CELLS_PER_DAY } from "../../../constants";
+import { CELLS_PER_DAY, CELL_HEIGHT } from "../../../constants";
 import { deepEqual } from "../../../utilities";
 import RangeBox from "../RangeBox/RangeBox";
 import { CreateEventContext } from "../../contexts";
@@ -48,7 +48,7 @@ const CalendarRangeSelector: React.FC<CalendarRangeSelectorProps> = ({
         key={timeSlot._id}
         timeSlot={timeSlot}
         cellWidth={130}
-        cellHeight={15}
+        cellHeight={CELL_HEIGHT}
         onChange={onUpdateTimeSlot}
         onDelete={onDeleteTimeSlot}
       />
