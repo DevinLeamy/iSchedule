@@ -1,0 +1,58 @@
+.ec-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 7px;
+}
+
+.ec-message-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  padding: 0px 10px;
+}
+
+.sender-container {
+  justify-content: flex-end;
+}
+
+.receiver-container {
+  justify-content: flex-start;
+}
+
+.inner-message-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  width: fit-content;
+  border-radius: 8px;
+}
+
+.sender {
+  background-color: #1982FC;
+  color: var(--off-white);
+}
+
+.receiver {
+  background-color: var(--light-grey);
+  color: var(--black);
+}
+
+.ec-input {
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.ec-input > input:focus {
+  outline: none;
+}
+
+.message-sender {
+  font-family: var(--header-font)
+}
+
+.message-timestamp {
+  color: var(--light-grey);
+  justify-content: center;
+}

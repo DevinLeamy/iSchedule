@@ -44,12 +44,15 @@ const CreateEventContextProvider: React.FC<CreateEventContextProviderProps> = ({
   const eventsRef = db.collection('events')
 
  const onCreateEvent = async () : Promise<void> => {
-    if (eventName === "" || timeSlots.length === 0) {
-      alert("event data is incomplete");
-      return;
-    }
+   if (timeSlots.length === 0) {
+     alert("Enter your availability into the calendar")
+     return
+   }
 
-    // TODO: Convert timeslots to UTC
+    if (eventName === "") {
+      alert("Enter an event name")
+      return
+    }
 
     const uid = generateDocId("events") 
     const utcTimeSlots = convertTimeSlotsToUTC(timeSlots, getTimezoneString(timezone))

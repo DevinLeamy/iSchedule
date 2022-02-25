@@ -34,7 +34,8 @@ const EventPage: React.FC = () => {
     }
   };
 
-  const eventLink = `http://localhost:3000/event/${_id}`;
+  // const eventLink = `http://localhost:3000/event/${_id}`;
+  const eventLink = `https://iSchedule.ca/event/${_id}`;
 
   // if (event === undefined) {
   //   return (
@@ -123,10 +124,9 @@ const EventPage: React.FC = () => {
           </Button>
         </div>
         <Box className="respondents-container">
-          Respondents
+          Include
           <EventRespondents />
         </Box>
-        {/* <div className="spacer" /> */}
         <div className="ep-calendar-container calendar-container">
           <EventCalendar />
         </div>
@@ -141,20 +141,12 @@ const EventPage: React.FC = () => {
         </Box>
         <div className="spacer" />
         <Box>
-          Comments
+          Chat
           <EventChat />
         </Box>
       </ContentBox>
     </Page>
   );
-};
-
-const COPY_EVENT_BUTTON: CSS = {
-  fontWeight: "bolder",
-  fontSize: "16px",
-  textTransform: "none",
-  borderRadius: 0,
-  marginLeft: 10,
 };
 
 const EM_INPUT_BUTTON: CSS = {

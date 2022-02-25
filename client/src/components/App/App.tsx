@@ -1,6 +1,8 @@
 import React from 'react';
-import './App.css';
+import '@progress/kendo-theme-default/dist/all.css';
+
 import { Navigator } from "../Navigator/Navigator";
+import './App.css';
 
 const App: React.FC = () => {
   return <Navigator />;

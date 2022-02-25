@@ -6,12 +6,8 @@ import TextField from '@mui/material/TextField';
 import { useNavigate } from "react-router-dom";
 import TimezoneSelect, { ITimezone, allTimezones } from "react-timezone-select";
 
-import { usePersistedValue, useTimezone } from "../../hooks";
-import { createEvent } from "../../api";
 import { Page, Header, ContentBox } from "../common";
 import { Calendar } from "../Calendar/Calendar";
-import { DateRange, AbsTime } from "../../types/types";
-import { getTimezoneString } from "../../utilities";
 
 import './CreateEventPage.css';
 import { CreateEventContext } from '../contexts';

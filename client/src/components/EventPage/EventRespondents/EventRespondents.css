@@ -10,6 +10,7 @@
   padding: 1px 5px;
   border-radius: 5px;
   color: var(--black);
+  line-height: 40px;
 }
 
 .hoverable:hover {
