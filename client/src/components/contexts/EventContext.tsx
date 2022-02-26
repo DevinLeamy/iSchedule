@@ -1,9 +1,9 @@
 import React, { useContext, useState, Dispatch } from "react";
 import { useParams } from "react-router-dom";
 
-import { Event, Message, TimeSlot } from "../../types";
+import { Event, Message, TimeSlot, Respondent } from "../../types";
 import { useEvent, useTimezone, usePersistedValue } from "../../hooks";
-import { clone, convertMessagesToTimezone, convertTimeSlotsToTimezone, getTimezoneString } from "../../utilities"
+import { clone, convertMessagesToTimezone, convertTimeSlotsToTimezone, generateRandomColor, getRandomColorByName, getTimezoneString } from "../../utilities"
 import { ITimezone } from "react-timezone-select/dist";
 import { CELLS_PER_DAY, CELL_HEIGHT } from "../../constants";
 
@@ -22,7 +22,7 @@ interface EventContextI {
   cellHeight: number,
   cellWidth: number,
 
-  respondents: Array<string>,
+  respondents: Array<Respondent>,
 
   selectedRespondents: Array<string>
   setSelectedRespondents: Dispatch<Array<string>>
@@ -61,11 +61,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
     for (let timeSlot of event.timeSlots)
       respondents.push(...timeSlot.availability.flat())
     
-    if (member !== undefined && !respondents.includes(member)) {
-      respondents.push(member)
-    }
-    
-    return respondents.filter((r, i, a) => a.indexOf(r) === i)
+    return respondents.filter((r, i, a) => a.indexOf(r) === i).sort()
   }
 
   const [selectedRespondents, setSelectedRespondents] = useState<Array<string>>(
@@ -76,6 +72,12 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
     setSelectedRespondents([updatedMember])
     setMember(updatedMember)
   }
+
+  const respondents = [...getAllRespondents()].map(name => { return {
+    name: name,
+    color: getRandomColorByName(name),
+    // color: generateRandomColor()
+  }})
   
   return (
     <EventContext.Provider
@@ -93,7 +95,7 @@ const EventContextProvider: React.FC<EventContextProviderProps> = ({
         cellWidth: 130,
         cellHeight: CELL_HEIGHT,
 
-        respondents: [...getAllRespondents()].sort(),
+        respondents,
         
         selectedRespondents: [...selectedRespondents].sort(),
         setSelectedRespondents

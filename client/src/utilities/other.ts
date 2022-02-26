@@ -434,13 +434,41 @@ const colors = [
   "#DD2C00",
 ];
 
-const generateRandomColor = (): string => {
+// const colors = [
+//   "#92400E",
+//   "#3F6212",
+//   "#166534",
+//   "#115E59",
+//   "#1E40AF",
+//   "#3730A3",
+//   "#E11D48",
+//   "#2563EB",
+//   "#0D9488",
+//   "#DC2626",
+//   "#0284C7",
+//   "#64748B",
+//   "#16A34A",
+//   "#65A30D",
+//   "#F97316"
+// ]
+
+const generateRandomColor = () : string => {
   return colors[Math.floor(Math.random() * colors.length)];
 };
+
+const getRandomColorByName = (member: string) : string => {
+  const key = member + "-color"
+  if (!localStorage.getItem(key)) {
+    localStorage.setItem(key, generateRandomColor())
+  }
+
+  return localStorage.getItem(key) as string
+}
 
 export {
   serializeDateRanges,
   generateRandomColor,
+  getRandomColorByName,
   deserializeDateRanges,
   getTimezoneString,
   getRangeBlocksFromDateRanges,

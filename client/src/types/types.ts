@@ -89,6 +89,12 @@ export type MemberDateRange = DateRange & {
   name: string
 }
 
+export type Respondent = {
+  name: string,
+  color: string,
+  // selected: boolean
+}
+
 // Could refactor events to be
 /*
 export type Event = {

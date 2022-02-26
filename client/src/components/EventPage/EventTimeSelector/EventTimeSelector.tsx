@@ -1,13 +1,13 @@
 import React, { useContext, useRef, useEffect, useState } from "react";
+import { ITimezone } from "react-timezone-select";
 
-import { MemberRangeBlockBox, TimeSlot, Position, DateRange, MemberDateRange, RangeBlockBox } from "../../../types";
+import { MemberRangeBlockBox, TimeSlot, Position, DateRange, MemberDateRange, RangeBlockBox, Respondent } from "../../../types";
 import { List } from "../../common";
 import { EventContext } from "../../contexts";
 import { getAbsMinutesFromDate, clone, getTimezoneString } from "../../../utilities";
 import { CELL_HEIGHT } from "../../../constants";
 
 import "./EventTimeSelector.css";
-import { ITimezone } from "react-timezone-select";
 
 interface EventTimeSelectorProps {
   timeSlot: TimeSlot, // represents the space occupied by the box
@@ -20,7 +20,7 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
   const selectMode = useRef<boolean>(false)
   const mouseDown = useRef<boolean>(false)
 
-  const { member, timezone, respondents, selectedRespondents, setSelectedRespondents, onTimeSlotUpdate } = useContext(EventContext);
+  const { member, timezone, respondents, selectedRespondents, onTimeSlotUpdate } = useContext(EventContext);
   const rangeSelectorRef = useRef<HTMLDivElement | null>(null);
 
   const [rowState, setRowState] = useState<Array<Array<string>>>(timeSlot.availability)
@@ -76,23 +76,7 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
     if (mouseDown.current) {
       updateRow(row)
     }
-
-    // setSelectedRespondents([...rowState[row]])
   }
-
-  const updatedSelectedRespondents = (event: any) => {
-    // const row = getEventRow(event)
-    // setSelectedRespondents([...rowState[row]]) 
-  }
-
-  const getMaxAvailability = () : number => {
-    if (member === undefined || respondents.includes(member)) 
-      return respondents.length 
-    
-    return respondents.length + 1
-  }
-
-  const maxAvailability = getMaxAvailability()
 
 
   const updateRow = (index: number) : void => {
@@ -108,45 +92,41 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
       clonedAVB[index].push(member)
     } 
 
-    // timeSlot.availability = clonedAVB;
     setRowState(clonedAVB)
 
     lastUpdatedRow.current = index;
-
-    // onTimeSlotUpdate(timeSlot)
   }
 
   const mapRowState = (rowStateRow: Array<string>, index?: number) : React.ReactNode => {
-    let memberIncluded = rowStateRow.includes(member === undefined ? "" : member)
+    let included = member !== undefined && rowStateRow.includes(member)
 
-    let included = selectedRespondents.length > 0 
-
-    for (let respondent of selectedRespondents)
-      included &&= rowStateRow.includes(respondent)
-
-    // const included = (member === undefined || !rowState[row].includes(member))
-    const maxWidth = rangeSelectorRef?.current?.getBoundingClientRect()?.width ?? 1
-
-    const available = rowStateRow.length
-    const width = (maxAvailability === 0 || available === 0) ? 20 : (available / maxAvailability) * maxWidth
-
+    const outerColor = !included ? "#EEEEEE" : "var(--blue)" 
     return (
       <div 
         className="row-state-row"
         style={{
-          backgroundColor: !included ? "#EEEEEE" : "var(--blue)",
-          color: !included ? "var(--black)" : "var(--white)",
-          border: "2px solid " + (!memberIncluded ? (included ? "var(--black)" : "#EEEEEE") : "var(--blue)"), 
-          width: width
+          boxSizing: "border-box",
+          width: '100%' 
         }} 
       >
-        {/* {rowStateRow.length} */}
-        {/* <div 
-          className="member-tag"
-          style={{
-            backgroundColor: !memberIncluded ? "#EEEEEE" : "var(--blue)"
-          }}
-        /> */}
+        {selectedRespondents.filter(r => r !== member).map((name) => (
+          <div
+            style={{
+              // backgroundColor: !rowStateRow.includes(name) ? (respondents.find(r => r.name === name) as Respondent).color: "white",
+              backgroundColor: (respondents.find(r => r.name === name) as Respondent).color,
+              opacity: !rowStateRow.includes(name) ? 1.0 : 0.2,
+              height: "100%",
+              width: 8,
+              marginRight: 1,
+            }} 
+          />
+        ))}
+        <div style={{
+          flex: 1,
+          backgroundColor: outerColor
+        }}
+        >
+        </div>
       </div>
     )
   }
@@ -158,7 +138,7 @@ const EventTimeSelector: React.FC<EventTimeSelectorProps> = ({
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
-      onMouseLeave={(e) => { onMouseUp(e); updatedSelectedRespondents(e) }}
+      onMouseLeave={(e) => { onMouseUp(e); }}
     >
       <List
         listItemMap={mapRowState}

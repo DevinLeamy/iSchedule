@@ -6,38 +6,35 @@ import { EventContext } from "../../contexts";
 import { generateRandomColor } from "../../../utilities";
 
 import "./EventRespondents.css";
+import { Respondent } from "../../../types";
 
 const EventRespondents: React.FC = ({}) => {
   const { respondents, member, selectedRespondents, setSelectedRespondents } =
     useContext(EventContext);
 
-  const toggleRespondent = (respondent: string): void => {
-    let remove = selectedRespondents.includes(respondent);
-    let updated = selectedRespondents.filter((m) => m !== respondent);
+  const toggleRespondent = (respondent: Respondent): void => {
+    let remove = selectedRespondents.includes(respondent.name);
+    let updated = selectedRespondents.filter((m) => m !== respondent.name);
 
     if (!remove) {
-      updated.push(respondent);
+      updated.push(respondent.name);
     }
 
     setSelectedRespondents(updated);
   };
 
   const selectAll = (): void => {
-    setSelectedRespondents(respondents);
+    setSelectedRespondents(respondents.map(r => r.name));
   };
 
-  const mapRespondent = (respondent: string): React.ReactNode => {
-    const selected = selectedRespondents.includes(respondent);
+  const mapRespondent = (respondent: Respondent): React.ReactNode => {
+    const selected = selectedRespondents.includes(respondent.name);
 
     return (
       <div
         className={classNames(
           "res",
           "hoverable"
-          // {
-          //   'filled-selected': selected,
-          // 'filled-unselected': !selected
-          // }
         )}
         onClick={(e) => toggleRespondent(respondent)}
       >
@@ -46,18 +43,19 @@ const EventRespondents: React.FC = ({}) => {
           avatar={
             <Avatar
               sx={{
-                bgcolor: generateRandomColor(),
+                bgcolor: selected ? respondent.color : 'inherit',
                 height: "32px !important",
                 width: "32px !important",
                 fontSize: "17px !important",
-                color: "black !important",
+                color: "white !important",
               }}
             >
-              {respondent.slice(0, 2)}
+              {respondent.name.slice(0, 2)}
             </Avatar>
           }
-          label={respondent}
-          variant="outlined"
+          label={respondent.name}
+
+          variant={selected ? "outlined" : 'filled'}
         />
       </div>
     );
@@ -74,6 +72,13 @@ const EventRespondents: React.FC = ({}) => {
           "filled-selected": selected,
           "filled-unselected": !selected,
         })}
+        style={{
+          width: 50,
+          height: 40,
+          borderRadius: 5,
+          textAlign: "center",
+          lineHeight: 2 
+        }}
         onClick={onClick}
       >
         {text}
@@ -83,19 +88,8 @@ const EventRespondents: React.FC = ({}) => {
 
   return (
     <div className="res-container">
-      {renderFilled(false, "ALL", (e: any) => selectAll())}
-      {/* {member !== undefined && (
-        renderFilled(
-          (member !== undefined && selectedRespondents.includes(member)),
-          member,
-          (e: any) => {
-            if (member !== undefined) {
-              toggleRespondent(member)
-            }
-          }
-        )
-      )} */}
-      {respondents.filter((r) => r !== member).map(mapRespondent)}
+      {renderFilled(respondents.length === selectedRespondents.length, "ALL", (e: any) => selectAll())}
+      {respondents.filter((r) => r.name !== member).map(mapRespondent)}
     </div>
   );
 };

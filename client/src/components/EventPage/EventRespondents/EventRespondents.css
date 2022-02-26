@@ -7,10 +7,8 @@
 
 .res {
   margin-right: 5px;
-  padding: 1px 5px;
-  border-radius: 5px;
   color: var(--black);
-  line-height: 40px;
+  line-height: 30px;
 }
 
 .hoverable:hover {

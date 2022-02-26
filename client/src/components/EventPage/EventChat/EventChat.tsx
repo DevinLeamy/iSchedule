@@ -4,13 +4,13 @@ import { Card, IconButton, Avatar } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
 import { EventContext } from "../../contexts";
-import { Message } from "../../../types";
+import { Message, Respondent } from "../../../types";
 import { generateRandomColor } from "../../../utilities";
 
 import "./EventChat.css";
 
 const EventChat: React.FC = () => {
-  const { event, member, onNewMessage } = useContext(EventContext);
+  const { event, respondents, member, onNewMessage } = useContext(EventContext);
 
   const [message, setMessage] = useState<string>("");
 
@@ -48,18 +48,22 @@ const EventChat: React.FC = () => {
       }
 
       if (message.sender !== prevSender && message.sender !== member) {
+        const respondent = respondents.find((r) => r.name === message.sender) as Respondent
+
         formattedMessages.push(
           // <div className="message-sender">
           //   {message.sender}
           // </div>
           <Avatar 
             sx={{ 
-              color: "var(--black)", 
-              width: 40, 
-              height: 40, 
+              color: "white",
+              width: 35, 
+              height: 35, 
+              marginTop: 2,
               marginBottom: 1,
-              bgcolor: generateRandomColor(),
-              marginLeft: 1
+              bgcolor: respondent.color,
+              marginLeft: 1,
+              fontSize: 17
             }}>
             {message.sender.slice(0, 2)}
           </Avatar>
@@ -104,7 +108,7 @@ const EventChat: React.FC = () => {
   };
 
   return (
-    <Card className="ec-container" raised>
+    <Card className="ec-container">
       <form
         onSubmit={(e) => {
           e.preventDefault();

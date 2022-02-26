@@ -26,7 +26,7 @@
   margin-bottom: 8px;
   padding: 5px 10px;
   width: fit-content;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 
 .sender {
@@ -35,8 +35,10 @@
 }
 
 .receiver {
-  background-color: var(--light-grey);
-  color: var(--black);
+  background-color: #1982FC;
+  /* background-color: var(--light-grey); */
+  color: var(--off-white);
+  margin-left: 40px;
 }
 
 .ec-input {
@@ -49,7 +51,7 @@
 }
 
 .message-sender {
-  font-family: var(--header-font)
+  font-family: var(--header-font);
 }
 
 .message-timestamp {

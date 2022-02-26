@@ -35,7 +35,7 @@ const EventPage: React.FC = () => {
   };
 
   // const eventLink = `http://localhost:3000/event/${_id}`;
-  const eventLink = `https://iSchedule.ca/event/${_id}`;
+  const eventLink = `https://ischedule.ca/event/${_id}`;
 
   // if (event === undefined) {
   //   return (
@@ -52,7 +52,7 @@ const EventPage: React.FC = () => {
       <ContentBox>
         <div className="h-center-contents" style={{ position: "relative" }}>
           {/* NOTE: name-cover literally covers the input field so it cannot be selected */}
-          <div className="name-cover" />
+          {/* <div className="name-cover" />
           <TextField
             variant="outlined"
             // TODO: can remove optional when "if (event === undefined)" is uncommented
@@ -66,7 +66,10 @@ const EventPage: React.FC = () => {
                 fontWeight: "bolder",
               },
             }}
-          />
+          /> */}
+          <div className="event-name">
+            {event?.name}
+          </div>
         </div>
         <div>Share the event</div>
         <div className="copy-event-container">
