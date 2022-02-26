@@ -25,65 +25,79 @@ const EventChat: React.FC = () => {
       datetime: new Date(),
     });
 
-    setMessage("")
+    setMessage("");
   };
 
   // TODO: move to util
 
-
   const renderMessages = (messages: Message[]): React.ReactNode[] => {
-    if (messages.length === 0) return []
+    if (messages.length === 0) return [];
 
-    let formattedMessages = []
-    let prevSendDate = new Date(40) //new Date()
-    let prevSender = "" 
+    let formattedMessages = [];
+    let prevSendDate = new Date(40); //new Date()
+    let prevSender = "";
 
     for (let message of messages) {
       if (message.datetime.toDateString() != prevSendDate.toDateString()) {
         formattedMessages.push(
-          <div className="ec-message-container message-timestamp">
+          <div
+            className="ec-message-container message-timestamp"
+            style={{
+              fontFamily: "var(--mom-cake)",
+              fontSize: 20,
+            }}
+          >
             - {message.datetime.toDateString()} -
           </div>
-        )
+        );
       }
 
       if (message.sender !== prevSender && message.sender !== member) {
-        const respondent = respondents.find((r) => r.name === message.sender) as Respondent
+        const respondent = respondents.find(
+          (r) => r.name === message.sender
+        ) as Respondent;
 
         formattedMessages.push(
           // <div className="message-sender">
           //   {message.sender}
           // </div>
-          <Avatar 
-            sx={{ 
+          <Avatar
+            sx={{
               color: "white",
-              width: 35, 
-              height: 35, 
+              width: 35,
+              height: 35,
               marginTop: 2,
               marginBottom: 1,
               bgcolor: respondent.color,
               marginLeft: 1,
-              fontSize: 17
-            }}>
+              fontSize: 17,
+            }}
+          >
             {message.sender.slice(0, 2)}
           </Avatar>
-        )
+        );
       }
 
-      formattedMessages.push(mapMessage(message))
+      formattedMessages.push(mapMessage(message));
 
-      prevSendDate = message.datetime
-      prevSender = message.sender
+      prevSendDate = message.datetime;
+      prevSender = message.sender;
     }
 
     formattedMessages.push(
-      <div className="ec-message-container message-timestamp">
+      <div
+        className="ec-message-container message-timestamp"
+        style={{
+          fontFamily: "var(--mom-cake)",
+          fontSize: 20,
+        }}
+      >
         event created
       </div>
-    )
+    );
 
-    return formattedMessages 
-  }
+    return formattedMessages;
+  };
 
   const mapMessage = (message: Message): React.ReactNode => {
     const memberIsSender = message.sender === member;
